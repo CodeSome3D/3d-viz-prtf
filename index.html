@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D CGI & Visualization Portfolio | Works & Renders</title>
+  <meta name="description" content="Portfolio of high-end 3D renderings, archviz scenes, and hard-surface visualizations showcasing projects created with Blender, 3ds Max, Maya, Houdini, and Cinema 4D.">
+  <meta name="keywords" content="3D artist, portfolio, CGI, rendering, Blender, 3ds Max, Corona, Cycles, V-Ray, Arnold, Octane, Redshift">
+
+  <!-- OpenGraph / Social Cards -->
+  <meta property="og:title" content="3D CGI & Visualization Portfolio">
+  <meta property="og:description" content="Explore hard-surface models, architectural visualization, and digital art with full DCC & Renderer technical breakdowns.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/001_Mayekawa_Sauna_01.jpg">
+
+  <!-- Fonts: Outfit (modern sans) & JetBrains Mono (technical monospace) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ======================================================================
+       NAVIGATION HEADER
+       ====================================================================== -->
+  <header class="site-header">
+    <div class="container nav-content">
+      <a href="#" class="brand-wrapper" aria-label="Egor Baklykov — 3D Content Creation & Visualization">
+        <div class="brand-avatar">
+          <img src="assets/EB_avatar_office.png" alt="Egor Baklykov" class="brand-avatar-img">
+        </div>
+        <div class="brand-titles">
+          <span class="brand-name">Egor Baklykov</span>
+          <span class="brand-subtitle">3D Content Creation & Visualization</span>
+        </div>
+      </a>
+
+      <nav class="nav-actions" aria-label="Portfolio Tools">
+        <button type="button" id="btnOpenEditor" class="btn btn-secondary admin-only" title="Edit artwork names, DCCs, and renderers (Owner Mode)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span>Edit Metadata</span>
+        </button>
+
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="View on GitHub">
+          <svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       HERO INTRODUCTION
+       ====================================================================== -->
+  <section class="hero-section">
+    <div class="container hero-content">
+      <h1 class="hero-title">
+        <span class="gradient-text">Product Visualization</span>
+      </h1>
+
+      <p class="hero-description">
+        A curated showcase of product imagery, concept art and architectural visualizations. Each project includes technical breakdowns detailing the DCC authoring software and render engine utilized.
+      </p>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       CONTROLS & FILTER TOOLBAR (2 Slim Rows)
+       ====================================================================== -->
+  <section class="controls-panel" aria-label="Filters and Search">
+    <div class="container controls-grid">
+      <!-- Row 1: Search, Sort, Layout & Status Counter -->
+      <div class="controls-row-main">
+        <div class="search-wrapper">
+          <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input 
+            type="search" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search projects, tools..." 
+            autocomplete="off"
+            aria-label="Search portfolio"
+          >
+          <button type="button" id="searchClear" class="search-clear" title="Clear search">✕</button>
+        </div>
+
+        <div class="view-tools">
+          <select id="sortSelect" class="sort-select" aria-label="Sort Artworks">
+            <option value="default">Default Order</option>
+            <option value="name-asc">Name (A → Z)</option>
+            <option value="name-desc">Name (Z → A)</option>
+            <option value="year-desc">Newest Year</option>
+          </select>
+
+          <div class="layout-toggle-group" role="group" aria-label="Grid layout toggle">
+            <button type="button" id="btnLayoutMasonry" class="layout-btn active" title="Masonry Flow" aria-label="Masonry layout">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="11" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="17" width="7" height="4" rx="1.5"/></svg>
+            </button>
+            <button type="button" id="btnLayoutGrid" class="layout-btn" title="Uniform Grid" aria-label="Uniform grid layout">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </button>
+          </div>
+
+          <div class="results-status">
+            <span id="resultsCount">22 works</span>
+            <button type="button" id="resetFiltersBtn" class="reset-filters-btn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: DCC and Renderer Filter Chips in One Unified Line -->
+      <div class="filter-row-unified">
+        <div class="filter-subgroup">
+          <span class="filter-label">DCC:</span>
+          <div class="chip-list" id="dccFilterList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="filter-divider" aria-hidden="true"></div>
+
+        <div class="filter-subgroup">
+          <span class="filter-label">Renderer:</span>
+          <div class="chip-list" id="rndFilterList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       GALLERY DISPLAY
+       ====================================================================== -->
+  <main class="container gallery-container">
+    <div id="galleryGrid" class="gallery-grid layout-masonry">
+      <!-- Art Cards dynamically injected by app.js -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" role="status">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+      <h3>No matching artworks found</h3>
+      <p>Try adjusting your search keywords, clearing DCC/Renderer filter chips, or resetting your filter criteria.</p>
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('resetFiltersBtn').click()">Reset Filters</button>
+    </div>
+  </main>
+
+  <!-- ======================================================================
+       FULLSCREEN LIGHTBOX MODAL (<dialog>)
+       ====================================================================== -->
+  <dialog id="lightboxModal" class="lightbox-dialog" aria-labelledby="lightboxTitle" closedby="any">
+    <div class="lightbox-wrapper">
+      <!-- Main Image Stage -->
+      <div class="lightbox-stage">
+        <button type="button" id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" aria-label="Previous Artwork">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+
+        <div id="lightboxImgContainer" class="lightbox-img-container" title="Scroll wheel to zoom, drag to pan">
+          <img id="lightboxImg" class="lightbox-img" src="" alt="Artwork High Resolution View">
+        </div>
+
+        <button type="button" id="lightboxNext" class="lightbox-nav-btn lightbox-next" aria-label="Next Artwork">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <!-- Stage Zoom Bar -->
+        <div class="stage-controls">
+          <button type="button" id="zoomOutBtn" class="stage-btn" title="Zoom Out (-)">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <span id="zoomLevelText" class="zoom-level-text">100%</span>
+          <button type="button" id="zoomInBtn" class="stage-btn" title="Zoom In (+)">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <button type="button" id="zoomResetBtn" class="stage-btn" title="Reset Zoom (0)">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Detail Sidebar -->
+      <aside class="lightbox-sidebar">
+        <div class="sidebar-header">
+          <span id="lightboxCounter" class="item-counter">0 / 0</span>
+          <button type="button" id="lightboxClose" class="close-btn" aria-label="Close Lightbox">✕</button>
+        </div>
+
+        <h2 id="lightboxTitle" class="sidebar-title">Artwork Title</h2>
+
+        <div class="specs-card">
+          <div class="spec-row">
+            <span class="spec-key">DCC Tools</span>
+            <div id="lightboxDcc" class="art-badges-inline spec-val"></div>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Render Engine</span>
+            <span id="lightboxRenderer" class="badge-rnd spec-val">Cycles</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Category</span>
+            <span id="lightboxCategory" class="spec-val">Archviz</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Year</span>
+            <span id="lightboxYear" class="spec-val">2024</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Resolution</span>
+            <span id="lightboxDimensions" class="spec-val">Checking...</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">File</span>
+            <span id="lightboxFilename" class="spec-val" style="font-size:0.75rem; word-break: break-all;">image.jpg</span>
+          </div>
+        </div>
+
+        <p id="lightboxDesc" class="sidebar-desc">
+          Project notes and details.
+        </p>
+
+        <div class="sidebar-actions">
+          <button type="button" id="lightboxEditBtn" class="btn btn-secondary admin-only">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            Edit This Artwork
+          </button>
+        </div>
+      </aside>
+    </div>
+  </dialog>
+
+  <!-- ======================================================================
+       METADATA EDITOR / EXPORTER MODAL (<dialog>)
+       ====================================================================== -->
+  <dialog id="editorModal" class="editor-dialog" aria-labelledby="editorModalTitle" closedby="any">
+    <div class="editor-window">
+      <div class="editor-header">
+        <h3 id="editorModalTitle">
+          <svg width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Portfolio Metadata Inspector
+        </h3>
+        <button type="button" id="editorClose" class="close-btn" aria-label="Close Editor">✕</button>
+      </div>
+
+      <div class="editor-body">
+        <div class="editor-selector-row">
+          <label for="selectWorkItem" class="form-label">Select Artwork to Edit</label>
+          <select id="selectWorkItem" class="form-control">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <div class="editor-preview-strip">
+          <img id="editorPreviewImg" class="editor-preview-img" src="" alt="Thumbnail preview">
+          <div class="editor-preview-info">
+            <span id="editorPreviewTitle" class="editor-preview-title">Mayekawa Sauna</span>
+            <span id="editorPreviewFile" class="editor-preview-file">images/001_Mayekawa_Sauna_01.jpg</span>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div>
+            <label for="editFieldTitle" class="form-label">Artwork Name / Title</label>
+            <input type="text" id="editFieldTitle" class="form-control" placeholder="e.g. Modern Villa Exterior">
+          </div>
+
+          <div>
+            <label for="editFieldCategory" class="form-label">Category</label>
+            <select id="editFieldCategory" class="form-control">
+              <option value="Archviz">Archviz</option>
+              <option value="Product">Product</option>
+              <option value="Hard Surface">Hard Surface</option>
+              <option value="Concept Art">Concept Art</option>
+              <option value="Automotive">Automotive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div>
+            <label class="form-label">DCC Tools (Select one or more)</label>
+            <div class="dcc-selection-grid" id="dccCheckboxGroup">
+              <label class="dcc-checkbox-label">
+                <input type="checkbox" value="3ds Max"> 3ds Max
+              </label>
+              <label class="dcc-checkbox-label">
+                <input type="checkbox" value="Blender"> Blender
+              </label>
+              <label class="dcc-checkbox-label">
+                <input type="checkbox" value="Cinema 4D"> Cinema 4D
+              </label>
+              <label class="dcc-checkbox-label">
+                <input type="checkbox" value="Autodesk Fusion"> Autodesk Fusion
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="editFieldRnd" class="form-label">Render Engine</label>
+            <select id="editFieldRnd" class="form-control">
+              <option value="Corona">Corona</option>
+              <option value="Cycles">Cycles</option>
+              <option value="Redshift">Redshift</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div>
+            <label for="editFieldYear" class="form-label">Year</label>
+            <select id="editFieldYear" class="form-control">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="editFieldDesc" class="form-label">Short Description</label>
+            <input type="text" id="editFieldDesc" class="form-control" placeholder="Lighting style, materials, notes...">
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-footer">
+        <div class="editor-footer-left">
+          <button type="button" id="btnSaveItem" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save Changes
+          </button>
+          <button type="button" id="btnAddNewWork" class="btn btn-secondary">
+            + Add New Image
+          </button>
+        </div>
+
+        <div class="editor-footer-right">
+          <button type="button" id="btnCopyJs" class="btn btn-outline" title="Copy updated works.js code to clipboard">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Copy Code
+          </button>
+          <button type="button" id="btnDownloadJs" class="btn btn-secondary" title="Download updated works.js to replace data/works.js">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Download works.js
+          </button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ======================================================================
+       FOOTER
+       ====================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <span class="footer-title">3D CGI & Visualization Portfolio</span>
+        <span class="footer-note">Optimized for GitHub Pages • Pure HTML5, CSS & Vanilla JS (Zero Build)</span>
+      </div>
+
+      <div class="footer-links">
+        <button type="button" id="btnToggleAdmin" class="footer-link" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Owner Editor Access (Alt+E)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span>Owner Access</span>
+        </button>
+        <a href="#top" class="footer-link">Back to Top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data/works.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/editor.js"></script>
+</body>
+</html>

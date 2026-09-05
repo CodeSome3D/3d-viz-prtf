@@ -96,16 +96,16 @@
           </select>
 
           <div class="layout-toggle-group" role="group" aria-label="Grid layout toggle">
-            <button type="button" id="btnLayoutMasonry" class="layout-btn active" title="Masonry Flow" aria-label="Masonry layout">
+            <button type="button" id="btnLayoutMasonry" class="layout-btn" title="Masonry Flow" aria-label="Masonry layout">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="11" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="17" width="7" height="4" rx="1.5"/></svg>
             </button>
-            <button type="button" id="btnLayoutGrid" class="layout-btn" title="Uniform Grid" aria-label="Uniform grid layout">
+            <button type="button" id="btnLayoutGrid" class="layout-btn active" title="Uniform Grid" aria-label="Uniform grid layout">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
             </button>
           </div>
 
           <div class="results-status">
-            <span id="resultsCount">22 works</span>
+            <span id="resultsCount">29 works</span>
             <button type="button" id="resetFiltersBtn" class="reset-filters-btn">Reset</button>
           </div>
         </div>
@@ -136,7 +136,7 @@
        GALLERY DISPLAY
        ====================================================================== -->
   <main class="container gallery-container">
-    <div id="galleryGrid" class="gallery-grid layout-masonry">
+    <div id="galleryGrid" class="gallery-grid layout-grid">
       <!-- Art Cards dynamically injected by app.js -->
     </div>
 
@@ -209,14 +209,6 @@
             <span class="spec-key">Year</span>
             <span id="lightboxYear" class="spec-val">2024</span>
           </div>
-          <div class="spec-row">
-            <span class="spec-key">Resolution</span>
-            <span id="lightboxDimensions" class="spec-val">Checking...</span>
-          </div>
-          <div class="spec-row">
-            <span class="spec-key">File</span>
-            <span id="lightboxFilename" class="spec-val" style="font-size:0.75rem; word-break: break-all;">image.jpg</span>
-          </div>
         </div>
 
         <p id="lightboxDesc" class="sidebar-desc">
@@ -246,86 +238,259 @@
         <button type="button" id="editorClose" class="close-btn" aria-label="Close Editor">✕</button>
       </div>
 
+      <div class="editor-tabs" role="tablist">
+        <button type="button" id="tabEditExisting" class="editor-tab-btn active" role="tab" aria-selected="true">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          Edit Existing Artwork
+        </button>
+        <button type="button" id="tabAddNew" class="editor-tab-btn" role="tab" aria-selected="false">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          + Add New Artwork
+        </button>
+      </div>
+
       <div class="editor-body">
-        <div class="editor-selector-row">
-          <label for="selectWorkItem" class="form-label">Select Artwork to Edit</label>
-          <select id="selectWorkItem" class="form-control">
-            <!-- Populated via JS -->
-          </select>
-        </div>
-
-        <div class="editor-preview-strip">
-          <img id="editorPreviewImg" class="editor-preview-img" src="" alt="Thumbnail preview">
-          <div class="editor-preview-info">
-            <span id="editorPreviewTitle" class="editor-preview-title">Mayekawa Sauna</span>
-            <span id="editorPreviewFile" class="editor-preview-file">images/001_Mayekawa_Sauna_01.jpg</span>
-          </div>
-        </div>
-
-        <div class="form-grid-2">
-          <div>
-            <label for="editFieldTitle" class="form-label">Artwork Name / Title</label>
-            <input type="text" id="editFieldTitle" class="form-control" placeholder="e.g. Modern Villa Exterior">
-          </div>
-
-          <div>
-            <label for="editFieldCategory" class="form-label">Category</label>
-            <select id="editFieldCategory" class="form-control">
-              <option value="Archviz">Archviz</option>
-              <option value="Product">Product</option>
-              <option value="Hard Surface">Hard Surface</option>
-              <option value="Concept Art">Concept Art</option>
-              <option value="Automotive">Automotive</option>
+        <!-- PANEL 1: EDIT EXISTING ARTWORK -->
+        <div id="panelEditExisting" class="editor-panel">
+          <div class="editor-selector-row">
+            <label for="selectWorkItem" class="form-label">Select Artwork to Edit</label>
+            <select id="selectWorkItem" class="form-control">
+              <!-- Populated via JS -->
             </select>
           </div>
+
+          <div class="editor-preview-strip">
+            <img id="editorPreviewImg" class="editor-preview-img" src="" alt="Thumbnail preview">
+            <div class="editor-preview-info">
+              <span id="editorPreviewTitle" class="editor-preview-title">Mayekawa Sauna</span>
+              <span id="editorPreviewFile" class="editor-preview-file">images/001_Mayekawa_Sauna_01.jpg</span>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label for="editFieldTitle" class="form-label">Artwork Name / Title</label>
+              <input type="text" id="editFieldTitle" class="form-control" placeholder="e.g. Modern Villa Exterior">
+            </div>
+
+            <div>
+              <label for="editFieldCategory" class="form-label">Category</label>
+              <select id="editFieldCategory" class="form-control">
+                <option value="Archviz">Archviz</option>
+                <option value="Product">Product</option>
+                <option value="Hard Surface">Hard Surface</option>
+                <option value="Concept Art">Concept Art</option>
+                <option value="Automotive">Automotive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label class="form-label">DCC Tools (Select one or more)</label>
+              <div class="dcc-selection-grid" id="dccCheckboxGroup">
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="3ds Max"> 3ds Max
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="Blender"> Blender
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="Cinema 4D"> Cinema 4D
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="Autodesk Fusion"> Autodesk Fusion
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="ZBrush"> ZBrush
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="editFieldRnd" class="form-label">Render Engine</label>
+              <select id="editFieldRnd" class="form-control">
+                <option value="Corona">Corona</option>
+                <option value="Cycles">Cycles</option>
+                <option value="Redshift">Redshift</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label for="editFieldYear" class="form-label">Year</label>
+              <select id="editFieldYear" class="form-control">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+                <option value="2014">2014</option>
+                <option value="2013">2013</option>
+                <option value="2012">2012</option>
+                <option value="2011">2011</option>
+                <option value="2010">2010</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="editFieldDesc" class="form-label">Short Description</label>
+              <input type="text" id="editFieldDesc" class="form-control" placeholder="Lighting style, materials, notes...">
+            </div>
+          </div>
         </div>
 
-        <div class="form-grid-2">
-          <div>
-            <label class="form-label">DCC Tools (Select one or more)</label>
-            <div class="dcc-selection-grid" id="dccCheckboxGroup">
-              <label class="dcc-checkbox-label">
-                <input type="checkbox" value="3ds Max"> 3ds Max
-              </label>
-              <label class="dcc-checkbox-label">
-                <input type="checkbox" value="Blender"> Blender
-              </label>
-              <label class="dcc-checkbox-label">
-                <input type="checkbox" value="Cinema 4D"> Cinema 4D
-              </label>
-              <label class="dcc-checkbox-label">
-                <input type="checkbox" value="Autodesk Fusion"> Autodesk Fusion
-              </label>
+        <!-- PANEL 2: DEDICATED ADD NEW ARTWORK FORM -->
+        <div id="panelAddNew" class="editor-panel" style="display: none;">
+          <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1.1rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+            <strong style="color: #fff;">How to add an image:</strong> Save your image file into the project's <code style="color: var(--accent-cyan);">images/</code> folder (e.g. <code>030_MyArtwork.jpg</code>), enter its filename below, and fill in the details. It will be added to the portfolio instantly!
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label for="newFieldFile" class="form-label">Image File Name (in images/)</label>
+              <input type="text" id="newFieldFile" class="form-control" placeholder="e.g. 030_NewRender.jpg" autocomplete="off">
+            </div>
+
+            <div>
+              <label for="newFieldTitle" class="form-label">Artwork Name / Title</label>
+              <input type="text" id="newFieldTitle" class="form-control" placeholder="e.g. Modern Villa Pavilion">
+            </div>
+          </div>
+
+          <!-- Dynamic Live Preview of the new image -->
+          <div class="editor-preview-strip" id="newPreviewStrip" style="display: none;">
+            <img id="newPreviewImg" class="editor-preview-img" src="" alt="Thumbnail preview">
+            <div class="editor-preview-info">
+              <span id="newPreviewTitleText" class="editor-preview-title">Preview</span>
+              <span id="newPreviewPathText" class="editor-preview-file">images/...</span>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label class="form-label">DCC Tools (Select one or more)</label>
+              <div class="dcc-selection-grid" id="newDccCheckboxGroup">
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="3ds Max"> 3ds Max
+                </label>
+                <label class="dcc-checkbox-label is-checked">
+                  <input type="checkbox" value="Blender" checked> Blender
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="Cinema 4D"> Cinema 4D
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="Autodesk Fusion"> Autodesk Fusion
+                </label>
+                <label class="dcc-checkbox-label">
+                  <input type="checkbox" value="ZBrush"> ZBrush
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="newFieldRnd" class="form-label">Render Engine</label>
+              <select id="newFieldRnd" class="form-control">
+                <option value="Corona">Corona</option>
+                <option value="Cycles" selected>Cycles</option>
+                <option value="Redshift">Redshift</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div>
+              <label for="newFieldCategory" class="form-label">Category</label>
+              <select id="newFieldCategory" class="form-control">
+                <option value="Archviz">Archviz</option>
+                <option value="Product">Product</option>
+                <option value="Hard Surface">Hard Surface</option>
+                <option value="Concept Art" selected>Concept Art</option>
+                <option value="Automotive">Automotive</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="newFieldYear" class="form-label">Year</label>
+              <select id="newFieldYear" class="form-control">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024" selected>2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+                <option value="2014">2014</option>
+                <option value="2013">2013</option>
+                <option value="2012">2012</option>
+                <option value="2011">2011</option>
+                <option value="2010">2010</option>
+              </select>
             </div>
           </div>
 
           <div>
-            <label for="editFieldRnd" class="form-label">Render Engine</label>
-            <select id="editFieldRnd" class="form-control">
-              <option value="Corona">Corona</option>
-              <option value="Cycles">Cycles</option>
-              <option value="Redshift">Redshift</option>
-            </select>
+            <label for="newFieldDesc" class="form-label">Short Description</label>
+            <input type="text" id="newFieldDesc" class="form-control" placeholder="Lighting notes, camera setup, materials, or project concept...">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" id="btnSubmitNewWork" class="btn btn-primary" style="padding: 0.7rem 1.5rem;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              Add to Portfolio Gallery
+            </button>
           </div>
         </div>
 
-        <div class="form-grid-2">
-          <div>
-            <label for="editFieldYear" class="form-label">Year</label>
-            <select id="editFieldYear" class="form-control">
-              <option value="2026">2026</option>
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              <option value="2020">2020</option>
-            </select>
+        <!-- GitHub Sync & Deployment Section -->
+        <div class="editor-sync-box">
+          <div class="sync-box-header" id="syncHeaderToggle" role="button" tabindex="0">
+            <span class="sync-box-title">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              Direct GitHub Sync (Publish to GitHub Pages)
+            </span>
+            <span class="sync-arrow" id="syncArrow">▼</span>
           </div>
 
-          <div>
-            <label for="editFieldDesc" class="form-label">Short Description</label>
-            <input type="text" id="editFieldDesc" class="form-control" placeholder="Lighting style, materials, notes...">
+          <div class="sync-box-body" id="syncBoxBody">
+            <p class="sync-hint">
+              Changes are saved in this browser via <strong>localStorage</strong> (they will not disappear on page refresh). To publish them live for all visitors worldwide on GitHub Pages, commit directly using a GitHub Token below:
+            </p>
+            <div class="form-grid-2" style="margin-top: 0.75rem;">
+              <div>
+                <label for="ghRepoInput" class="form-label">GitHub Repository (owner/repo)</label>
+                <input type="text" id="ghRepoInput" class="form-control" placeholder="username/portfolio_rend">
+              </div>
+              <div>
+                <label for="ghBranchInput" class="form-label">Branch</label>
+                <input type="text" id="ghBranchInput" class="form-control" value="main">
+              </div>
+            </div>
+            <div style="margin-top: 0.75rem;">
+              <label for="ghTokenInput" class="form-label">GitHub Personal Access Token (repo scope)</label>
+              <input type="password" id="ghTokenInput" class="form-control" placeholder="ghp_... (saved securely in your browser only)">
+            </div>
+            <div class="sync-button-row" style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <button type="button" id="btnPushGitHub" class="btn btn-primary">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                Commit &amp; Push to GitHub
+              </button>
+              <span id="ghSyncStatus" class="sync-status" style="font-family: var(--font-mono); font-size: 0.8rem;"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -338,6 +503,9 @@
           </button>
           <button type="button" id="btnAddNewWork" class="btn btn-secondary">
             + Add New Image
+          </button>
+          <button type="button" id="btnResetDefaults" class="btn btn-outline" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3);" title="Revert all local changes back to the original repository data">
+            Reset to Repo
           </button>
         </div>
 
@@ -355,6 +523,45 @@
     </div>
   </dialog>
 
+  <!-- ======================================================================
+       OWNER AUTHENTICATION MODAL (<dialog>)
+       ====================================================================== -->
+  <dialog id="authModal" class="editor-dialog" aria-labelledby="authModalTitle" closedby="any">
+    <div class="editor-window" style="max-width: 440px; margin: auto;">
+      <div class="editor-header">
+        <h3 id="authModalTitle" style="font-size: 1.1rem;">
+          <svg width="18" height="18" fill="none" stroke="#38bdf8" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Owner Authentication
+        </h3>
+        <button type="button" id="authClose" class="close-btn" aria-label="Close">✕</button>
+      </div>
+
+      <form id="authForm" class="editor-body" style="gap: 1.25rem;">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+          Enter the owner password to access editing and metadata management tools.
+        </p>
+
+        <div>
+          <label for="authPasswordInput" class="form-label">Password</label>
+          <input 
+            type="password" 
+            id="authPasswordInput" 
+            class="form-control" 
+            placeholder="Enter password..." 
+            autocomplete="current-password"
+            required
+          >
+          <div id="authErrorMsg" style="color: #f87171; font-size: 0.8rem; margin-top: 0.5rem; display: none;"></div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; margin-top: 0.25rem;">
+          <button type="button" id="authCancelBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="authSubmitBtn" class="btn btn-primary">Unlock</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
@@ -369,7 +576,7 @@
       </div>
 
       <div class="footer-links">
-        <button type="button" id="btnToggleAdmin" class="footer-link" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Owner Editor Access (Alt+E)">
+        <button type="button" id="btnToggleAdmin" class="footer-link" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Owner Editor Access (Ctrl+Alt+E)">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           <span>Owner Access</span>
         </button>

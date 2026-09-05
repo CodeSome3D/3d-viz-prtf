@@ -7,7 +7,7 @@ A modern, high-aesthetic portfolio web application tailored for 3D artists, ligh
 ## ✨ Features
 
 - **Custom Metadata Per Image**:
-  - **DCC Tools** (multi-select supported!): *3ds Max*, *Blender*, *Cinema 4D*, *Autodesk Fusion*.
+  - **DCC Tools** (multi-select supported!): *3ds Max*, *Blender*, *Cinema 4D*, *Autodesk Fusion*, *ZBrush*.
   - **Render Engines**: *Corona*, *Cycles*, *Redshift*.
   - **Category**: *Archviz*, *Product*, *Hard Surface*, *Concept Art*, *Automotive*.
   - **Year & Description**.
@@ -15,7 +15,7 @@ A modern, high-aesthetic portfolio web application tailored for 3D artists, ligh
 - **GitHub Pages Ready**: Zero build dependencies, pure HTML5, modern Vanilla CSS, and modular JavaScript. Uses relative paths so it functions immediately on `https://<username>.github.io/<repo>/`.
 - **Owner Mode & Privacy**:
   - Regular visitors to your GitHub Pages site **only see your clean portfolio** with all edit controls hidden.
-  - You can open Owner Mode anytime by pressing **`Alt + E`** (or visiting with `?edit=1`), or clicking the discrete **"🔒 Owner Access"** button in the footer.
+  - You can open Owner Mode anytime by pressing **`Ctrl + Alt + E`** (or visiting with `?edit=1`), or clicking the discrete **"🔒 Owner Access"** button in the footer.
   - Since GitHub Pages is static, changes made in a browser cannot alter your GitHub repository directly. You can update values in the browser, download `works.js`, or edit `data/works.js` directly in your code editor and commit it.
 - **Interactive Lightbox Modal**: Native HTML `<dialog>` with backdrop blur, full-resolution display, dynamic image resolution calculation, zoom & pan controls, and keyboard navigation (Left/Right arrows, Escape).
 - **Instant Filtering & Search**:
@@ -50,20 +50,32 @@ A modern, high-aesthetic portfolio web application tailored for 3D artists, ligh
 
 ---
 
-## 📝 How to Fill or Edit Your Images' Metadata
+## 📝 How to Save & Publish Your Metadata Changes
 
-You have two easy ways to customize the Name, DCC, and Renderer:
+Because GitHub Pages is a static host without a backend database:
 
-### Option A: Using the On-Page Visual Editor (Recommended)
-1. Open `index.html` in your browser.
-2. Click the **"Edit Metadata"** button in the top right.
-3. Select any artwork from the dropdown list.
-4. Modify the **Artwork Name**, **DCC Software**, **Render Engine**, **Category**, or **Description**.
-5. Click **"Save Changes"** to see it instantly update on the page!
-6. Click **"Download works.js"** (or "Copy Code") and replace `data/works.js` with your updated file.
+### 1. Instant Browser Persistence (`localStorage`)
+- Any change you make in the on-page editor and click **"Save Changes"** is **automatically saved to your browser** (`localStorage`).
+- **Refreshing the page or reopening the browser will NOT lose your edits.**
 
-### Option B: Editing `data/works.js` Directly in your Code Editor
-Open `data/works.js` in VS Code or any text editor. Each artwork is defined as an object:
+### 2. Making Changes Live on GitHub Pages (for everyone):
+Choose either option:
+
+#### Option A: One-Click Direct GitHub Sync (Recommended)
+1. In the **Metadata Inspector** modal, expand **"Direct GitHub Sync"**.
+2. Enter your repository (`username/portfolio_rend`) and a GitHub Personal Access Token (with `repo` write permission).
+3. Click **"Commit & Push to GitHub"**.
+4. The site commits `data/works.js` directly to your GitHub repository! GitHub Pages will build and update automatically in ~60 seconds.
+
+#### Option B: Download & Git Push
+1. In the on-page editor, click **"Download works.js"** (or **"Copy Code"**).
+2. Replace [`data/works.js`](file:///c:/Users/Egor/.gemini/antigravity/scratch/portfolio_rend/data/works.js) with your downloaded file.
+3. Commit and push:
+   ```bash
+   git add data/works.js
+   git commit -m "Update portfolio metadata"
+   git push
+   ```
 
 ```javascript
 {

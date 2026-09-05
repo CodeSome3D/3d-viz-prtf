@@ -1,8 +1,8 @@
 /**
  * PORTFOLIO WORKS DATA
  * ----------------------------------------------------
- * Allowed DCC Tools: "3ds Max", "Blender", "Cinema 4D", "Autodesk Fusion"
- * (Supports multiple DCC tools per artwork in an array, e.g. ["3ds Max", "Autodesk Fusion"])
+ * Allowed DCC Tools: "3ds Max", "Blender", "Cinema 4D", "Autodesk Fusion", "ZBrush"
+ * (Supports multiple DCC tools per artwork in an array, e.g. ["3ds Max", "ZBrush"])
  *
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
  */
@@ -227,5 +227,75 @@ window.PORTFOLIO_WORKS = [
     category: "Hard Surface",
     year: "2024",
     description: "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling."
+  },
+  {
+    id: "023",
+    name: "Surreal Form Study — Art 05",
+    file: "images/023_Art_05.jpg",
+    dcc: ["Cinema 4D"],
+    renderer: "Redshift",
+    category: "Concept Art",
+    year: "2024",
+    description: "Digital sculpture exploration with dynamic organic flow and specular highlights."
+  },
+  {
+    id: "024",
+    name: "Luminescent Composition — Art 06",
+    file: "images/024_Art_06.jpg",
+    dcc: ["Cinema 4D"],
+    renderer: "Redshift",
+    category: "Concept Art",
+    year: "2024",
+    description: "Procedural geometry and intricate light interplay in an abstract conceptual space."
+  },
+  {
+    id: "025",
+    name: "Typography & Material Study — Font 01",
+    file: "images/025_Font_01.jpg",
+    dcc: ["Blender"],
+    renderer: "Cycles",
+    category: "Product",
+    year: "2024",
+    description: "Tactile 3D typographic visualization exploring surface wear, micro-bump textures and studio lighting."
+  },
+  {
+    id: "026",
+    name: "Complex Organic Structures — Art 07",
+    file: "images/026_Art_07.jpg",
+    dcc: ["Blender", "Autodesk Fusion"],
+    renderer: "Cycles",
+    category: "Concept Art",
+    year: "2024",
+    description: "Generative organic lattice structure rendered with high-precision refractive glass and internal caustics."
+  },
+  {
+    id: "027",
+    name: "Monolithic Geometry — Art 08",
+    file: "images/027_Art_08.jpg",
+    dcc: ["Cinema 4D"],
+    renderer: "Redshift",
+    category: "Concept Art",
+    year: "2024",
+    description: "Monolithic sculpture rendering featuring atmospheric volumetric scattering and dramatic directional light."
+  },
+  {
+    id: "028",
+    name: "Embossed Typography — Font 02",
+    file: "images/028_Font_02.jpg",
+    dcc: ["Blender", "Autodesk Fusion"],
+    renderer: "Cycles",
+    category: "Product",
+    year: "2024",
+    description: "Hard-surface custom typographic relief with precision bevels and metallic sheen."
+  },
+  {
+    id: "029",
+    name: "Abstract Spatial Synthesis — Art 09",
+    file: "images/029_Art_08.jpg",
+    dcc: ["3ds Max"],
+    renderer: "Corona",
+    category: "Concept Art",
+    year: "2024",
+    description: "Atmospheric abstract concept art exploring balanced spatial geometry, tone, and depth."
   }
 ];

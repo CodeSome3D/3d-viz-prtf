@@ -9,18 +9,52 @@
   'use strict';
 
   // Allowed Filter Values requested by artist
-  const ALLOWED_DCCS = ['3ds Max', 'Blender', 'Cinema 4D', 'Autodesk Fusion'];
+  const ALLOWED_DCCS = ['3ds Max', 'Blender', 'Cinema 4D', 'Autodesk Fusion', 'ZBrush'];
   const ALLOWED_RENDERERS = ['Corona', 'Cycles', 'Redshift'];
+
+  // Helper to load initial works from localStorage or fallback to default data file
+  function loadInitialWorks() {
+    const defaultWorks = Array.isArray(window.PORTFOLIO_WORKS) ? [...window.PORTFOLIO_WORKS] : [];
+    try {
+      const saved = localStorage.getItem('portfolio_saved_works');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Merge: Keep parsed items, but append any default items whose id or file is not in parsed
+          const existingKeys = new Set(parsed.map(w => w.id || w.file));
+          let hasNew = false;
+          for (const item of defaultWorks) {
+            const key = item.id || item.file;
+            if (!existingKeys.has(key)) {
+              parsed.push(item);
+              existingKeys.add(key);
+              hasNew = true;
+            }
+          }
+          if (hasNew) {
+            try {
+              localStorage.setItem('portfolio_saved_works', JSON.stringify(parsed));
+            } catch (e) {}
+          }
+          window.PORTFOLIO_WORKS = parsed;
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read saved works from localStorage', e);
+    }
+    return defaultWorks;
+  }
 
   // State Management
   const state = {
-    works: Array.isArray(window.PORTFOLIO_WORKS) ? [...window.PORTFOLIO_WORKS] : [],
+    works: loadInitialWorks(),
     filteredWorks: [],
     selectedDcc: 'all',
     selectedRenderer: 'all',
     searchQuery: '',
     sortBy: 'default',
-    layout: 'masonry',
+    layout: 'grid',
     currentLightboxIndex: -1,
     zoomLevel: 1,
     panOffset: { x: 0, y: 0 },
@@ -67,8 +101,6 @@
     lightboxRenderer: document.getElementById('lightboxRenderer'),
     lightboxCategory: document.getElementById('lightboxCategory'),
     lightboxYear: document.getElementById('lightboxYear'),
-    lightboxDimensions: document.getElementById('lightboxDimensions'),
-    lightboxFilename: document.getElementById('lightboxFilename'),
     lightboxDesc: document.getElementById('lightboxDesc'),
     lightboxEditBtn: document.getElementById('lightboxEditBtn'),
     zoomInBtn: document.getElementById('zoomInBtn'),
@@ -76,8 +108,14 @@
     zoomResetBtn: document.getElementById('zoomResetBtn'),
     zoomLevelText: document.getElementById('zoomLevelText'),
 
-    // Admin & Toast
+    // Admin & Auth Elements
     btnToggleAdmin: document.getElementById('btnToggleAdmin'),
+    authModal: document.getElementById('authModal'),
+    authClose: document.getElementById('authClose'),
+    authCancelBtn: document.getElementById('authCancelBtn'),
+    authForm: document.getElementById('authForm'),
+    authPasswordInput: document.getElementById('authPasswordInput'),
+    authErrorMsg: document.getElementById('authErrorMsg'),
     toastContainer: document.getElementById('toastContainer'),
 
     // Header Stats
@@ -85,6 +123,18 @@
     statDccCount: document.getElementById('statDccCount'),
     statRndCount: document.getElementById('statRndCount')
   };
+
+  // --- CRYPTOGRAPHIC OWNER AUTHENTICATION ---
+  // One-way SHA-256 hash of password "GBs13L168MKp" (never stored as plain text)
+  const OWNER_PWD_HASH = 'dbd1648af1f6d81bca373e98aa28e5547b88063949bd16fcd8202174f742916e';
+
+  async function computeSha256(str) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
 
   // --- INITIALIZATION ---
   function init() {
@@ -94,29 +144,79 @@
     applyFilters();
     bindEvents();
     bindLightboxEvents();
+    bindAuthEvents();
   }
 
-  // --- ADMIN MODE TOGGLE ---
+  // --- ADMIN & AUTH MODE ---
   function initAdminMode() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasAdminParam = urlParams.has('edit') || urlParams.has('admin');
-    const isStoredAdmin = localStorage.getItem('portfolio_editor_mode') === 'true';
-
-    if (hasAdminParam || isStoredAdmin) {
+    const isSessionAuth = sessionStorage.getItem('portfolio_owner_authenticated') === 'true';
+    if (isSessionAuth) {
       document.body.classList.add('is-admin');
-      localStorage.setItem('portfolio_editor_mode', 'true');
+    }
+  }
+
+  function openAuthModal() {
+    if (!elements.authModal) return;
+    elements.authPasswordInput.value = '';
+    elements.authErrorMsg.style.display = 'none';
+    elements.authModal.showModal();
+    setTimeout(() => elements.authPasswordInput.focus(), 80);
+  }
+
+  function closeAuthModal() {
+    if (elements.authModal && elements.authModal.open) {
+      elements.authModal.close();
+    }
+  }
+
+  async function handleAuthSubmit(e) {
+    e.preventDefault();
+    const inputVal = elements.authPasswordInput.value.trim();
+    if (!inputVal) return;
+
+    const inputHash = await computeSha256(inputVal);
+
+    if (inputHash === OWNER_PWD_HASH) {
+      document.body.classList.add('is-admin');
+      sessionStorage.setItem('portfolio_owner_authenticated', 'true');
+      closeAuthModal();
+      window.PORTFOLIO_APP.showToast('Owner access unlocked!');
+    } else {
+      elements.authErrorMsg.textContent = 'Incorrect password. Access denied.';
+      elements.authErrorMsg.style.display = 'block';
+      elements.authPasswordInput.select();
     }
   }
 
   function toggleAdminMode() {
     const isCurrentlyAdmin = document.body.classList.contains('is-admin');
-    const nextState = !isCurrentlyAdmin;
-    document.body.classList.toggle('is-admin', nextState);
-    localStorage.setItem('portfolio_editor_mode', nextState ? 'true' : 'false');
+    if (isCurrentlyAdmin) {
+      document.body.classList.remove('is-admin');
+      sessionStorage.removeItem('portfolio_owner_authenticated');
+      localStorage.removeItem('portfolio_editor_mode');
+      window.PORTFOLIO_APP.showToast('Owner mode locked');
+    } else {
+      openAuthModal();
+    }
+  }
 
-    window.PORTFOLIO_APP.showToast(
-      nextState ? 'Owner Mode Enabled (Edit controls visible)' : 'Owner Mode Hidden'
-    );
+  function bindAuthEvents() {
+    if (elements.authForm) {
+      elements.authForm.addEventListener('submit', handleAuthSubmit);
+    }
+    if (elements.authClose) {
+      elements.authClose.addEventListener('click', closeAuthModal);
+    }
+    if (elements.authCancelBtn) {
+      elements.authCancelBtn.addEventListener('click', closeAuthModal);
+    }
+    if (elements.authModal) {
+      elements.authModal.addEventListener('click', (e) => {
+        if (e.target === elements.authModal) {
+          closeAuthModal();
+        }
+      });
+    }
   }
 
   // --- STATS & COUNTERS ---
@@ -333,16 +433,7 @@
 
     elements.lightboxCategory.textContent = item.category || 'Artwork';
     elements.lightboxYear.textContent = item.year || '—';
-    elements.lightboxFilename.textContent = item.file.split('/').pop();
     elements.lightboxDesc.textContent = item.description || 'No description provided.';
-
-    // Measure dimensions once loaded
-    elements.lightboxDimensions.textContent = 'Analyzing...';
-    const tempImg = new Image();
-    tempImg.onload = function () {
-      elements.lightboxDimensions.textContent = `${this.naturalWidth} × ${this.naturalHeight} px`;
-    };
-    tempImg.src = item.file;
   }
 
   function navigateLightbox(direction) {
@@ -388,9 +479,10 @@
       elements.btnToggleAdmin.addEventListener('click', toggleAdminMode);
     }
 
-    // Hotkey: Alt+E toggles admin mode
+    // Hotkey: Ctrl+Alt+E toggles admin mode
     window.addEventListener('keydown', (e) => {
-      if ((e.altKey && e.key.toLowerCase() === 'e') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'e')) {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
         toggleAdminMode();
       }
     });
@@ -559,9 +651,18 @@
     refreshData: function (newWorks) {
       state.works = [...newWorks];
       window.PORTFOLIO_WORKS = state.works;
+      try {
+        localStorage.setItem('portfolio_saved_works', JSON.stringify(state.works));
+      } catch (e) {
+        console.warn('Could not save to localStorage', e);
+      }
       updateHeaderStats();
       buildFilterChips();
       applyFilters();
+    },
+    resetToDefaults: function () {
+      localStorage.removeItem('portfolio_saved_works');
+      window.location.reload();
     },
     showToast: function (message, type = 'success') {
       const toast = document.createElement('div');

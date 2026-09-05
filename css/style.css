@@ -280,6 +280,19 @@ body::after {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.email-btn-text-short {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .email-btn-text-full {
+    display: none;
+  }
+  .email-btn-text-short {
+    display: inline;
+  }
+}
+
 /* ==========================================================================
    HERO / INTRO SECTION (Slim & Dimmed Background Image)
    ========================================================================== */

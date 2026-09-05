@@ -155,7 +155,7 @@
     selectWorkItem.value = item.id;
   }
 
-  function saveCurrentItem() {
+  function saveCurrentItem(showToast = true) {
     if (!currentEditingItem) return;
 
     currentEditingItem.name = editFieldTitle.value.trim() || 'Untitled Render';
@@ -171,7 +171,7 @@
     currentEditingItem.year = editFieldYear ? editFieldYear.value : '2024';
     currentEditingItem.description = editFieldDesc.value.trim();
 
-    previewTitle.textContent = currentEditingItem.name;
+    if (previewTitle) previewTitle.textContent = currentEditingItem.name;
 
     // Refresh option title in dropdown
     populateSelectOptions(currentEditingItem.id);
@@ -186,7 +186,9 @@
     // Sync with main app
     if (window.PORTFOLIO_APP) {
       window.PORTFOLIO_APP.refreshData(window.PORTFOLIO_WORKS);
-      window.PORTFOLIO_APP.showToast(`Saved "${currentEditingItem.name}" locally in your browser!`);
+      if (showToast) {
+        window.PORTFOLIO_APP.showToast(`Saved "${currentEditingItem.name}" locally in your browser!`);
+      }
     }
   }
 
@@ -519,23 +521,40 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       }
     });
 
-    // Dropdown change
-    selectWorkItem.addEventListener('change', (e) => {
-      const selected = (window.PORTFOLIO_WORKS || []).find(w => w.id === e.target.value);
-      if (selected) {
-        loadItemIntoForm(selected);
+    // Auto-save on field changes in Edit form so edits are never lost
+    const autoSaveInputFields = [editFieldTitle, editFieldDesc];
+    autoSaveInputFields.forEach(field => {
+      if (field) {
+        field.addEventListener('input', () => saveCurrentItem(false));
       }
     });
 
-    // Checkbox styling toggle on change (Edit form)
+    const autoSaveChangeFields = [editFieldRnd, editFieldCategory, editFieldYear];
+    autoSaveChangeFields.forEach(field => {
+      if (field) {
+        field.addEventListener('change', () => saveCurrentItem(false));
+      }
+    });
+
+    // Checkbox styling toggle & auto-save on change (Edit form)
     if (dccCheckboxGroup) {
       dccCheckboxGroup.addEventListener('change', (e) => {
         const cb = e.target.closest('input[type="checkbox"]');
         if (cb) {
           cb.closest('.dcc-checkbox-label').classList.toggle('is-checked', cb.checked);
         }
+        saveCurrentItem(false);
       });
     }
+
+    // Dropdown change: auto-save current item before switching
+    selectWorkItem.addEventListener('change', (e) => {
+      saveCurrentItem(false);
+      const selected = (window.PORTFOLIO_WORKS || []).find(w => w.id === e.target.value);
+      if (selected) {
+        loadItemIntoForm(selected);
+      }
+    });
 
     // Toggle GitHub Sync Box
     if (syncHeaderToggle && syncBoxBody) {
@@ -545,8 +564,8 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       });
     }
 
-    // Save button
-    btnSaveItem.addEventListener('click', saveCurrentItem);
+    // Manual Save button (shows explicit toast feedback)
+    btnSaveItem.addEventListener('click', () => saveCurrentItem(true));
 
     // Download button
     btnDownloadJs.addEventListener('click', downloadWorksFile);

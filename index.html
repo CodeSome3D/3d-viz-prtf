@@ -456,6 +456,21 @@
           </div>
         </div>
 
+        <!-- Publishing to GitHub Pages Guide Banner -->
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 0.9rem 1.15rem; font-size: 0.825rem; color: var(--text-secondary); line-height: 1.55;">
+          <div style="color: #fff; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <svg width="16" height="16" fill="none" stroke="#38bdf8" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            How to publish your changes live to GitHub Pages:
+          </div>
+          Edits are auto-saved in your browser. Because GitHub Pages is static, to make your changes visible to everyone worldwide:
+          <ol style="margin: 0.4rem 0 0 1.25rem; padding: 0;">
+            <li>Click <strong>Download works.js</strong> below (or <strong>Copy Code</strong>).</li>
+            <li>Replace the file <code>data/works.js</code> in your project repository with the downloaded file.</li>
+            <li>Commit &amp; push via Git (<code>git add data/works.js</code> &rarr; <code>git commit -m "Update artwork metadata"</code> &rarr; <code>git push</code>).</li>
+            <li><em>Or use the <strong>Direct GitHub Sync</strong> below to commit directly with a GitHub token without opening Git!</em></li>
+          </ol>
+        </div>
+
         <!-- GitHub Sync & Deployment Section -->
         <div class="editor-sync-box">
           <div class="sync-box-header" id="syncHeaderToggle" role="button" tabindex="0">

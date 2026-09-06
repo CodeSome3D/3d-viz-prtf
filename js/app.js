@@ -9,6 +9,7 @@
   'use strict';
 
   // Allowed Filter Values requested by artist
+  const ALLOWED_CATEGORIES = ['Archviz', 'Concept Art', 'Hard Surface', 'Product'];
   const ALLOWED_DCCS = ['3ds Max', 'Blender', 'Cinema 4D', 'Autodesk Fusion', 'ZBrush'];
   const ALLOWED_RENDERERS = ['Corona', 'Cycles', 'Redshift'];
 
@@ -50,6 +51,7 @@
   const state = {
     works: loadInitialWorks(),
     filteredWorks: [],
+    selectedCategory: 'all',
     selectedDcc: 'all',
     selectedRenderer: 'all',
     searchQuery: '',
@@ -74,6 +76,19 @@
     return [];
   }
 
+  // Helper: Get list of available categories
+  function getAvailableCategories() {
+    const cats = new Set(ALLOWED_CATEGORIES);
+    if (Array.isArray(state.works)) {
+      state.works.forEach(w => {
+        if (w.category && typeof w.category === 'string' && w.category.trim()) {
+          cats.add(w.category.trim());
+        }
+      });
+    }
+    return Array.from(cats);
+  }
+
   // DOM Elements
   const elements = {
     galleryGrid: document.getElementById('galleryGrid'),
@@ -83,10 +98,12 @@
     searchInput: document.getElementById('searchInput'),
     searchClear: document.getElementById('searchClear'),
     sortSelect: document.getElementById('sortSelect'),
+    catFilterList: document.getElementById('catFilterList'),
     dccFilterList: document.getElementById('dccFilterList'),
     rndFilterList: document.getElementById('rndFilterList'),
     btnLayoutMasonry: document.getElementById('btnLayoutMasonry'),
     btnLayoutGrid: document.getElementById('btnLayoutGrid'),
+    btnBackToTop: document.getElementById('btnBackToTop'),
 
     // Lightbox Elements
     lightboxDialog: document.getElementById('lightboxModal'),
@@ -136,6 +153,24 @@
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  // Preload all remaining portfolio images into browser cache so scrolling is instant with zero blank squares
+  function precacheRemainingWorks() {
+    if (!Array.isArray(state.works)) return;
+    const preload = () => {
+      state.works.forEach((item, i) => {
+        if (i >= 9 && item.file) {
+          const img = new Image();
+          img.src = item.file;
+        }
+      });
+    };
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(preload, { timeout: 1500 });
+    } else {
+      setTimeout(preload, 600);
+    }
+  }
+
   // --- INITIALIZATION ---
   function init() {
     initAdminMode();
@@ -145,6 +180,7 @@
     bindEvents();
     bindLightboxEvents();
     bindAuthEvents();
+    precacheRemainingWorks();
   }
 
   // --- ADMIN & AUTH MODE ---
@@ -237,15 +273,24 @@
 
   // --- FILTER CHIPS BUILDER ---
   function buildFilterChips() {
-    // Fixed allowed DCCs: 3ds Max, Blender, Cinema 4D, Autodesk Fusion
+    // Categories: Archviz, Concept Art, Hard Surface, Product, etc.
+    const categories = getAvailableCategories();
+    if (elements.catFilterList) {
+      elements.catFilterList.innerHTML = `
+        <button type="button" class="chip active" data-cat="all">All</button>
+        ${categories.map(cat => `<button type="button" class="chip" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`).join('')}
+      `;
+    }
+
+    // Fixed allowed DCCs: 3ds Max, Blender, Cinema 4D, Autodesk Fusion, ZBrush
     elements.dccFilterList.innerHTML = `
-      <button type="button" class="chip active" data-dcc="all">All Tools</button>
+      <button type="button" class="chip active" data-dcc="all">All</button>
       ${ALLOWED_DCCS.map(dcc => `<button type="button" class="chip" data-dcc="${escapeHtml(dcc)}">${escapeHtml(dcc)}</button>`).join('')}
     `;
 
     // Fixed allowed Renderers: Corona, Cycles, Redshift
     elements.rndFilterList.innerHTML = `
-      <button type="button" class="chip active" data-rnd="all">All Engines</button>
+      <button type="button" class="chip active" data-rnd="all">All</button>
       ${ALLOWED_RENDERERS.map(rnd => `<button type="button" class="chip" data-rnd="${escapeHtml(rnd)}">${escapeHtml(rnd)}</button>`).join('')}
     `;
   }
@@ -256,6 +301,13 @@
 
     state.filteredWorks = state.works.filter(item => {
       const itemDccs = getDccList(item);
+
+      // Category filter
+      if (state.selectedCategory !== 'all') {
+        if ((item.category || '').toLowerCase() !== state.selectedCategory.toLowerCase()) {
+          return false;
+        }
+      }
 
       // DCC filter (matches any of the item's DCC tools)
       if (state.selectedDcc !== 'all') {
@@ -290,8 +342,12 @@
       state.filteredWorks.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     } else if (state.sortBy === 'name-desc') {
       state.filteredWorks.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    } else if (state.sortBy === 'category') {
+      state.filteredWorks.sort((a, b) => (a.category || '').localeCompare(b.category || '') || (a.name || '').localeCompare(b.name || ''));
     } else if (state.sortBy === 'year-desc') {
-      state.filteredWorks.sort((a, b) => (parseInt(b.year) || 0) - (parseInt(a.year) || 0));
+      state.filteredWorks.sort((a, b) => ((parseInt(b.year) || 0) - (parseInt(a.year) || 0)) || (a.name || '').localeCompare(b.name || ''));
+    } else if (state.sortBy === 'year-asc') {
+      state.filteredWorks.sort((a, b) => ((parseInt(a.year) || 0) - (parseInt(b.year) || 0)) || (a.name || '').localeCompare(b.name || ''));
     }
 
     renderGallery();
@@ -326,8 +382,9 @@
               class="art-img" 
               src="${escapeHtml(item.file)}" 
               alt="${escapeHtml(name)}" 
-              loading="lazy"
-              decoding="async"
+              ${index < 9 ? 'fetchpriority="high"' : ''}
+              decoding="auto"
+              onload="this.parentElement.classList.add('has-loaded')"
             >
             <div class="card-hover-overlay">
               <span class="quick-view-badge">
@@ -363,7 +420,8 @@
         : `${state.filteredWorks.length} / ${state.works.length} works`;
     }
 
-    const hasFilters = state.selectedDcc !== 'all' ||
+    const hasFilters = state.selectedCategory !== 'all' ||
+      state.selectedDcc !== 'all' ||
       state.selectedRenderer !== 'all' ||
       state.searchQuery.trim() !== '' ||
       state.sortBy !== 'default';
@@ -377,6 +435,7 @@
   }
 
   function resetAllFilters() {
+    state.selectedCategory = 'all';
     state.selectedDcc = 'all';
     state.selectedRenderer = 'all';
     state.searchQuery = '';
@@ -385,6 +444,11 @@
     elements.sortSelect.value = 'default';
 
     // Update chips active states
+    if (elements.catFilterList) {
+      elements.catFilterList.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.cat === 'all');
+      });
+    }
     elements.dccFilterList.querySelectorAll('.chip').forEach(c => {
       c.classList.toggle('active', c.dataset.dcc === 'all');
     });
@@ -509,6 +573,19 @@
     // Reset filters
     elements.resetFiltersBtn.addEventListener('click', resetAllFilters);
 
+    // Category chip list clicks
+    if (elements.catFilterList) {
+      elements.catFilterList.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+
+        elements.catFilterList.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.selectedCategory = chip.dataset.cat;
+        applyFilters();
+      });
+    }
+
     // DCC chip list clicks
     elements.dccFilterList.addEventListener('click', (e) => {
       const chip = e.target.closest('.chip');
@@ -563,6 +640,24 @@
         }
       }
     });
+
+    // Floating Back to Top Button
+    if (elements.btnBackToTop) {
+      const handleScroll = () => {
+        if (window.scrollY > 160) {
+          elements.btnBackToTop.classList.add('is-visible');
+        } else {
+          elements.btnBackToTop.classList.remove('is-visible');
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+
+      elements.btnBackToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   }
 
   function bindLightboxEvents() {

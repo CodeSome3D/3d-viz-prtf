@@ -514,15 +514,17 @@ body::after {
   color: #7dd3fc;
 }
 
-/* Row 2: Unified Filter Chips Toolbar */
+/* Row 2: Unified Filter Chips Toolbar (Adaptive Full-Width & Centered) */
 .filter-row-unified {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
+  width: 100%;
+  gap: clamp(0.35rem, 0.9vw, 1.25rem);
   overflow-x: auto;
   scrollbar-width: none;
-  padding: 6px 4px;
-  margin: -2px -4px;
+  padding: 6px 0;
+  margin: 0;
 }
 
 .filter-row-unified::-webkit-scrollbar {
@@ -532,22 +534,22 @@ body::after {
 .filter-subgroup {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: clamp(0.25rem, 0.4vw, 0.4rem);
   flex-shrink: 0;
 }
 
 .filter-divider {
   width: 1px;
-  height: 16px;
+  height: 14px;
   background: var(--border-subtle);
   flex-shrink: 0;
 }
 
 .filter-label {
-  font-size: 0.68rem;
+  font-size: clamp(0.65rem, 0.7vw, 0.7rem);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
   flex-shrink: 0;
 }
@@ -555,18 +557,18 @@ body::after {
 .chip-list {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: clamp(0.2rem, 0.32vw, 0.3rem);
   flex-wrap: nowrap;
-  padding: 2px 2px;
+  padding: 2px 0;
 }
 
 .chip {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
-  padding: 0.28rem 0.75rem;
+  padding: 0.24rem clamp(0.48rem, 0.55vw, 0.65rem);
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 0.74vw, 0.75rem);
   line-height: 1.2;
   cursor: pointer;
   white-space: nowrap;
@@ -590,6 +592,20 @@ body::after {
   color: #fff;
   font-weight: 600;
   box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+}
+
+@media (max-width: 1080px) {
+  .filter-row-unified {
+    justify-content: flex-start;
+    gap: 0.6rem;
+    padding: 6px 4px;
+  }
+  .filter-subgroup {
+    gap: 0.35rem;
+  }
+  .chip-list {
+    gap: 0.28rem;
+  }
 }
 
 .reset-filters-btn:hover {
@@ -646,11 +662,11 @@ body::after {
   break-inside: avoid;
   cursor: pointer;
   transition: var(--transition-smooth);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .layout-grid .art-card {
@@ -659,7 +675,8 @@ body::after {
 }
 
 .art-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
+  -webkit-transform: translateY(-4px) translateZ(0);
   border-color: rgba(255, 255, 255, 0.22);
   box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.12);
 }
@@ -669,6 +686,29 @@ body::after {
   width: 100%;
   overflow: hidden;
   background: #0d1017;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.art-media-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: mediaShimmer 1.8s infinite;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.4s ease;
+}
+
+.art-media-wrap.has-loaded::before {
+  opacity: 0;
+}
+
+@keyframes mediaShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .layout-grid .art-media-wrap {
@@ -680,7 +720,12 @@ body::after {
   height: auto;
   display: block;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
 }
 
 .layout-grid .art-img {
@@ -688,7 +733,8 @@ body::after {
 }
 
 .art-card:hover .art-img {
-  transform: scale(1.04);
+  transform: scale(1.04) translateZ(0);
+  -webkit-transform: scale(1.04) translateZ(0);
 }
 
 /* Quick Action Overlay */
@@ -1478,11 +1524,73 @@ body.is-admin .admin-only {
 }
 
 /* ==========================================================================
+   FLOATING BACK TO TOP BUTTON
+   ========================================================================== */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(18, 22, 33, 0.88);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.3s,
+              background 0.2s,
+              border-color 0.2s,
+              color 0.2s,
+              box-shadow 0.2s;
+  z-index: 990;
+}
+
+.back-to-top-btn.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--accent-cyan);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+.back-to-top-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .back-to-top-btn {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* ==========================================================================
    TOAST NOTIFICATIONS
    ========================================================================== */
 .toast-container {
   position: fixed;
-  bottom: 2rem;
+  bottom: 5.5rem;
   right: 2rem;
   z-index: 1000;
   display: flex;

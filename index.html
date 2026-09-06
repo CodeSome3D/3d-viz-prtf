@@ -98,7 +98,9 @@
             <option value="default">Default Order</option>
             <option value="name-asc">Name (A → Z)</option>
             <option value="name-desc">Name (Z → A)</option>
+            <option value="category">Category</option>
             <option value="year-desc">Newest Year</option>
+            <option value="year-asc">Oldest Year</option>
           </select>
 
           <div class="layout-toggle-group" role="group" aria-label="Grid layout toggle">
@@ -117,8 +119,17 @@
         </div>
       </div>
 
-      <!-- Row 2: DCC and Renderer Filter Chips in One Unified Line -->
+      <!-- Row 2: Category, DCC, and Renderer Filter Chips in One Unified Line -->
       <div class="filter-row-unified">
+        <div class="filter-subgroup">
+          <span class="filter-label">Category:</span>
+          <div class="chip-list" id="catFilterList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="filter-divider" aria-hidden="true"></div>
+
         <div class="filter-subgroup">
           <span class="filter-label">DCC:</span>
           <div class="chip-list" id="dccFilterList">
@@ -586,6 +597,13 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
+  <!-- Floating Back to Top Arrow Button -->
+  <button type="button" id="btnBackToTop" class="back-to-top-btn" aria-label="Scroll back to top" title="Back to top">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+    </svg>
+  </button>
+
   <!-- ======================================================================
        FOOTER
        ====================================================================== -->
@@ -597,13 +615,10 @@
       </div>
 
       <div class="footer-links">
-        <a href="https://www.linkedin.com/in/egorbaklykov/" target="_blank" rel="noopener noreferrer" class="footer-link">LinkedIn</a>
-        <a href="mailto:jegor.baklykov@gmail.com" class="footer-link">Email</a>
         <button type="button" id="btnToggleAdmin" class="footer-link" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Owner Editor Access (Ctrl+Alt+E)">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           <span>Owner Access</span>
         </button>
-        <a href="#top" class="footer-link">Back to Top ↑</a>
       </div>
     </div>
   </footer>

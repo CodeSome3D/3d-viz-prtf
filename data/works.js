@@ -3,7 +3,7 @@
  * ----------------------------------------------------
  * Allowed DCC Tools: "3ds Max", "Blender", "Cinema 4D", "Autodesk Fusion", "ZBrush"
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
- * Last updated: 2026-09-05
+ * Last updated: 2026-10-12
  */
 
 window.PORTFOLIO_WORKS = [
@@ -33,20 +33,20 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "003",
-    "name": "Modern 3D Printed House Details 01",
-    "file": "images/003_Exterior_01.jpg",
+    "name": "Mayekawa Close-up",
+    "file": "images/003_Mayekawa_Close-up_02.jpg",
     "dcc": [
-      "3ds Max"
+      "Blender"
     ],
-    "renderer": "Corona",
-    "category": "Archviz",
-    "year": "2020",
-    "description": "Exterior architectural visualization of the modern 3D printed house in daylight conditions."
+    "renderer": "Cycles",
+    "category": "Product",
+    "year": "2026",
+    "description": "Details View of Mayekawa Compressor"
   },
   {
     "id": "004",
-    "name": "Modern 3D Printed House Drone View",
-    "file": "images/004_Exterior_02.jpg",
+    "name": "Modern 3D Printed House Details 01",
+    "file": "images/004_Exterior_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -57,8 +57,20 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "005",
+    "name": "Modern 3D Printed House Drone View",
+    "file": "images/005_Exterior_02.jpg",
+    "dcc": [
+      "3ds Max"
+    ],
+    "renderer": "Corona",
+    "category": "Archviz",
+    "year": "2020",
+    "description": "Exterior architectural visualization of the modern 3D printed house in daylight conditions."
+  },
+  {
+    "id": "006",
     "name": "Cinematic View Explore 01",
-    "file": "images/005_Art_01.jpg",
+    "file": "images/006_Art_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -68,9 +80,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Cinematic R&D exploration."
   },
   {
-    "id": "006",
+    "id": "007",
     "name": "Veritamorph Jukebox",
-    "file": "images/006_Art_02.jpg",
+    "file": "images/007_Art_02.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -80,9 +92,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Still frame from the fan art animation made for the Veritamorph band https://youtu.be/ESg6NeaswM0"
   },
   {
-    "id": "007",
+    "id": "008",
     "name": "Ring Crown — Studio Showcase",
-    "file": "images/007_Ring_Crown_Studio.png",
+    "file": "images/008_Ring_Crown_Studio.png",
     "dcc": [
       "Blender"
     ],
@@ -92,9 +104,9 @@ window.PORTFOLIO_WORKS = [
     "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
   },
   {
-    "id": "008",
+    "id": "009",
     "name": "Crypto Monuments — Columns",
-    "file": "images/008_Crypto_Collumns.png",
+    "file": "images/009_Crypto_Collumns.png",
     "dcc": [
       "Blender"
     ],
@@ -104,9 +116,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Stylized fintech art with monumental crypto columns and dramatic lighting."
   },
   {
-    "id": "009",
+    "id": "010",
     "name": "Crypto Monuments — Circle",
-    "file": "images/009_Crypto_Circle.png",
+    "file": "images/010_Crypto_Circle.png",
     "dcc": [
       "Blender"
     ],
@@ -116,9 +128,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Monolithic circular composition with dramatic cinematic lighting and floating crypto coins."
   },
   {
-    "id": "010",
+    "id": "011",
     "name": "Fintech Tokenomics — Coins & Cards",
-    "file": "images/010_Coins_Cards.png",
+    "file": "images/011_Coins_Cards.png",
     "dcc": [
       "Blender"
     ],
@@ -128,9 +140,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Premium credit card visual of frosted matte acrylics coins with embossed gold details."
   },
   {
-    "id": "011",
+    "id": "012",
     "name": "Minimal Living Space",
-    "file": "images/011_Interior_01.jpg",
+    "file": "images/012_Interior_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -140,9 +152,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Scandinavian interior styling with neutral plaster, linen fabrics, and soft overcast daylight."
   },
   {
-    "id": "012",
+    "id": "013",
     "name": "Cozy Minimalistic Bedroom",
-    "file": "images/012_Interior_02.jpg",
+    "file": "images/013_Interior_02.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -152,9 +164,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Minimalistic yet cozy bedroom in golden hour lighting atmosphere."
   },
   {
-    "id": "013",
+    "id": "014",
     "name": "Clicker Microdevice Internals",
-    "file": "images/013_Microdevice.png",
+    "file": "images/014_Microdevice.png",
     "dcc": [
       "Blender"
     ],
@@ -164,9 +176,9 @@ window.PORTFOLIO_WORKS = [
     "description": "High-tech industrial product design visualization."
   },
   {
-    "id": "014",
+    "id": "015",
     "name": "King Air",
-    "file": "images/014_King_Air_01.png",
+    "file": "images/015_King_Air_01.png",
     "dcc": [
       "3ds Max",
       "Blender"
@@ -177,9 +189,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Electric converted King Air aircraft with the new skin."
   },
   {
-    "id": "015",
+    "id": "016",
     "name": "Abstract Metamaterial",
-    "file": "images/015_Art_03.jpg",
+    "file": "images/016_Art_03.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -189,9 +201,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Experimental R&D visualization."
   },
   {
-    "id": "016",
+    "id": "017",
     "name": "Studio Props & Artifacts",
-    "file": "images/016_Objects_01.jpg",
+    "file": "images/017_Objects_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -201,9 +213,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Precision hard-surface prop study with realistic materials and dramatic lighting."
   },
   {
-    "id": "017",
+    "id": "018",
     "name": "Koh-Saah Ring",
-    "file": "images/017_Objects_02.jpg",
+    "file": "images/018_Objects_02.jpg",
     "dcc": [
       "3ds Max",
       "Blender",
@@ -215,9 +227,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Gothic jewelry product viz in studio environment with dramatic lighting."
   },
   {
-    "id": "018",
+    "id": "019",
     "name": "Coastal Pavilion 3D Printed",
-    "file": "images/018_Exterior_03.jpg",
+    "file": "images/019_Exterior_03.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -227,9 +239,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Contemporary coastal 3D Printed architecture rendering."
   },
   {
-    "id": "019",
+    "id": "020",
     "name": "Warehouse Industrial Logistics",
-    "file": "images/019_Kruger_Pallet.png",
+    "file": "images/020_Kruger_Pallet.png",
     "dcc": [
       "3ds Max",
       "Blender"
@@ -240,9 +252,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Commercial logistics packaging visualization featuring accurate shaders."
   },
   {
-    "id": "020",
+    "id": "021",
     "name": "Chromatic Luminescence — Art 04",
-    "file": "images/020_Art_04.jpg",
+    "file": "images/021_Art_04.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -252,9 +264,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Vibrant artistic R&D pattern rendering."
   },
   {
-    "id": "021",
+    "id": "022",
     "name": "Modern 3D Printed House Details 02",
-    "file": "images/021_Exterior_03.jpg",
+    "file": "images/022_Exterior_03.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -264,9 +276,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Exterior architectural visualization of the modern 3D printed house in daylight conditions."
   },
   {
-    "id": "022",
+    "id": "023",
     "name": "Industrial Mechanism",
-    "file": "images/022_Objects_03.jpg",
+    "file": "images/023_Objects_03.jpg",
     "dcc": [
       "Cinema 4D",
       "Autodesk Fusion"
@@ -277,9 +289,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling."
   },
   {
-    "id": "023",
+    "id": "024",
     "name": "Cinematic View Explore 02",
-    "file": "images/023_Art_05.jpg",
+    "file": "images/024_Art_05.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -289,9 +301,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Cinematic R&D exploration."
   },
   {
-    "id": "024",
+    "id": "025",
     "name": "Pop Art Pattern",
-    "file": "images/024_Art_06.jpg",
+    "file": "images/025_Art_06.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -301,9 +313,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Patterns exploration."
   },
   {
-    "id": "025",
+    "id": "026",
     "name": "Typography & Material Study 01",
-    "file": "images/025_Font_01.jpg",
+    "file": "images/026_Font_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -313,9 +325,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Typographic 3D broadcast-style visualization."
   },
   {
-    "id": "026",
+    "id": "027",
     "name": "Pop Art Skull Tiles",
-    "file": "images/026_Art_07.jpg",
+    "file": "images/027_Art_07.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -325,9 +337,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Patterns and materials exploration."
   },
   {
-    "id": "027",
+    "id": "028",
     "name": "Monolithic Geometry",
-    "file": "images/027_Art_08.jpg",
+    "file": "images/028_Art_08.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -337,9 +349,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Materials and postproduction exploration."
   },
   {
-    "id": "028",
+    "id": "029",
     "name": "Typography And Materials Study 02",
-    "file": "images/028_Font_02.jpg",
+    "file": "images/029_Font_02.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -349,9 +361,9 @@ window.PORTFOLIO_WORKS = [
     "description": "Typography pattern cinematic render exploration."
   },
   {
-    "id": "029",
+    "id": "030",
     "name": "Abstract Spatial Synthesis",
-    "file": "images/029_Art_08.jpg",
+    "file": "images/030_Art_08.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -359,5 +371,5 @@ window.PORTFOLIO_WORKS = [
     "category": "Concept Art",
     "year": "2020",
     "description": "Materials and patterns exploration."
-  }
+  },
 ];

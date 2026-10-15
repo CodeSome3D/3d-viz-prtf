@@ -14,9 +14,9 @@ A modern, high-aesthetic portfolio web application tailored for 3D artists, ligh
 - **Clean Thumbnails**: Metadata badges appear cleanly underneath each thumbnail (no floating toast overlays obstructing your renders).
 - **GitHub Pages Ready**: Zero build dependencies, pure HTML5, modern Vanilla CSS, and modular JavaScript. Uses relative paths so it functions immediately on `https://<username>.github.io/<repo>/`.
 - **Owner Mode & Privacy**:
-  - Regular visitors to your GitHub Pages site **only see your clean portfolio** with all edit controls hidden.
   - You can open Owner Mode anytime by pressing **`Ctrl + Alt + E`** (or visiting with `?edit=1`), or clicking the discrete **"🔒 Owner Access"** button in the footer.
-  - Since GitHub Pages is static, changes made in a browser cannot alter your GitHub repository directly. You can update values in the browser, download `works.js`, or edit `data/works.js` directly in your code editor and commit it.
+  - Upon unlocking, the **"Edit Gallery"** button appears prominently in the navigation bar and controls toolbar, giving 1-click access to add artworks and reorder the gallery.
+  - Since GitHub Pages is static, changes made in a browser cannot alter your GitHub repository directly. You can update values in the browser, download `works.js`, or commit directly with a GitHub token.
 - **Interactive Lightbox Modal**: Native HTML `<dialog>` with backdrop blur, full-resolution display, dynamic image resolution calculation, zoom & pan controls, and keyboard navigation (Left/Right arrows, Escape).
 - **Instant Filtering & Search**:
   - Filter chips by DCC tool (color-coded badges).
@@ -69,7 +69,7 @@ Choose either option:
 
 #### Option B: Download & Git Push
 1. In the on-page editor, click **"Download works.js"** (or **"Copy Code"**).
-2. Replace [`data/works.js`](file:///c:/Users/Egor/.gemini/antigravity/scratch/portfolio_rend/data/works.js) with your downloaded file.
+2. Replace `data/works.js` with your downloaded file.
 3. Commit and push:
    ```bash
    git add data/works.js
@@ -81,7 +81,7 @@ Choose either option:
 {
   id: "001",
   name: "Mayekawa Sauna — Interior 01",
-  file: "images/001_Mayekawa_Sauna_01.jpg",
+  file: "images/product_mayekawa-compressor_01.jpg",
   dcc: "3ds Max",              // e.g. Blender, 3ds Max, Maya, Houdini, Cinema 4D
   renderer: "Corona",          // e.g. Corona, Cycles, Arnold, V-Ray, Octane, Redshift
   category: "Archviz",         // e.g. Archviz, Product, Hard Surface, Concept Art
@@ -94,23 +94,35 @@ Simply change the strings to whatever you like.
 
 ---
 
-## 🖼️ Adding New Images
+---
 
-1. Drop your new image file into the `images/` folder (e.g. `images/my_new_render.png`).
-2. Add a new entry to `data/works.js` with its filename:
-   ```javascript
-   {
-     id: "023",
-     name: "My New Render",
-     file: "images/my_new_render.png",
-     dcc: "Blender",
-     renderer: "Cycles",
-     category: "Hard Surface",
-     year: "2024",
-     description: "Description of the new piece."
-   }
-   ```
-   *(Or click **"Edit Metadata"** → **"+ Add New Image"** right in your browser!)*
+## 🖼️ Adding & Reordering Images Freely
+
+### 1. Flexible Filenames (No Numbering Required!)
+You **do NOT need to number your image filenames** (e.g. `001_`, `002_`). You can name your files whatever you like:
+- `images/product_mayekawa-compressor_03.jpg`
+- `images/Studio_Ring_Showcase.png`
+- `images/Coastal_Pavilion.jpg`
+
+The order images appear in the gallery is determined **solely by their position in the array** in `data/works.js`, which can be reordered at any time!
+
+### 2. In-Browser Visual Reordering (Owner Mode)
+1. Unlock Owner Mode (`Ctrl + Alt + E` or click **"🔒 Owner Access"** in the footer) and click **"Edit Gallery"** in the header or toolbar.
+2. In the Gallery Organizer, you can:
+   - **Drag & Drop** any image card into any position.
+   - Click **▲ Up**, **▼ Down**, **⤒ Top**, or **⤓ Bottom**.
+   - Type an exact position number (e.g. type `3` to jump directly to 3rd place).
+4. Changes update the live gallery immediately and save to your browser!
+5. Click **"Download works.js"** or **"Commit & Push to GitHub"** to publish the new order live to GitHub Pages.
+
+### 3. Adding an Image at Any Position
+1. Save your image into the `images/` folder.
+2. In the browser editor, click **"+ Add New Artwork"**.
+3. Under **"Placement in Gallery"**, choose:
+   - **At the beginning (1st item)**
+   - **At specific position...** (e.g. Position #3)
+   - **At the end (last item)**
+4. Click **"Add to Portfolio Gallery"**! All IDs are automatically normalized sequentially.
 
 ---
 
@@ -127,6 +139,6 @@ portfolio_rend/
 │   ├── app.js            # Gallery renderer, filter logic, lightbox controller
 │   └── editor.js         # Interactive metadata editor & export utility
 ├── data/
-│   └── works.js          # All 22 projects with Name, DCC, and Renderer metadata
-└── images/               # 22 artwork files
+│   └── works.js          # All 30 projects with Name, DCC, and Renderer metadata
+└── images/               # 30 artwork files
 ```

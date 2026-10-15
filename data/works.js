@@ -10,7 +10,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "001",
     "name": "Mayekawa Compressor Studio",
-    "file": "images/001_Mayekawa_Sauna_01.jpg",
+    "file": "images/product_mayekawa-compressor_01.jpg",
     "dcc": [
       "Blender"
     ],
@@ -22,7 +22,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "002",
     "name": "Mayekawa Compressor Closeup",
-    "file": "images/002_Mayekawa_Sauna_02.jpg",
+    "file": "images/product_mayekawa-compressor_02.jpg",
     "dcc": [
       "Blender"
     ],
@@ -34,7 +34,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "003",
     "name": "Mayekawa Close-up",
-    "file": "images/003_Mayekawa_Close-up_02.jpg",
+    "file": "images/product_mayekawa-compressor_03.jpg",
     "dcc": [
       "Blender"
     ],
@@ -46,7 +46,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "004",
     "name": "Modern 3D Printed House Details 01",
-    "file": "images/004_Exterior_01.jpg",
+    "file": "images/archviz_3d-printed-house_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -58,7 +58,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "005",
     "name": "Modern 3D Printed House Drone View",
-    "file": "images/005_Exterior_02.jpg",
+    "file": "images/archviz_3d-printed-house_02.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -70,7 +70,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "006",
     "name": "Cinematic View Explore 01",
-    "file": "images/006_Art_01.jpg",
+    "file": "images/concept_cinematic-explore_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -82,7 +82,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "007",
     "name": "Veritamorph Jukebox",
-    "file": "images/007_Art_02.jpg",
+    "file": "images/concept_veritamorph-jukebox_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -94,7 +94,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "008",
     "name": "Ring Crown — Studio Showcase",
-    "file": "images/008_Ring_Crown_Studio.png",
+    "file": "images/product_ring-crown_01.png",
     "dcc": [
       "Blender"
     ],
@@ -106,7 +106,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "009",
     "name": "Crypto Monuments — Columns",
-    "file": "images/009_Crypto_Collumns.png",
+    "file": "images/concept_crypto-monuments_01.png",
     "dcc": [
       "Blender"
     ],
@@ -118,7 +118,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "010",
     "name": "Crypto Monuments — Circle",
-    "file": "images/010_Crypto_Circle.png",
+    "file": "images/concept_crypto-monuments_02.png",
     "dcc": [
       "Blender"
     ],
@@ -130,7 +130,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "011",
     "name": "Fintech Tokenomics — Coins & Cards",
-    "file": "images/011_Coins_Cards.png",
+    "file": "images/product_fintech-coins-cards_01.png",
     "dcc": [
       "Blender"
     ],
@@ -142,7 +142,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "012",
     "name": "Minimal Living Space",
-    "file": "images/012_Interior_01.jpg",
+    "file": "images/archviz_living-room_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -154,7 +154,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "013",
     "name": "Cozy Minimalistic Bedroom",
-    "file": "images/013_Interior_02.jpg",
+    "file": "images/archviz_bedroom_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -166,7 +166,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "014",
     "name": "Clicker Microdevice Internals",
-    "file": "images/014_Microdevice.png",
+    "file": "images/product_clicker-microdevice_01.png",
     "dcc": [
       "Blender"
     ],
@@ -178,7 +178,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "015",
     "name": "King Air",
-    "file": "images/015_King_Air_01.png",
+    "file": "images/product_king-air_01.png",
     "dcc": [
       "3ds Max",
       "Blender"
@@ -191,7 +191,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "016",
     "name": "Abstract Metamaterial",
-    "file": "images/016_Art_03.jpg",
+    "file": "images/concept_abstract-metamaterial_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -203,7 +203,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "017",
     "name": "Studio Props & Artifacts",
-    "file": "images/017_Objects_01.jpg",
+    "file": "images/hardsurface_studio-props_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -215,7 +215,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "018",
     "name": "Koh-Saah Ring",
-    "file": "images/018_Objects_02.jpg",
+    "file": "images/product_koh-saah-ring_01.jpg",
     "dcc": [
       "3ds Max",
       "Blender",
@@ -229,7 +229,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "019",
     "name": "Coastal Pavilion 3D Printed",
-    "file": "images/019_Exterior_03.jpg",
+    "file": "images/archviz_coastal-pavilion_01.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -241,7 +241,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "020",
     "name": "Warehouse Industrial Logistics",
-    "file": "images/020_Kruger_Pallet.png",
+    "file": "images/product_kruger-pallet_01.png",
     "dcc": [
       "3ds Max",
       "Blender"
@@ -254,7 +254,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "021",
     "name": "Chromatic Luminescence — Art 04",
-    "file": "images/021_Art_04.jpg",
+    "file": "images/concept_chromatic-luminescence_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -266,7 +266,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "022",
     "name": "Modern 3D Printed House Details 02",
-    "file": "images/022_Exterior_03.jpg",
+    "file": "images/archviz_3d-printed-house_03.jpg",
     "dcc": [
       "3ds Max"
     ],
@@ -278,7 +278,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "023",
     "name": "Industrial Mechanism",
-    "file": "images/023_Objects_03.jpg",
+    "file": "images/hardsurface_industrial-mechanism_01.jpg",
     "dcc": [
       "Cinema 4D",
       "Autodesk Fusion"
@@ -291,7 +291,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "024",
     "name": "Cinematic View Explore 02",
-    "file": "images/024_Art_05.jpg",
+    "file": "images/concept_cinematic-explore_02.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -303,7 +303,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "025",
     "name": "Pop Art Pattern",
-    "file": "images/025_Art_06.jpg",
+    "file": "images/concept_pop-art-pattern_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -315,7 +315,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "026",
     "name": "Typography & Material Study 01",
-    "file": "images/026_Font_01.jpg",
+    "file": "images/product_typography-study_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -327,7 +327,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "027",
     "name": "Pop Art Skull Tiles",
-    "file": "images/027_Art_07.jpg",
+    "file": "images/concept_pop-art-skull-tiles_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -339,7 +339,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "028",
     "name": "Monolithic Geometry",
-    "file": "images/028_Art_08.jpg",
+    "file": "images/concept_monolithic-geometry_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -351,7 +351,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "029",
     "name": "Typography And Materials Study 02",
-    "file": "images/029_Font_02.jpg",
+    "file": "images/product_typography-study_02.jpg",
     "dcc": [
       "Cinema 4D"
     ],
@@ -363,7 +363,7 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "030",
     "name": "Abstract Spatial Synthesis",
-    "file": "images/030_Art_08.jpg",
+    "file": "images/concept_abstract-spatial-synthesis_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],

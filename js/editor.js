@@ -15,13 +15,26 @@
   const editorDialog = document.getElementById('editorModal');
   const editorClose = document.getElementById('editorClose');
   const btnOpenEditor = document.getElementById('btnOpenEditor');
+  const btnEditGallery = document.getElementById('btnEditGallery');
+  const btnControlsEditGallery = document.getElementById('btnControlsEditGallery');
+  const btnReorderAddNew = document.getElementById('btnReorderAddNew');
+  const btnBackToReorder = document.getElementById('btnBackToReorder');
+  const editorModalTitleText = document.getElementById('editorModalTitleText');
   const tabEditExisting = document.getElementById('tabEditExisting');
   const tabAddNew = document.getElementById('tabAddNew');
+  const tabReorder = document.getElementById('tabReorder');
   const panelEditExisting = document.getElementById('panelEditExisting');
   const panelAddNew = document.getElementById('panelAddNew');
+  const panelReorder = document.getElementById('panelReorder');
 
   // Edit Existing Form Elements
   const selectWorkItem = document.getElementById('selectWorkItem');
+  const editCurrentPosBadge = document.getElementById('editCurrentPosBadge');
+  const btnMoveTop = document.getElementById('btnMoveTop');
+  const btnMoveUp = document.getElementById('btnMoveUp');
+  const btnMoveDown = document.getElementById('btnMoveDown');
+  const btnMoveBottom = document.getElementById('btnMoveBottom');
+  const selectJumpPosition = document.getElementById('selectJumpPosition');
   const editFieldTitle = document.getElementById('editFieldTitle');
   const dccCheckboxGroup = document.getElementById('dccCheckboxGroup');
   const editFieldRnd = document.getElementById('editFieldRnd');
@@ -35,6 +48,9 @@
   // Add New Artwork Form Elements
   const newFieldFile = document.getElementById('newFieldFile');
   const newFieldTitle = document.getElementById('newFieldTitle');
+  const newFieldPositionMode = document.getElementById('newFieldPositionMode');
+  const newFieldSpecificPosWrap = document.getElementById('newFieldSpecificPosWrap');
+  const newFieldSpecificPos = document.getElementById('newFieldSpecificPos');
   const newDccCheckboxGroup = document.getElementById('newDccCheckboxGroup');
   const newFieldRnd = document.getElementById('newFieldRnd');
   const newFieldCategory = document.getElementById('newFieldCategory');
@@ -45,6 +61,12 @@
   const newPreviewTitleText = document.getElementById('newPreviewTitleText');
   const newPreviewPathText = document.getElementById('newPreviewPathText');
   const btnSubmitNewWork = document.getElementById('btnSubmitNewWork');
+
+  // Reorder Panel Elements
+  const reorderList = document.getElementById('reorderList');
+  const reorderSearchInput = document.getElementById('reorderSearchInput');
+  const reorderCountBadge = document.getElementById('reorderCountBadge');
+  const btnReorderReset = document.getElementById('btnReorderReset');
 
   // GitHub Sync Elements
   const syncHeaderToggle = document.getElementById('syncHeaderToggle');
@@ -57,17 +79,21 @@
 
   // Buttons
   const btnSaveItem = document.getElementById('btnSaveItem');
+  const btnGoToReorder = document.getElementById('btnGoToReorder');
   const btnDownloadJs = document.getElementById('btnDownloadJs');
   const btnCopyJs = document.getElementById('btnCopyJs');
   const btnAddNewWork = document.getElementById('btnAddNewWork');
   const btnResetDefaults = document.getElementById('btnResetDefaults');
 
   let currentEditingItem = null;
+  let draggedItemIndex = null;
 
   function init() {
     if (!editorDialog) return;
 
+    normalizeWorkIds(window.PORTFOLIO_WORKS);
     populateSelectOptions();
+    populateNewArtworkPositionOptions();
     autoDetectGitHubConfig();
     bindEditorEvents();
 
@@ -75,6 +101,13 @@
     if (window.PORTFOLIO_WORKS && window.PORTFOLIO_WORKS.length > 0) {
       loadItemIntoForm(window.PORTFOLIO_WORKS[0]);
     }
+  }
+
+  function normalizeWorkIds(works) {
+    if (!Array.isArray(works)) return;
+    works.forEach((w, idx) => {
+      w.id = String(idx + 1).padStart(3, '0');
+    });
   }
 
   function autoDetectGitHubConfig() {
@@ -153,6 +186,7 @@
     previewTitle.textContent = item.name || 'Untitled Render';
     previewFile.textContent = item.file || '';
     selectWorkItem.value = item.id;
+    updatePositionControls(item);
   }
 
   function saveCurrentItem(showToast = true) {
@@ -193,6 +227,7 @@
   }
 
   function generateFileContent() {
+    normalizeWorkIds(window.PORTFOLIO_WORKS);
     const code = `/**
  * PORTFOLIO WORKS DATA
  * ----------------------------------------------------
@@ -327,32 +362,246 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     }
   }
 
+  function updatePositionControls(item) {
+    const works = window.PORTFOLIO_WORKS || [];
+    const index = works.findIndex(w => w.id === (item ? item.id : null));
+    if (index === -1) return;
+
+    if (editCurrentPosBadge) {
+      editCurrentPosBadge.textContent = `#${index + 1} of ${works.length}`;
+    }
+    if (btnMoveTop) btnMoveTop.disabled = (index === 0);
+    if (btnMoveUp) btnMoveUp.disabled = (index === 0);
+    if (btnMoveDown) btnMoveDown.disabled = (index === works.length - 1);
+    if (btnMoveBottom) btnMoveBottom.disabled = (index === works.length - 1);
+
+    if (selectJumpPosition) {
+      selectJumpPosition.innerHTML = works.map((_, i) => {
+        const pos = i + 1;
+        const isSel = pos === (index + 1) ? 'selected' : '';
+        return `<option value="${pos}" ${isSel}>#${pos}</option>`;
+      }).join('');
+    }
+  }
+
+  function populateNewArtworkPositionOptions() {
+    if (!newFieldSpecificPos) return;
+    const works = window.PORTFOLIO_WORKS || [];
+    newFieldSpecificPos.innerHTML = works.map((w, idx) => {
+      const pos = idx + 1;
+      const label = `Position #${pos} — Before "${w.name || 'Artwork'}"`;
+      return `<option value="${pos}">${escapeHtml(label)}</option>`;
+    }).join('') + `<option value="${works.length + 1}" selected>Position #${works.length + 1} — At the very end</option>`;
+  }
+
+  function moveArtwork(fromIndex, toIndex, showToast = true) {
+    const works = window.PORTFOLIO_WORKS || [];
+    if (fromIndex < 0 || fromIndex >= works.length) return;
+    if (toIndex < 0 || toIndex >= works.length) return;
+    if (fromIndex === toIndex) return;
+
+    const [item] = works.splice(fromIndex, 1);
+    works.splice(toIndex, 0, item);
+    normalizeWorkIds(works);
+
+    // Save to localStorage immediately
+    try {
+      localStorage.setItem('portfolio_saved_works', JSON.stringify(works));
+    } catch (e) {
+      console.warn('Could not save to localStorage', e);
+    }
+
+    // Refresh application & gallery
+    if (window.PORTFOLIO_APP) {
+      window.PORTFOLIO_APP.refreshData(works);
+      if (showToast) {
+        window.PORTFOLIO_APP.showToast(`Moved "${item.name}" to position #${toIndex + 1}!`);
+      }
+    }
+
+    currentEditingItem = item;
+    populateSelectOptions(item.id);
+    updatePositionControls(item);
+    populateNewArtworkPositionOptions();
+    renderReorderList();
+  }
+
+  function renderReorderList() {
+    if (!reorderList) return;
+    const works = window.PORTFOLIO_WORKS || [];
+    const query = (reorderSearchInput ? reorderSearchInput.value.toLowerCase().trim() : '');
+
+    if (reorderCountBadge) {
+      reorderCountBadge.textContent = `${works.length} artworks`;
+    }
+
+    reorderList.innerHTML = '';
+    works.forEach((w, index) => {
+      const matches = !query ||
+        (w.name && w.name.toLowerCase().includes(query)) ||
+        (w.file && w.file.toLowerCase().includes(query)) ||
+        (w.category && w.category.toLowerCase().includes(query));
+
+      if (!matches) return;
+
+      const itemEl = document.createElement('div');
+      itemEl.className = 'reorder-item';
+      if (currentEditingItem && currentEditingItem.id === w.id) {
+        itemEl.classList.add('is-selected');
+      }
+      itemEl.draggable = true;
+      itemEl.dataset.index = index;
+
+      const isFirst = index === 0;
+      const isLast = index === works.length - 1;
+
+      itemEl.innerHTML = `
+        <div class="reorder-handle" title="Drag to reorder">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
+            <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+            <circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+          </svg>
+        </div>
+        <span class="reorder-index">#${index + 1}</span>
+        <img class="reorder-thumb" src="${escapeHtml(w.file)}" alt="" loading="lazy">
+        <div class="reorder-details">
+          <span class="reorder-title">${escapeHtml(w.name || 'Untitled')}</span>
+          <span class="reorder-meta">${escapeHtml(w.file)} • ${escapeHtml(w.category || 'Product')}</span>
+        </div>
+        <div class="reorder-controls">
+          <button type="button" class="btn-icon-sm btn-reorder-top" title="Move to top" ${isFirst ? 'disabled' : ''}>⤒</button>
+          <button type="button" class="btn-icon-sm btn-reorder-up" title="Move up" ${isFirst ? 'disabled' : ''}>▲</button>
+          <button type="button" class="btn-icon-sm btn-reorder-down" title="Move down" ${isLast ? 'disabled' : ''}>▼</button>
+          <button type="button" class="btn-icon-sm btn-reorder-bottom" title="Move to bottom" ${isLast ? 'disabled' : ''}>⤓</button>
+          <input type="number" min="1" max="${works.length}" value="${index + 1}" class="reorder-num-input" title="Type position number and press Enter">
+        </div>
+      `;
+
+      itemEl.querySelector('.btn-reorder-top').addEventListener('click', (e) => {
+        e.stopPropagation();
+        moveArtwork(index, 0);
+      });
+      itemEl.querySelector('.btn-reorder-up').addEventListener('click', (e) => {
+        e.stopPropagation();
+        moveArtwork(index, index - 1);
+      });
+      itemEl.querySelector('.btn-reorder-down').addEventListener('click', (e) => {
+        e.stopPropagation();
+        moveArtwork(index, index + 1);
+      });
+      itemEl.querySelector('.btn-reorder-bottom').addEventListener('click', (e) => {
+        e.stopPropagation();
+        moveArtwork(index, works.length - 1);
+      });
+
+      const numInput = itemEl.querySelector('.reorder-num-input');
+      numInput.addEventListener('click', (e) => e.stopPropagation());
+      numInput.addEventListener('change', () => {
+        const targetPos = parseInt(numInput.value, 10);
+        if (!isNaN(targetPos) && targetPos >= 1 && targetPos <= works.length) {
+          moveArtwork(index, targetPos - 1);
+        } else {
+          numInput.value = index + 1;
+        }
+      });
+      numInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') numInput.blur();
+      });
+
+      // Quick-select in editor when clicking item
+      itemEl.addEventListener('click', () => {
+        loadItemIntoForm(w);
+        switchTab('edit');
+      });
+
+      // HTML5 Drag & Drop
+      itemEl.addEventListener('dragstart', (e) => {
+        draggedItemIndex = index;
+        itemEl.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(index));
+      });
+
+      itemEl.addEventListener('dragend', () => {
+        draggedItemIndex = null;
+        itemEl.classList.remove('dragging');
+        reorderList.querySelectorAll('.reorder-item').forEach(el => {
+          el.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+      });
+
+      itemEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (draggedItemIndex === null || draggedItemIndex === index) return;
+        e.dataTransfer.dropEffect = 'move';
+        const rect = itemEl.getBoundingClientRect();
+        const isTopHalf = (e.clientY - rect.top) < (rect.height / 2);
+        itemEl.classList.toggle('drag-over-top', isTopHalf);
+        itemEl.classList.toggle('drag-over-bottom', !isTopHalf);
+      });
+
+      itemEl.addEventListener('dragleave', () => {
+        itemEl.classList.remove('drag-over-top', 'drag-over-bottom');
+      });
+
+      itemEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        itemEl.classList.remove('drag-over-top', 'drag-over-bottom');
+        if (draggedItemIndex === null || draggedItemIndex === index) return;
+        const rect = itemEl.getBoundingClientRect();
+        const isTopHalf = (e.clientY - rect.top) < (rect.height / 2);
+        let targetIdx = isTopHalf ? index : index + 1;
+        if (draggedItemIndex < targetIdx) targetIdx--;
+        moveArtwork(draggedItemIndex, targetIdx);
+      });
+
+      reorderList.appendChild(itemEl);
+    });
+  }
+
   function switchTab(tab) {
-    if (tab === 'addNew') {
-      if (tabAddNew) {
-        tabAddNew.classList.add('active');
-        tabAddNew.setAttribute('aria-selected', 'true');
+    const isAddNew = tab === 'addNew';
+    const isReorder = tab === 'reorder';
+    const isEdit = !isAddNew && !isReorder;
+
+    if (tabEditExisting) {
+      tabEditExisting.classList.toggle('active', isEdit);
+      tabEditExisting.setAttribute('aria-selected', String(isEdit));
+    }
+    if (tabAddNew) {
+      tabAddNew.classList.toggle('active', isAddNew);
+      tabAddNew.setAttribute('aria-selected', String(isAddNew));
+    }
+    if (tabReorder) {
+      tabReorder.classList.toggle('active', isReorder);
+      tabReorder.setAttribute('aria-selected', String(isReorder));
+    }
+
+    if (panelEditExisting) panelEditExisting.style.display = isEdit ? 'flex' : 'none';
+    if (panelAddNew) panelAddNew.style.display = isAddNew ? 'flex' : 'none';
+    if (panelReorder) panelReorder.style.display = isReorder ? 'flex' : 'none';
+
+    if (editorModalTitleText) {
+      if (isReorder) {
+        editorModalTitleText.textContent = 'Edit Gallery & Reorder Artworks';
+      } else if (isAddNew) {
+        editorModalTitleText.textContent = '+ Add New Artwork to Gallery';
+      } else {
+        editorModalTitleText.textContent = 'Edit Artwork Metadata';
       }
-      if (tabEditExisting) {
-        tabEditExisting.classList.remove('active');
-        tabEditExisting.setAttribute('aria-selected', 'false');
-      }
-      if (panelAddNew) panelAddNew.style.display = 'flex';
-      if (panelEditExisting) panelEditExisting.style.display = 'none';
-      if (btnSaveItem) btnSaveItem.style.display = 'none';
+    }
+
+    if (btnSaveItem) btnSaveItem.style.display = isEdit ? 'inline-flex' : 'none';
+
+    if (isAddNew) {
+      populateNewArtworkPositionOptions();
       if (newFieldFile) newFieldFile.focus();
+    } else if (isReorder) {
+      renderReorderList();
+      if (reorderSearchInput) reorderSearchInput.focus();
     } else {
-      if (tabEditExisting) {
-        tabEditExisting.classList.add('active');
-        tabEditExisting.setAttribute('aria-selected', 'true');
-      }
-      if (tabAddNew) {
-        tabAddNew.classList.remove('active');
-        tabAddNew.setAttribute('aria-selected', 'false');
-      }
-      if (panelEditExisting) panelEditExisting.style.display = 'flex';
-      if (panelAddNew) panelAddNew.style.display = 'none';
-      if (btnSaveItem) btnSaveItem.style.display = 'inline-flex';
+      if (currentEditingItem) updatePositionControls(currentEditingItem);
     }
   }
 
@@ -389,7 +638,7 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     if (!newFieldFile) return;
     let rawFile = newFieldFile.value.trim();
     if (!rawFile) {
-      alert('Please enter an image file name (e.g. 030_NewRender.jpg).');
+      alert('Please enter an image file name (e.g. MyRender.jpg).');
       newFieldFile.focus();
       return;
     }
@@ -414,16 +663,22 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     const year = (newFieldYear && newFieldYear.value) || String(new Date().getFullYear());
     const desc = (newFieldDesc && newFieldDesc.value.trim()) || 'New portfolio artwork render.';
 
-    // Calculate next ID
     const currentWorks = window.PORTFOLIO_WORKS || [];
-    const maxNum = currentWorks.reduce((max, w) => {
-      const num = parseInt(w.id, 10);
-      return !isNaN(num) && num > max ? num : max;
-    }, currentWorks.length);
-    const nextId = String(maxNum + 1).padStart(3, '0');
+
+    // Determine target placement position
+    let targetIndex = currentWorks.length; // default 'end'
+    const posMode = (newFieldPositionMode && newFieldPositionMode.value) || 'end';
+    if (posMode === 'start') {
+      targetIndex = 0;
+    } else if (posMode === 'specific' && newFieldSpecificPos) {
+      const chosenPos = parseInt(newFieldSpecificPos.value, 10);
+      if (!isNaN(chosenPos)) {
+        targetIndex = Math.max(0, Math.min(currentWorks.length, chosenPos - 1));
+      }
+    }
 
     const newItem = {
-      id: nextId,
+      id: '000', // Re-indexed immediately below
       name: title,
       file: filePath,
       dcc: selectedDccs,
@@ -433,7 +688,8 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       description: desc
     };
 
-    currentWorks.push(newItem);
+    currentWorks.splice(targetIndex, 0, newItem);
+    normalizeWorkIds(currentWorks);
 
     // Save to localStorage immediately
     try {
@@ -444,12 +700,14 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
 
     // Refresh application & UI
     populateSelectOptions(newItem.id);
+    updatePositionControls(newItem);
+    populateNewArtworkPositionOptions();
     loadItemIntoForm(newItem);
-    switchTab('edit');
+    switchTab('reorder');
 
     if (window.PORTFOLIO_APP) {
       window.PORTFOLIO_APP.refreshData(currentWorks);
-      window.PORTFOLIO_APP.showToast(`Added "${newItem.name}" to gallery!`);
+      window.PORTFOLIO_APP.showToast(`Added "${newItem.name}" at position #${targetIndex + 1}!`);
     }
 
     // Reset add form fields
@@ -469,6 +727,74 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     }
     if (tabAddNew) {
       tabAddNew.addEventListener('click', () => switchTab('addNew'));
+    }
+    if (tabReorder) {
+      tabReorder.addEventListener('click', () => switchTab('reorder'));
+    }
+
+    // Position controls in Edit Form
+    if (btnMoveTop) {
+      btnMoveTop.addEventListener('click', () => {
+        const works = window.PORTFOLIO_WORKS || [];
+        const idx = works.indexOf(currentEditingItem);
+        if (idx > -1) moveArtwork(idx, 0);
+      });
+    }
+    if (btnMoveUp) {
+      btnMoveUp.addEventListener('click', () => {
+        const works = window.PORTFOLIO_WORKS || [];
+        const idx = works.indexOf(currentEditingItem);
+        if (idx > 0) moveArtwork(idx, idx - 1);
+      });
+    }
+    if (btnMoveDown) {
+      btnMoveDown.addEventListener('click', () => {
+        const works = window.PORTFOLIO_WORKS || [];
+        const idx = works.indexOf(currentEditingItem);
+        if (idx > -1 && idx < works.length - 1) moveArtwork(idx, idx + 1);
+      });
+    }
+    if (btnMoveBottom) {
+      btnMoveBottom.addEventListener('click', () => {
+        const works = window.PORTFOLIO_WORKS || [];
+        const idx = works.indexOf(currentEditingItem);
+        if (idx > -1 && idx < works.length - 1) moveArtwork(idx, works.length - 1);
+      });
+    }
+    if (selectJumpPosition) {
+      selectJumpPosition.addEventListener('change', (e) => {
+        const works = window.PORTFOLIO_WORKS || [];
+        const idx = works.indexOf(currentEditingItem);
+        const targetPos = parseInt(e.target.value, 10);
+        if (idx > -1 && !isNaN(targetPos) && targetPos >= 1 && targetPos <= works.length) {
+          moveArtwork(idx, targetPos - 1);
+        }
+      });
+    }
+
+    // Position mode toggle in Add New Form
+    if (newFieldPositionMode) {
+      newFieldPositionMode.addEventListener('change', () => {
+        if (newFieldSpecificPosWrap) {
+          newFieldSpecificPosWrap.style.display = newFieldPositionMode.value === 'specific' ? 'block' : 'none';
+        }
+      });
+    }
+
+    // Reorder panel search
+    if (reorderSearchInput) {
+      reorderSearchInput.addEventListener('input', renderReorderList);
+    }
+
+    // Reorder panel reset button
+    if (btnReorderReset) {
+      btnReorderReset.addEventListener('click', () => {
+        if (confirm('Reset gallery order back to default repository order?')) {
+          if (window.PORTFOLIO_APP && window.PORTFOLIO_APP.resetToDefaults) {
+            window.PORTFOLIO_APP.resetToDefaults();
+          }
+        }
+      });
     }
 
     // Real-time input handling for Add New Artwork
@@ -499,7 +825,37 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       btnSubmitNewWork.addEventListener('click', submitNewArtwork);
     }
 
-    // Open editor
+    // Open Edit Gallery button (in header)
+    if (btnEditGallery) {
+      btnEditGallery.addEventListener('click', () => {
+        switchTab('reorder');
+        editorDialog.showModal();
+      });
+    }
+
+    // Open Edit Gallery button (in controls toolbar)
+    if (btnControlsEditGallery) {
+      btnControlsEditGallery.addEventListener('click', () => {
+        switchTab('reorder');
+        editorDialog.showModal();
+      });
+    }
+
+    // Quick Add button in Reorder Panel
+    if (btnReorderAddNew) {
+      btnReorderAddNew.addEventListener('click', () => {
+        switchTab('addNew');
+      });
+    }
+
+    // Back to Reorder button in Add Artwork Panel
+    if (btnBackToReorder) {
+      btnBackToReorder.addEventListener('click', () => {
+        switchTab('reorder');
+      });
+    }
+
+    // Open editor (Metadata)
     if (btnOpenEditor) {
       btnOpenEditor.addEventListener('click', () => {
         switchTab('edit');
@@ -593,6 +949,11 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     if (btnAddNewWork) {
       btnAddNewWork.addEventListener('click', () => switchTab('addNew'));
     }
+
+    // Footer "↕ Reorder Gallery" button switches to Reorder tab
+    if (btnGoToReorder) {
+      btnGoToReorder.addEventListener('click', () => switchTab('reorder'));
+    }
   }
 
   function escapeHtml(str) {
@@ -611,6 +972,11 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       if (!editorDialog) return;
       populateSelectOptions(item.id);
       loadItemIntoForm(item);
+      editorDialog.showModal();
+    },
+    openReorder: function () {
+      if (!editorDialog) return;
+      switchTab('reorder');
       editorDialog.showModal();
     }
   };

@@ -17,31 +17,46 @@
   function loadInitialWorks() {
     const defaultWorks = Array.isArray(window.PORTFOLIO_WORKS) ? [...window.PORTFOLIO_WORKS] : [];
     if (!defaultWorks.length) return [];
+    // Untouched copy of works.js, so the editor can look up an artwork's own texts after it moved into a project
+    window.PORTFOLIO_ORIGINAL_WORKS = JSON.parse(JSON.stringify(defaultWorks));
     try {
       const saved = localStorage.getItem('portfolio_saved_works');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const defaultByFile = new Map(defaultWorks.filter(w => w && w.file).map(w => [w.file, w]));
-          const defaultFiles = new Set(defaultByFile.keys());
+          const defaultByKey = new Map(defaultWorks.filter(w => getWorkKey(w)).map(w => [getWorkKey(w), w]));
 
-          const savedFiles = new Set();
+          const savedKeys = new Set();
           const merged = [];
 
-          // 1. Preserve user custom ordering from localStorage for valid files
+          // 1. Preserve user custom ordering from localStorage for valid files / videos
           for (const item of parsed) {
-            if (item && item.file && defaultFiles.has(item.file)) {
-              const def = defaultByFile.get(item.file);
+            const key = getWorkKey(item);
+            if (key && defaultByKey.has(key) && !savedKeys.has(key)) {
+              const def = defaultByKey.get(key);
               merged.push({ ...def, ...item, id: String(merged.length + 1).padStart(3, '0') });
-              savedFiles.add(item.file);
+              savedKeys.add(key);
+            } else if (key && isProject(item) && !savedKeys.has(key)) {
+              // Project made in the browser editor (not exported to works.js yet): keep it
+              merged.push({ ...item, id: String(merged.length + 1).padStart(3, '0') });
+              savedKeys.add(key);
+            } else {
+              continue;
+            }
+            // Images/videos inside a project are not re-added as separate works
+            if (isProject(item)) {
+              // Texts only: tools / models changed on the project since then must not be pinned on the items
+              fillItemTexts(merged[merged.length - 1], defaultWorks, ['name', 'description', 'year']);
+              item.items.forEach(it => savedKeys.add(getWorkKey(it)));
             }
           }
 
           // 2. Append any newly added defaultWorks items that were not yet in localStorage
           for (const item of defaultWorks) {
-            if (item && item.file && !savedFiles.has(item.file)) {
+            const key = getWorkKey(item);
+            if (key && !savedKeys.has(key)) {
               merged.push({ ...item, id: String(merged.length + 1).padStart(3, '0') });
-              savedFiles.add(item.file);
+              savedKeys.add(key);
             }
           }
 
@@ -62,6 +77,8 @@
   const state = {
     works: loadInitialWorks(),
     filteredWorks: [],
+    displayList: [],      // cards currently shown: filtered works, or the open project's materials
+    openProject: null,    // project whose sub-gallery is open
     selectedCategory: 'all',
     selectedDcc: 'all',
     selectedRenderer: 'all',
@@ -115,11 +132,19 @@
     btnLayoutMasonry: document.getElementById('btnLayoutMasonry'),
     btnLayoutGrid: document.getElementById('btnLayoutGrid'),
     btnBackToTop: document.getElementById('btnBackToTop'),
+    projectHeader: document.getElementById('projectHeader'),
+    projectBack: document.getElementById('projectBack'),
+    projectTitle: document.getElementById('projectTitle'),
+    projectInfo: document.getElementById('projectInfo'),
+    projectDesc: document.getElementById('projectDesc'),
 
     // Lightbox Elements
     lightboxDialog: document.getElementById('lightboxModal'),
     lightboxImg: document.getElementById('lightboxImg'),
     lightboxImgContainer: document.getElementById('lightboxImgContainer'),
+    lightboxVideoWrap: document.getElementById('lightboxVideoWrap'),
+    lightboxVideo: document.getElementById('lightboxVideo'),
+    stageControls: document.querySelector('.lightbox-stage .stage-controls'),
     lightboxPrev: document.getElementById('lightboxPrev'),
     lightboxNext: document.getElementById('lightboxNext'),
     lightboxClose: document.getElementById('lightboxClose'),
@@ -251,9 +276,9 @@
     const preload = () => {
       // Only small WebP thumbnails are precached; full renders load when opened in the lightbox
       state.works.forEach((item, i) => {
-        if (i >= 4 && item.file) {
+        if (i >= 4) {
           const img = new Image();
-          img.src = getThumbPath(item.file);
+          img.src = getCardImage(item);
         }
       });
     };
@@ -274,6 +299,7 @@
     bindLightboxEvents();
     bindAuthEvents();
     precacheRemainingWorks();
+    syncProjectFromHash();
   }
 
   // --- ADMIN & AUTH MODE ---
@@ -372,6 +398,7 @@
       elements.catFilterList.innerHTML = `
         <button type="button" class="chip active" data-cat="all">All</button>
         ${categories.map(cat => `<button type="button" class="chip" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`).join('')}
+        ${state.works.some(isProject) ? `<button type="button" class="chip chip-project" data-cat="${PROJECTS_FILTER}">Projects</button>` : ''}
       `;
     }
 
@@ -392,11 +419,14 @@
   function applyFilters() {
     const query = state.searchQuery.trim().toLowerCase();
 
-    state.filteredWorks = state.works.filter(item => {
+    // A project matches when the project itself or any of its items matches (items can have their own tools / models)
+    const matches = (item, owner) => {
       const itemDccs = getDccList(item);
 
       // Category filter
-      if (state.selectedCategory !== 'all') {
+      if (state.selectedCategory === PROJECTS_FILTER) {
+        if (!isProject(owner)) return false;
+      } else if (state.selectedCategory !== 'all') {
         if ((item.category || '').toLowerCase() !== state.selectedCategory.toLowerCase()) {
           return false;
         }
@@ -428,7 +458,9 @@
         }
       }
       return true;
-    });
+    };
+    state.filteredWorks = state.works.filter(item =>
+      matches(item, item) || (isProject(item) && getProjectEntries(item).some(entry => matches(entry, item))));
 
     // Sort
     if (state.sortBy === 'name-asc') {
@@ -449,7 +481,8 @@
 
   // --- RENDER GALLERY ---
   function renderGallery() {
-    if (state.filteredWorks.length === 0) {
+    state.displayList = state.openProject ? getProjectEntries(state.openProject) : state.filteredWorks;
+    if (state.displayList.length === 0) {
       elements.galleryGrid.innerHTML = '';
       elements.emptyState.style.display = 'flex';
       return;
@@ -457,33 +490,39 @@
 
     elements.emptyState.style.display = 'none';
 
-    const cardsHtml = state.filteredWorks.map((item, index) => {
+    const cardsHtml = state.displayList.map((item, index) => {
       const dccs = getDccList(item);
       const rnd = item.renderer || 'Corona';
       const name = item.name || 'Untitled Render';
       const year = item.year || '';
       const category = item.category || 'Render';
+      const project = isProject(item);
+      const cover = getCover(item);
+      const video = isVideo(cover);
+      const fallback = cover.file && !video ? cover.file : getYouTubeThumb(cover);
 
       // Badges rendered strictly under the thumbnail in art-details
       const dccBadgesHtml = dccs.map(d => `<span class="badge-dcc" data-dcc="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join('');
       const rndBadgeHtml = `<span class="badge-rnd" data-rnd="${escapeHtml(rnd)}">${escapeHtml(rnd)}</span>`;
 
       return `
-        <article class="art-card" data-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(name)}">
+        <article class="art-card${project ? ' is-project' : ''}" data-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(project ? `Project: ${name}` : name)}">
           <div class="art-media-wrap">
             <img 
               class="art-img" 
-              src="${escapeHtml(getThumbPath(item.file))}" 
+              src="${escapeHtml(getCardImage(item))}" 
               alt="${escapeHtml(getAltText(item))}" 
               ${index < 2 ? 'fetchpriority="high"' : (index >= 4 ? 'loading="lazy"' : '')}
               decoding="async"
               onload="this.parentElement.classList.add('has-loaded')"
-              onerror="if (this.dataset.full !== '1') { this.dataset.full = '1'; this.src = '${escapeHtml(item.file)}'; }"
+              onerror="if (this.dataset.full !== '1') { this.dataset.full = '1'; this.src = '${escapeHtml(fallback)}'; }"
             >
+            ${video ? VIDEO_PLAY_ICON : ''}
+            ${project ? projectBadgeHtml(item) : ''}
             <div class="card-hover-overlay">
               <span class="quick-view-badge">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                Inspect Artwork
+                ${project ? 'Open Project' : (video ? 'Play Video' : 'Inspect Artwork')}
               </span>
             </div>
           </div>
@@ -555,12 +594,12 @@
 
   // --- LIGHTBOX CONTROLLER ---
   function openLightbox(index) {
-    if (index < 0 || index >= state.filteredWorks.length) return;
+    if (index < 0 || index >= state.displayList.length) return;
 
     state.currentLightboxIndex = index;
     resetZoom();
 
-    const item = state.filteredWorks[index];
+    const item = state.displayList[index];
     updateLightboxContent(item);
 
     elements.lightboxDialog.showModal();
@@ -568,14 +607,28 @@
   }
 
   function closeLightbox() {
+    stopLightboxVideo();
     elements.lightboxDialog.close();
     document.body.style.overflow = '';
   }
 
   function updateLightboxContent(item) {
-    elements.lightboxImg.src = item.file;
+    const videoId = getYouTubeId(item.youtube);
+    if (videoId && elements.lightboxVideo) {
+      // YouTube artwork: show the embedded player instead of the zoomable image
+      elements.lightboxImgContainer.hidden = true;
+      if (elements.stageControls) elements.stageControls.hidden = true;
+      elements.lightboxVideoWrap.hidden = false;
+      setLightboxVideoSrc(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`, item.name || 'YouTube video');
+      elements.lightboxImg.removeAttribute('src');
+    } else {
+      stopLightboxVideo();
+      elements.lightboxImgContainer.hidden = false;
+      if (elements.stageControls) elements.stageControls.hidden = false;
+      elements.lightboxImg.src = item.file;
+    }
     elements.lightboxImg.alt = getAltText(item);
-    elements.lightboxCounter.textContent = `${state.currentLightboxIndex + 1} / ${state.filteredWorks.length}`;
+    elements.lightboxCounter.textContent = `${state.currentLightboxIndex + 1} / ${state.displayList.length}`;
     elements.lightboxTitle.textContent = item.name || 'Untitled Render';
 
     // DCC Badges (Multiple supported)
@@ -595,7 +648,7 @@
   }
 
   function navigateLightbox(direction) {
-    const total = state.filteredWorks.length;
+    const total = state.displayList.length;
     if (total <= 1) return;
 
     let newIndex = state.currentLightboxIndex + direction;
@@ -603,6 +656,22 @@
     if (newIndex >= total) newIndex = 0;
 
     openLightbox(newIndex);
+  }
+
+  function stopLightboxVideo() {
+    if (!elements.lightboxVideo) return;
+    if (elements.lightboxVideo.hasAttribute('src')) setLightboxVideoSrc('', 'YouTube video');
+    elements.lightboxVideoWrap.hidden = true;
+  }
+
+  // Swap in a fresh iframe instead of changing src: changing an attached iframe's src adds
+  // browser history entries, which would hijack the Back button (e.g. leaving a project)
+  function setLightboxVideoSrc(src, title) {
+    const frame = elements.lightboxVideo.cloneNode(false);
+    if (src) frame.src = src; else frame.removeAttribute('src');
+    frame.title = title;
+    elements.lightboxVideo.replaceWith(frame);
+    elements.lightboxVideo = frame;
   }
 
   // --- ZOOM & PAN LOGIC ---
@@ -720,7 +789,7 @@
       const card = e.target.closest('.art-card');
       if (!card) return;
       const index = parseInt(card.dataset.index, 10);
-      openLightbox(index);
+      openCard(index);
     });
 
     // Card keyboard trigger (Enter/Space)
@@ -730,8 +799,19 @@
         if (card) {
           e.preventDefault();
           const index = parseInt(card.dataset.index, 10);
-          openLightbox(index);
+          openCard(index);
         }
+      }
+    });
+
+    // Project sub-gallery: back button, browser back/forward, Esc
+    if (elements.projectBack) {
+      elements.projectBack.addEventListener('click', () => closeProject());
+    }
+    window.addEventListener('hashchange', syncProjectFromHash);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && state.openProject && !document.querySelector('dialog[open]')) {
+        closeProject();
       }
     });
 
@@ -759,6 +839,9 @@
     elements.lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
     elements.lightboxNext.addEventListener('click', () => navigateLightbox(1));
     elements.lightboxClose.addEventListener('click', closeLightbox);
+
+    // Stop video playback however the dialog gets closed (Esc, light dismiss, close button)
+    elements.lightboxDialog.addEventListener('close', stopLightboxVideo);
 
     // Light dismiss: click outside the wrapper to close
     elements.lightboxDialog.addEventListener('click', (e) => {
@@ -827,10 +910,10 @@
 
     // Lightbox Edit Shortcut
     elements.lightboxEditBtn.addEventListener('click', () => {
-      const currentItem = state.filteredWorks[state.currentLightboxIndex];
+      const currentItem = state.displayList[state.currentLightboxIndex];
       closeLightbox();
       if (window.PORTFOLIO_EDITOR && window.PORTFOLIO_EDITOR.openWithItem) {
-        window.PORTFOLIO_EDITOR.openWithItem(currentItem);
+        window.PORTFOLIO_EDITOR.openWithItem(currentItem._project || currentItem, currentItem._itemIndex);
       }
     });
   }
@@ -847,8 +930,23 @@
       }
       updateHeaderStats();
       buildFilterChips();
+      state.selectedCategory = 'all';
+      if (state.openProject) {
+        const project = state.openProject;
+        if (state.works.includes(project) && isProject(project)) {
+          showProjectHeader(project);
+        } else {
+          closeProject();
+        }
+      }
       applyFilters();
     },
+    getYouTubeId: getYouTubeId,
+    isProject: isProject,
+    slugify: slugify,
+    getWorkKey: getWorkKey,
+    fillItemTexts: fillItemTexts,
+    getCardImage: getCardImage,
     resetToDefaults: function () {
       localStorage.removeItem('portfolio_saved_works');
       window.location.reload();
@@ -882,8 +980,169 @@
     const tools = getDccList(item).join(' & ');
     const rnd = item.renderer || '';
     const tech = [tools, rnd].filter(Boolean).join(', ');
-    const base = `${item.name || 'Untitled render'} - ${item.category || '3D'} render`;
+    const base = `${item.name || 'Untitled render'} - ${item.category || '3D'} ${isVideo(item) ? 'video' : 'render'}`;
     return tech ? `${base} made in ${tech}` : base;
+  }
+
+  // --- YOUTUBE ARTWORKS ---
+  // A work becomes a video when it has a "youtube" field (video ID or any YouTube link).
+  // "file" is optional for videos: if set, that image is the card poster, otherwise YouTube's thumbnail is used.
+  const VIDEO_PLAY_ICON = '<span class="video-play-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></span>';
+
+  function getYouTubeId(value) {
+    if (!value) return '';
+    const str = String(value).trim();
+    if (/^[\w-]{11}$/.test(str)) return str;
+    const match = str.match(/(?:youtu\.be\/|[?&]v=|\/(?:embed|shorts|live|v)\/)([\w-]{11})/);
+    return match ? match[1] : '';
+  }
+
+  function isVideo(item) {
+    return !!(item && getYouTubeId(item.youtube));
+  }
+
+  function getYouTubeThumb(item) {
+    const id = getYouTubeId(item && item.youtube);
+    return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
+  }
+
+  function getCardImage(item) {
+    const cover = getCover(item);
+    if (cover && cover.file) return getThumbPath(cover.file);
+    return getYouTubeThumb(cover);
+  }
+
+  // Identity of a work for saved-edit merging: project slug, image file, or YouTube video
+  function getWorkKey(item) {
+    if (!item) return '';
+    if (isProject(item)) return `project:${item.project}`;
+    if (item.file) return item.file;
+    const id = getYouTubeId(item.youtube);
+    return id ? `youtube:${id}` : '';
+  }
+
+  // --- PROJECTS ---
+  // A project is one gallery card that groups 2+ images/videos:
+  //   { "name": "...", "project": "url-slug", "items": [ { "file": "images/a.jpg" }, { "youtube": "https://youtu.be/...", "name": "Optional title" } ], ...same metadata as a work }
+  // The first item is the cover. Clicking the card opens the project's sub-gallery (shareable as #project=url-slug).
+  const PROJECTS_FILTER = '__projects';
+  const PROJECT_ICON = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 012 2v12"/></svg>';
+
+  function isProject(item) {
+    return !!(item && item.project && Array.isArray(item.items) && item.items.length > 0);
+  }
+
+  function getCover(item) {
+    return isProject(item) ? item.items[0] : item;
+  }
+
+  // Project items that were separate artworks keep that artwork's own info (title, description, year, category, tools / models),
+  // only where it differs from the project's, so items never repeat the project's info
+  function fillItemTexts(project, works, onlyFields) {
+    if (!isProject(project)) return project;
+    // Info a project item can have on its own (everything else always comes from the project)
+    const PROJECT_ITEM_FIELDS = ['name', 'description', 'year', 'category', 'dcc', 'renderer'];
+    const byKey = new Map();
+    (works || []).forEach(w => {
+      const key = w !== project && !isProject(w) ? getWorkKey(w) : '';
+      if (key) byKey.set(key, w);
+    });
+    project.items.forEach(it => {
+      const src = byKey.get(getWorkKey(it));
+      if (!src) return;
+      (onlyFields || PROJECT_ITEM_FIELDS).forEach(field => {
+        const value = src[field];
+        const empty = value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
+        if (it[field] !== undefined || empty || JSON.stringify(value) === JSON.stringify(project[field])) return;
+        it[field] = Array.isArray(value) ? [...value] : value;
+      });
+    });
+    return project;
+  }
+
+  function slugify(str) {
+    return String(str || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'project';
+  }
+
+  function projectBadgeHtml(item) {
+    return `<span class="project-badge">${PROJECT_ICON} Project &middot; ${item.items.length}</span>`;
+  }
+
+  // Each project material becomes a card that carries the project's metadata
+  function getProjectEntries(project) {
+    const { items, project: slug, ...meta } = project;
+    // Each item may override the project's info (title, description, year, category, tools / models)
+    return items.map((it, i) => ({
+      ...meta,
+      ...it,
+      file: it.file || '',
+      youtube: it.youtube || '',
+      name: it.name || project.name,
+      description: it.description || project.description,
+      year: it.year || project.year,
+      _project: project,
+      _itemIndex: i
+    }));
+  }
+
+  // Tool badges for a work (DCC tools + render engine)
+  function getBadgesHtml(item) {
+    const dccs = getDccList(item).map(d => `<span class="badge-dcc" data-dcc="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join('');
+    const rnd = item.renderer ? `<span class="badge-rnd" data-rnd="${escapeHtml(item.renderer)}">${escapeHtml(item.renderer)}</span>` : '';
+    return dccs + rnd;
+  }
+  function showProjectHeader(project) {
+    if (!elements.projectHeader) return;
+    elements.projectTitle.textContent = project.name || 'Untitled Project';
+    const info = [project.category, project.year, `${project.items.length} items`].filter(Boolean)
+      .map(t => `<span class="project-info-text">${escapeHtml(t)}</span>`).join('');
+    elements.projectInfo.innerHTML = `<span class="project-badge is-inline">${PROJECT_ICON} Project</span>${info}${getBadgesHtml(project)}`;
+    elements.projectDesc.textContent = project.description || '';
+    elements.projectHeader.hidden = false;
+  }
+
+  function openCard(index) {
+    const item = state.displayList[index];
+    if (!state.openProject && isProject(item)) {
+      openProject(item);
+    } else {
+      openLightbox(index);
+    }
+  }
+
+  function openProject(project, updateHash = true) {
+    state.openProject = project;
+    document.body.classList.add('is-project-view');
+    showProjectHeader(project);
+    renderGallery();
+    if (updateHash && location.hash !== `#project=${project.project}`) {
+      history.pushState(null, '', `#project=${encodeURIComponent(project.project)}`);
+    }
+    const top = elements.projectHeader ? elements.projectHeader.getBoundingClientRect().top + window.scrollY - 90 : 0;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
+  function closeProject(updateHash = true) {
+    if (!state.openProject) return;
+    state.openProject = null;
+    document.body.classList.remove('is-project-view');
+    if (elements.projectHeader) elements.projectHeader.hidden = true;
+    renderGallery();
+    if (updateHash && location.hash.startsWith('#project=')) {
+      history.pushState(null, '', location.pathname + location.search);
+    }
+  }
+
+  function syncProjectFromHash() {
+    const match = location.hash.match(/^#project=(.+)$/);
+    const slug = match ? decodeURIComponent(match[1]) : '';
+    const project = slug ? state.works.find(w => isProject(w) && w.project === slug) : null;
+    if (project && project !== state.openProject) {
+      openProject(project, false);
+    } else if (!project && state.openProject) {
+      closeProject(false);
+    }
   }
 
   // Helper utility

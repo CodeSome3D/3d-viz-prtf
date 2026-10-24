@@ -41,11 +41,21 @@
   const editFieldCategory = document.getElementById('editFieldCategory');
   const editFieldYear = document.getElementById('editFieldYear');
   const editFieldDesc = document.getElementById('editFieldDesc');
+  const editFieldYoutube = document.getElementById('editFieldYoutube');
+  const editFieldYoutubeWrap = document.getElementById('editFieldYoutubeWrap');
+  const editFieldItems = document.getElementById('editFieldItems');
   const previewImg = document.getElementById('editorPreviewImg');
   const previewTitle = document.getElementById('editorPreviewTitle');
   const previewFile = document.getElementById('editorPreviewFile');
 
   // Add New Artwork Form Elements
+  const newFieldType = document.getElementById('newFieldType');
+  const newFieldYoutube = document.getElementById('newFieldYoutube');
+  const newFieldYoutubeWrap = document.getElementById('newFieldYoutubeWrap');
+  const newFieldFileLabel = document.getElementById('newFieldFileLabel');
+  const newFieldFileWrap = document.getElementById('newFieldFileWrap');
+  const newFieldItems = document.getElementById('newFieldItems');
+  const newFieldItemsWrap = document.getElementById('newFieldItemsWrap');
   const newFieldFile = document.getElementById('newFieldFile');
   const newFieldTitle = document.getElementById('newFieldTitle');
   const newFieldPositionMode = document.getElementById('newFieldPositionMode');
@@ -84,8 +94,12 @@
   const btnCopyJs = document.getElementById('btnCopyJs');
   const btnAddNewWork = document.getElementById('btnAddNewWork');
   const btnResetDefaults = document.getElementById('btnResetDefaults');
+  const btnDeleteItem = document.getElementById('btnDeleteItem');
 
+  const editFieldItemsWrap = document.getElementById('editFieldItemsWrap');
   let currentEditingItem = null;
+  let editingItemIndex = -1; // >= 0 while one item of a project is being edited
+  const ITEM_FIELDS = ['name', 'description', 'year', 'category', 'dcc', 'renderer'];
   let draggedItemIndex = null;
 
   function init() {
@@ -136,10 +150,179 @@
   function populateSelectOptions(selectedId = null) {
     const works = window.PORTFOLIO_WORKS || [];
     selectWorkItem.innerHTML = works.map(w => {
-      const label = `${w.id || '—'}: ${w.name || 'Untitled'} (${w.file.split('/').pop()})`;
+      const source = isProject(w) ? `Project, ${w.items.length} items`
+        : (w.youtube ? `YouTube ${getYouTubeId(w.youtube)}` : (w.file || '').split('/').pop());
+      const label = `${w.id || '—'}: ${w.name || 'Untitled'} (${source})`;
       const isSelected = selectedId === w.id ? 'selected' : '';
       return `<option value="${w.id}" ${isSelected}>${escapeHtml(label)}</option>`;
     }).join('');
+  }
+
+  // YouTube helpers live in app.js (loaded first)
+  function getYouTubeId(value) {
+    return window.PORTFOLIO_APP ? window.PORTFOLIO_APP.getYouTubeId(value) : '';
+  }
+
+  function toYouTubeLink(value) {
+    const id = getYouTubeId(value);
+    return id ? `https://youtu.be/${id}` : '';
+  }
+
+  // Image shown for a work in editor previews: its own image, or the YouTube thumbnail for videos without one
+  function getPreviewImage(item) {
+    if (!item) return '';
+    const cover = isProject(item) ? item.items[0] : item;
+    if (cover.file) return cover.file;
+    return window.PORTFOLIO_APP ? window.PORTFOLIO_APP.getCardImage(cover) : '';
+  }
+
+  // Short label for a work's source: image path, YouTube link, or project size
+  function getSourceLabel(item) {
+    if (!item) return '';
+    if (isProject(item)) return `Project #${item.project} (${item.items.length} items)`;
+    if (item.youtube && !item.file) return toYouTubeLink(item.youtube) || item.youtube;
+    if (item.youtube) return `${item.file} + ${toYouTubeLink(item.youtube)}`;
+    return item.file || '';
+  }
+
+  // --- PROJECTS (helpers live in app.js) ---
+  function isProject(item) {
+    return !!(window.PORTFOLIO_APP && window.PORTFOLIO_APP.isProject(item));
+  }
+
+  // "images/a.jpg | Optional title" lines <-> [{ file, name }] / [{ youtube, name }]
+  function parseMaterials(text) {
+    return String(text || '').split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+      const [rawSource, ...rest] = line.split('|');
+      const source = rawSource.trim();
+      const name = rest.join('|').trim();
+      const link = toYouTubeLink(source);
+      let entry;
+      if (link) {
+        entry = { youtube: link };
+      } else {
+        entry = { file: (source.startsWith('images/') || source.startsWith('http')) ? source : `images/${source}` };
+      }
+      if (name) entry.name = name;
+      return entry;
+    });
+  }
+
+  function materialsToText(items) {
+    return (items || []).map(it => {
+      const source = it.youtube ? (toYouTubeLink(it.youtube) || it.youtube) : (it.file || '');
+      return it.name ? `${source} | ${it.name}` : source;
+    }).join('\n');
+  }
+
+  function uniqueProjectSlug(name, exceptItem) {
+    const base = window.PORTFOLIO_APP ? window.PORTFOLIO_APP.slugify(name) : 'project';
+    const taken = new Set((window.PORTFOLIO_WORKS || []).filter(w => w !== exceptItem && w.project).map(w => w.project));
+    let slug = base;
+    for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
+    return slug;
+  }
+
+  // ---- Editing one item of a project ----
+  function itemView(project, index) {
+    const { items, project: slug, file, youtube, ...meta } = project;
+    const it = items[index] || {};
+    const copy = obj => JSON.parse(JSON.stringify(obj));
+    return {
+      ...copy(meta),
+      ...copy(it),
+      name: it.name || project.name,
+      description: it.description || project.description,
+      year: it.year || project.year
+    };
+  }
+
+  // Store only what differs from the project, so the item keeps following the project's info otherwise
+  function commitItemView(project, index, view) {
+    const it = project.items[index];
+    if (!it) return;
+    view.name = editFieldTitle.value.trim();
+    ITEM_FIELDS.forEach(field => {
+      const value = view[field];
+      const empty = value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
+      if (empty || JSON.stringify(value) === JSON.stringify(project[field])) {
+        delete it[field];
+      } else {
+        it[field] = Array.isArray(value) ? [...value] : value;
+      }
+    });
+  }
+
+  function updatePartSelect(item) {
+    const wrap = document.getElementById('editFieldPartWrap');
+    const select = document.getElementById('editFieldPart');
+    if (!wrap || !select) return;
+    if (!isProject(item)) {
+      wrap.style.display = 'none';
+      select.innerHTML = '';
+      return;
+    }
+    wrap.style.display = '';
+    select.innerHTML = `<option value="-1">Whole project (info shared by all items)</option>` +
+      item.items.map((it, i) => {
+        const source = it.youtube ? 'YouTube video' : (it.file || '').split('/').pop();
+        return `<option value="${i}">Item ${i + 1}: ${escapeHtml(it.name || item.name || '')} (${escapeHtml(source)})</option>`;
+      }).join('');
+    select.value = String(editingItemIndex);
+  }
+
+  // Project items that are artworks already in the gallery take over that artwork's own title, description
+  // and year, and the artwork moves into the project instead of staying a separate card
+  function adoptExistingWorks(project) {
+    const app = window.PORTFOLIO_APP;
+    const works = window.PORTFOLIO_WORKS || [];
+    if (!app || !app.fillItemTexts || !isProject(project)) return 0;
+    app.fillItemTexts(project, [...(window.PORTFOLIO_ORIGINAL_WORKS || []), ...works]);
+    const keys = new Set(project.items.map(it => app.getWorkKey(it)));
+    let moved = 0;
+    for (let i = works.length - 1; i >= 0; i--) {
+      const w = works[i];
+      if (w !== project && !isProject(w) && keys.has(app.getWorkKey(w))) {
+        works.splice(i, 1);
+        moved++;
+      }
+    }
+    if (moved) normalizeWorkIds(works);
+    return moved;
+  }
+
+  // Materials field (Edit tab): 2+ lines make/update a project, 1 line turns a project back into a single work
+  function applyMaterials() {
+    if (!currentEditingItem || !editFieldItems || editingItemIndex >= 0) return;
+    const item = currentEditingItem;
+    const previous = isProject(item) ? item.items : [];
+    const items = parseMaterials(editFieldItems.value).map(entry => {
+      const old = previous.find(p => (entry.youtube ? p.youtube && getYouTubeId(p.youtube) === getYouTubeId(entry.youtube) : p.file === entry.file));
+      if (!old) return entry;
+      const merged = { ...old, ...entry };
+      if (!entry.name) delete merged.name;
+      return merged;
+    });
+    if (items.length >= 2) {
+      if (!item.project) item.project = uniqueProjectSlug(item.name, item);
+      item.items = items;
+      delete item.file;
+      delete item.youtube;
+      const moved = adoptExistingWorks(item);
+      if (moved && window.PORTFOLIO_APP) {
+        window.PORTFOLIO_APP.showToast(`${moved} artwork${moved > 1 ? 's' : ''} moved into the project "${item.name}".`);
+      }
+    } else if (items.length === 1 && isProject(item)) {
+      delete item.project;
+      delete item.items;
+      if (items[0].file) item.file = items[0].file;
+      if (items[0].youtube) item.youtube = items[0].youtube;
+    } else {
+      return;
+    }
+    saveCurrentItem(false);
+    loadItemIntoForm(item);
+    renderReorderList();
   }
 
   function getDccArray(item) {
@@ -149,14 +332,18 @@
     return [];
   }
 
-  function loadItemIntoForm(item) {
+  function loadItemIntoForm(item, itemIndex = -1) {
     if (!item) return;
     currentEditingItem = item;
+    editingItemIndex = isProject(item) && itemIndex >= 0 && itemIndex < item.items.length ? itemIndex : -1;
+    // One item of a project: the form shows (and saves) that item's own info on top of the project's
+    const view = editingItemIndex >= 0 ? itemView(item, editingItemIndex) : item;
+    updatePartSelect(item);
 
-    editFieldTitle.value = item.name || '';
+    editFieldTitle.value = view.name || '';
 
     // Set DCC checkboxes (Multi-select)
-    const itemDccs = getDccArray(item).map(d => d.toLowerCase());
+    const itemDccs = getDccArray(view).map(d => d.toLowerCase());
     const checkboxes = dccCheckboxGroup.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => {
       const val = cb.value.toLowerCase();
@@ -167,30 +354,45 @@
 
     // Set Renderer dropdown
     if (editFieldRnd) {
-      editFieldRnd.value = item.renderer || 'Corona';
+      editFieldRnd.value = view.renderer || 'Corona';
     }
 
     // Set Category dropdown
     if (editFieldCategory) {
-      editFieldCategory.value = item.category || 'Archviz';
+      editFieldCategory.value = view.category || 'Archviz';
     }
 
     // Set Year dropdown
     if (editFieldYear) {
-      editFieldYear.value = item.year || '2024';
+      editFieldYear.value = view.year || '2024';
     }
 
-    editFieldDesc.value = item.description || '';
+    editFieldDesc.value = view.description || '';
+    if (editFieldYoutube) editFieldYoutube.value = view.youtube ? toYouTubeLink(view.youtube) || view.youtube : '';
+    if (editFieldYoutubeWrap) editFieldYoutubeWrap.style.display = isProject(item) ? 'none' : 'block';
+    if (editFieldItems) {
+      editFieldItems.value = isProject(item) ? materialsToText(item.items)
+        : materialsToText([{ file: item.file, youtube: item.youtube }].filter(w => w.file || w.youtube));
+    }
 
-    previewImg.src = item.file || '';
-    previewTitle.textContent = item.name || 'Untitled Render';
-    previewFile.textContent = item.file || '';
+    previewImg.src = getPreviewImage(view);
+    previewTitle.textContent = view.name || 'Untitled Render';
+    previewFile.textContent = getSourceLabel(view);
+    if (editingItemIndex >= 0) {
+      if (editFieldYoutubeWrap) editFieldYoutubeWrap.style.display = 'none';
+      if (editFieldItemsWrap) editFieldItemsWrap.style.display = 'none';
+    } else if (editFieldItemsWrap) {
+      editFieldItemsWrap.style.display = '';
+    }
     selectWorkItem.value = item.id;
     updatePositionControls(item);
   }
 
   function saveCurrentItem(showToast = true) {
     if (!currentEditingItem) return;
+    const project = currentEditingItem;
+    const itemMode = editingItemIndex >= 0 && isProject(project);
+    if (itemMode) currentEditingItem = itemView(project, editingItemIndex);
 
     currentEditingItem.name = editFieldTitle.value.trim() || 'Untitled Render';
 
@@ -205,7 +407,27 @@
     currentEditingItem.year = editFieldYear ? editFieldYear.value : '2024';
     currentEditingItem.description = editFieldDesc.value.trim();
 
+    // YouTube link: a valid link makes the work a video; clearing it turns it back into an image
+    // (only possible when the work has an image file, otherwise the link is kept)
+    if (editFieldYoutube && !isProject(currentEditingItem)) {
+      const raw = editFieldYoutube.value.trim();
+      const link = toYouTubeLink(raw);
+      if (link) {
+        currentEditingItem.youtube = link;
+      } else if (!raw && currentEditingItem.file) {
+        delete currentEditingItem.youtube;
+      }
+      previewImg.src = getPreviewImage(currentEditingItem);
+      previewFile.textContent = getSourceLabel(currentEditingItem);
+    }
+
     if (previewTitle) previewTitle.textContent = currentEditingItem.name;
+
+    if (itemMode) {
+      commitItemView(project, editingItemIndex, currentEditingItem);
+      currentEditingItem = project;
+      updatePartSelect(project);
+    }
 
     // Refresh option title in dropdown
     populateSelectOptions(currentEditingItem.id);
@@ -226,6 +448,59 @@
     }
   }
 
+  function deleteCurrentItem() {
+    if (!currentEditingItem) return;
+
+    if (editingItemIndex >= 0 && isProject(currentEditingItem)) {
+      const project = currentEditingItem;
+      const it = project.items[editingItemIndex];
+      if (project.items.length <= 2) {
+        alert('A project needs at least 2 items. To turn it back into a single artwork, leave one line in Project Materials (Whole project).');
+        return;
+      }
+      if (!confirm(`Remove "${it.name || project.name}" from the project "${project.name}"? (The image file stays in the repository.)`)) return;
+      project.items.splice(editingItemIndex, 1);
+      loadItemIntoForm(project);
+      saveCurrentItem(false);
+      renderReorderList();
+      return;
+    }
+
+    const itemName = currentEditingItem.name || 'this artwork';
+    if (!confirm(`Delete "${itemName}" from the gallery? (Only the gallery entry is removed, the image file stays in the repository.)`)) {
+      return;
+    }
+
+    const currentWorks = window.PORTFOLIO_WORKS || [];
+    const index = currentWorks.indexOf(currentEditingItem);
+    if (index === -1) return;
+
+    currentWorks.splice(index, 1);
+    normalizeWorkIds(currentWorks);
+
+    try {
+      localStorage.setItem('portfolio_saved_works', JSON.stringify(currentWorks));
+    } catch (e) {
+      console.warn('Could not save to localStorage', e);
+    }
+
+    if (window.PORTFOLIO_APP) {
+      window.PORTFOLIO_APP.refreshData(currentWorks);
+      window.PORTFOLIO_APP.showToast(`Deleted "${itemName}" from the gallery. Download works.js or push to GitHub to publish.`);
+    }
+
+    if (currentWorks.length > 0) {
+      const nextItem = currentWorks[Math.min(index, currentWorks.length - 1)];
+      populateSelectOptions(nextItem.id);
+      loadItemIntoForm(nextItem);
+    } else {
+      currentEditingItem = null;
+      selectWorkItem.innerHTML = '';
+    }
+    populateNewArtworkPositionOptions();
+    renderReorderList();
+  }
+
   function generateFileContent() {
     normalizeWorkIds(window.PORTFOLIO_WORKS);
     const code = `/**
@@ -233,6 +508,8 @@
  * ----------------------------------------------------
  * Allowed DCC Tools: "3ds Max", "Blender", "Cinema 4D", "Autodesk Fusion", "ZBrush"
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
+ * YouTube videos: add "youtube": "https://youtu.be/VIDEO_ID" ("file" is then an optional poster image)
+ * Projects: "project": "url-slug" + "items": [{ "file": ... } or { "youtube": ... }, ...] (2+ items, first = cover)
  * Last updated: ${new Date().toISOString().split('T')[0]}
  */
 
@@ -440,6 +717,7 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       const matches = !query ||
         (w.name && w.name.toLowerCase().includes(query)) ||
         (w.file && w.file.toLowerCase().includes(query)) ||
+        (w.youtube && String(w.youtube).toLowerCase().includes(query)) ||
         (w.category && w.category.toLowerCase().includes(query));
 
       if (!matches) return;
@@ -455,7 +733,9 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       const isFirst = index === 0;
       const isLast = index === works.length - 1;
 
+      itemEl.classList.toggle('is-checked', mergeSelection.has(w));
       itemEl.innerHTML = `
+        <input type="checkbox" class="reorder-check" title="Select to merge into a project" ${mergeSelection.has(w) ? 'checked' : ''}>
         <div class="reorder-handle" title="Drag to reorder">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/>
@@ -464,10 +744,10 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
           </svg>
         </div>
         <span class="reorder-index">#${index + 1}</span>
-        <img class="reorder-thumb" src="${escapeHtml(w.file)}" alt="" loading="lazy">
+        <img class="reorder-thumb" src="${escapeHtml(getPreviewImage(w))}" alt="" loading="lazy">
         <div class="reorder-details">
-          <span class="reorder-title">${escapeHtml(w.name || 'Untitled')}</span>
-          <span class="reorder-meta">${escapeHtml(w.file)} • ${escapeHtml(w.category || 'Product')}</span>
+          <span class="reorder-title">${isProject(w) ? '▣ ' : (w.youtube ? '▶ ' : '')}${escapeHtml(w.name || 'Untitled')}</span>
+          <span class="reorder-meta">${escapeHtml(getSourceLabel(w))} • ${escapeHtml(w.category || 'Product')}</span>
         </div>
         <div class="reorder-controls">
           <button type="button" class="btn-icon-sm btn-reorder-top" title="Move to top" ${isFirst ? 'disabled' : ''}>⤒</button>
@@ -493,6 +773,14 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       itemEl.querySelector('.btn-reorder-bottom').addEventListener('click', (e) => {
         e.stopPropagation();
         moveArtwork(index, works.length - 1);
+      });
+
+      const check = itemEl.querySelector('.reorder-check');
+      check.addEventListener('click', (e) => e.stopPropagation());
+      check.addEventListener('change', () => {
+        if (check.checked) mergeSelection.add(w); else mergeSelection.delete(w);
+        itemEl.classList.toggle('is-checked', check.checked);
+        updateMergeBar();
       });
 
       const numInput = itemEl.querySelector('.reorder-num-input');
@@ -558,6 +846,89 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
 
       reorderList.appendChild(itemEl);
     });
+    updateMergeBar();
+  }
+
+  // ---- Merge selected works into one project (Reorder tab) ----
+  const mergeSelection = new Set();
+
+  function updateMergeBar() {
+    const works = window.PORTFOLIO_WORKS || [];
+    mergeSelection.forEach(w => { if (!works.includes(w)) mergeSelection.delete(w); });
+    const bar = document.getElementById('mergeBar');
+    if (!bar) return;
+    const count = mergeSelection.size;
+    bar.hidden = count === 0;
+    const label = document.getElementById('mergeBarCount');
+    if (label) label.textContent = `${count} selected`;
+    const btn = document.getElementById('btnMergeProject');
+    if (btn) btn.disabled = count < 2;
+  }
+
+  // A work as project items: a project gives its own items, a single work becomes one item that keeps its own texts
+  function workToItems(w, project) {
+    if (isProject(w)) {
+      return w.items.map(it => copyOwnInfo({ ...it }, w, project));
+    }
+    const entry = {};
+    if (w.file) entry.file = w.file;
+    if (w.youtube) entry.youtube = w.youtube;
+    return [copyOwnInfo(entry, w, project)];
+  }
+
+  // Give an item the source work's info (title, description, year, category, tools / models) where it differs from the project's
+  function copyOwnInfo(entry, source, project) {
+    ITEM_FIELDS.forEach(field => {
+      const value = source[field];
+      const empty = value === undefined || value === '' || (Array.isArray(value) && value.length === 0);
+      if (entry[field] !== undefined || empty || JSON.stringify(value) === JSON.stringify(project[field])) return;
+      entry[field] = Array.isArray(value) ? [...value] : value;
+    });
+    return entry;
+  }
+
+  function mergeSelectedIntoProject() {
+    const works = window.PORTFOLIO_WORKS || [];
+    const selected = works.filter(w => mergeSelection.has(w)); // gallery order: the top-most one is the cover
+    if (selected.length < 2) return;
+
+    const first = selected[0];
+    const name = prompt(
+      `Merge ${selected.length} artworks into one project.\n\n` +
+      `The first one ("${first.name || 'Untitled'}") is the cover and keeps its place, category, tools and description; ` +
+      `the others are removed from the gallery and become pages of the project (each keeps its own title and description).\n\n` +
+      `Project name:`, first.name || 'Untitled Project');
+    if (name === null) return;
+
+    // Each item keeps its own info (title, description, year, category, tools / models) where it differs from the project's
+    const project = { ...first, name: name.trim() || first.name || 'Untitled Project' };
+    const items = selected.flatMap(w => workToItems(w, project));
+    if (items.length < 2) return;
+
+    first.name = project.name;
+    if (!first.project) first.project = uniqueProjectSlug(first.name, first);
+    first.items = items;
+    delete first.file;
+    delete first.youtube;
+
+    selected.slice(1).forEach(w => works.splice(works.indexOf(w), 1));
+    normalizeWorkIds(works);
+    mergeSelection.clear();
+
+    try {
+      localStorage.setItem('portfolio_saved_works', JSON.stringify(works));
+    } catch (e) {
+      console.warn('Could not save to localStorage', e);
+    }
+    if (window.PORTFOLIO_APP) {
+      window.PORTFOLIO_APP.refreshData(works);
+      window.PORTFOLIO_APP.showToast(`Created project "${first.name}" with ${items.length} items. Download works.js or push to GitHub to publish.`);
+    }
+    populateSelectOptions(first.id);
+    loadItemIntoForm(first);
+    populateNewArtworkPositionOptions();
+    renderReorderList();
+    switchTab('edit');
   }
 
   function switchTab(tab) {
@@ -593,6 +964,7 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     }
 
     if (btnSaveItem) btnSaveItem.style.display = isEdit ? 'inline-flex' : 'none';
+    if (btnDeleteItem) btnDeleteItem.style.display = isEdit ? 'inline-flex' : 'none';
 
     if (isAddNew) {
       populateNewArtworkPositionOptions();
@@ -605,17 +977,62 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     }
   }
 
+  function isNewVideo() {
+    return !!(newFieldType && newFieldType.value === 'video');
+  }
+
+  function isNewProject() {
+    return !!(newFieldType && newFieldType.value === 'project');
+  }
+
+  function handleNewTypeChange() {
+    const video = isNewVideo();
+    const project = isNewProject();
+    if (newFieldYoutubeWrap) newFieldYoutubeWrap.style.display = video ? 'block' : 'none';
+    if (newFieldItemsWrap) newFieldItemsWrap.style.display = project ? 'block' : 'none';
+    if (newFieldFileWrap) newFieldFileWrap.style.visibility = project ? 'hidden' : 'visible';
+    if (newFieldFileLabel) {
+      newFieldFileLabel.textContent = video ? 'Poster Image (optional, in images/)' : 'Image File Name (in images/)';
+    }
+    if (newFieldFile) {
+      newFieldFile.placeholder = video ? 'Leave empty to use the YouTube thumbnail' : 'e.g. category_project-name_01.jpg';
+    }
+    handleNewImageFileInput();
+  }
+
   function handleNewImageFileInput() {
     if (!newFieldFile) return;
+    if (isNewProject()) {
+      const items = parseMaterials(newFieldItems ? newFieldItems.value : '');
+      if (newPreviewStrip && newPreviewImg && items.length) {
+        newPreviewImg.src = getPreviewImage(items[0]);
+        if (newPreviewTitleText) newPreviewTitleText.textContent = newFieldTitle.value || 'New Project';
+        if (newPreviewPathText) newPreviewPathText.textContent = `Project, ${items.length} item${items.length === 1 ? '' : 's'} (cover: ${getSourceLabel(items[0])})`;
+        newPreviewStrip.style.display = 'flex';
+      } else if (newPreviewStrip) {
+        newPreviewStrip.style.display = 'none';
+      }
+      return;
+    }
     let filename = newFieldFile.value.trim();
-    if (!filename) {
+    const videoLink = isNewVideo() && newFieldYoutube ? toYouTubeLink(newFieldYoutube.value) : '';
+    if (!filename && !videoLink) {
       if (newPreviewStrip) newPreviewStrip.style.display = 'none';
       return;
     }
 
     let filePath = filename;
-    if (!filePath.startsWith('images/') && !filePath.startsWith('http')) {
+    if (filePath && !filePath.startsWith('images/') && !filePath.startsWith('http')) {
       filePath = `images/${filePath}`;
+    }
+    if (!filename) {
+      if (newPreviewStrip && newPreviewImg) {
+        newPreviewImg.src = getPreviewImage({ youtube: videoLink });
+        if (newPreviewTitleText) newPreviewTitleText.textContent = newFieldTitle.value || 'New Video';
+        if (newPreviewPathText) newPreviewPathText.textContent = videoLink;
+        newPreviewStrip.style.display = 'flex';
+      }
+      return;
     }
 
     // Auto-suggest title if empty or previously auto-generated
@@ -636,15 +1053,34 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
 
   function submitNewArtwork() {
     if (!newFieldFile) return;
-    let rawFile = newFieldFile.value.trim();
-    if (!rawFile) {
+    const video = isNewVideo();
+    const project = isNewProject();
+    const projectItems = project ? parseMaterials(newFieldItems ? newFieldItems.value : '') : [];
+    const videoLink = video && newFieldYoutube ? toYouTubeLink(newFieldYoutube.value) : '';
+    let rawFile = project ? '' : newFieldFile.value.trim();
+    if (project && projectItems.length < 2) {
+      alert('A project needs at least 2 materials: one image file or YouTube link per line.');
+      if (newFieldItems) newFieldItems.focus();
+      return;
+    }
+    if (project && !(newFieldTitle && newFieldTitle.value.trim())) {
+      alert('Please give the project a name.');
+      if (newFieldTitle) newFieldTitle.focus();
+      return;
+    }
+    if (video && !videoLink) {
+      alert('Please paste a valid YouTube link (e.g. https://youtu.be/VIDEO_ID).');
+      if (newFieldYoutube) newFieldYoutube.focus();
+      return;
+    }
+    if (!video && !project && !rawFile) {
       alert('Please enter an image file name (e.g. MyRender.jpg).');
       newFieldFile.focus();
       return;
     }
 
     let filePath = rawFile;
-    if (!filePath.startsWith('images/') && !filePath.startsWith('http')) {
+    if (filePath && !filePath.startsWith('images/') && !filePath.startsWith('http')) {
       filePath = `images/${filePath}`;
     }
 
@@ -679,16 +1115,24 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
 
     const newItem = {
       id: '000', // Re-indexed immediately below
-      name: title,
-      file: filePath,
+      name: title
+    };
+    if (project) {
+      newItem.project = uniqueProjectSlug(title);
+      newItem.items = projectItems;
+    }
+    if (filePath) newItem.file = filePath;
+    if (videoLink) newItem.youtube = videoLink;
+    Object.assign(newItem, {
       dcc: selectedDccs,
       renderer: renderer,
       category: category,
       year: year,
       description: desc
-    };
+    });
 
     currentWorks.splice(targetIndex, 0, newItem);
+    if (project) adoptExistingWorks(newItem);
     normalizeWorkIds(currentWorks);
 
     // Save to localStorage immediately
@@ -712,6 +1156,8 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
 
     // Reset add form fields
     newFieldFile.value = '';
+    if (newFieldYoutube) newFieldYoutube.value = '';
+    if (newFieldItems) newFieldItems.value = '';
     if (newFieldTitle) {
       newFieldTitle.value = '';
       delete newFieldTitle.dataset.autoGenerated;
@@ -782,6 +1228,18 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     }
 
     // Reorder panel search
+    const btnMergeProject = document.getElementById('btnMergeProject');
+    if (btnMergeProject) {
+      btnMergeProject.addEventListener('click', mergeSelectedIntoProject);
+    }
+    const btnMergeClear = document.getElementById('btnMergeClear');
+    if (btnMergeClear) {
+      btnMergeClear.addEventListener('click', () => {
+        mergeSelection.clear();
+        renderReorderList();
+      });
+    }
+
     if (reorderSearchInput) {
       reorderSearchInput.addEventListener('input', renderReorderList);
     }
@@ -800,6 +1258,18 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     // Real-time input handling for Add New Artwork
     if (newFieldFile) {
       newFieldFile.addEventListener('input', handleNewImageFileInput);
+    }
+    if (newFieldType) {
+      newFieldType.addEventListener('change', handleNewTypeChange);
+    }
+    if (newFieldYoutube) {
+      newFieldYoutube.addEventListener('input', handleNewImageFileInput);
+    }
+    if (newFieldItems) {
+      newFieldItems.addEventListener('input', handleNewImageFileInput);
+    }
+    if (editFieldItems) {
+      editFieldItems.addEventListener('change', applyMaterials);
     }
     if (newFieldTitle) {
       newFieldTitle.addEventListener('input', () => {
@@ -885,7 +1355,7 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       }
     });
 
-    const autoSaveChangeFields = [editFieldRnd, editFieldCategory, editFieldYear];
+    const autoSaveChangeFields = [editFieldRnd, editFieldCategory, editFieldYear, editFieldYoutube];
     autoSaveChangeFields.forEach(field => {
       if (field) {
         field.addEventListener('change', () => saveCurrentItem(false));
@@ -904,9 +1374,19 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     }
 
     // Dropdown change: auto-save current item before switching
+    const editFieldPart = document.getElementById('editFieldPart');
+    if (editFieldPart) {
+      editFieldPart.addEventListener('change', (e) => {
+        const index = parseInt(e.target.value, 10); // read first: saving re-renders this dropdown
+        saveCurrentItem(false);
+        loadItemIntoForm(currentEditingItem, isNaN(index) ? -1 : index);
+      });
+    }
+
     selectWorkItem.addEventListener('change', (e) => {
+      const targetId = e.target.value; // read first: saving re-renders this dropdown
       saveCurrentItem(false);
-      const selected = (window.PORTFOLIO_WORKS || []).find(w => w.id === e.target.value);
+      const selected = (window.PORTFOLIO_WORKS || []).find(w => w.id === targetId);
       if (selected) {
         loadItemIntoForm(selected);
       }
@@ -932,6 +1412,11 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     // Direct GitHub Push button
     if (btnPushGitHub) {
       btnPushGitHub.addEventListener('click', pushDirectlyToGitHub);
+    }
+
+    // Delete current artwork
+    if (btnDeleteItem) {
+      btnDeleteItem.addEventListener('click', deleteCurrentItem);
     }
 
     // Reset to defaults
@@ -968,10 +1453,10 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
 
   // Public API
   window.PORTFOLIO_EDITOR = {
-    openWithItem: function (item) {
+    openWithItem: function (item, itemIndex = -1) {
       if (!editorDialog) return;
       populateSelectOptions(item.id);
-      loadItemIntoForm(item);
+      loadItemIntoForm(item, typeof itemIndex === 'number' ? itemIndex : -1);
       editorDialog.showModal();
     },
     openReorder: function () {

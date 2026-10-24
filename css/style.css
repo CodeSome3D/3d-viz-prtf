@@ -612,6 +612,29 @@ body::after {
   color: #7dd3fc;
 }
 
+/* Filter chips wrap onto a new line instead of hiding past the right edge */
+.filter-row-unified {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  row-gap: 0.45rem;
+}
+
+.filter-subgroup {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.chip-list {
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
+}
+
+@media (max-width: 1080px) {
+  .filter-divider {
+    display: none;
+  }
+}
+
 /* ==========================================================================
    PORTFOLIO GALLERY GRID
    ========================================================================== */
@@ -1077,6 +1100,201 @@ body.is-admin .admin-only {
   transform-origin: center center;
   box-shadow: 0 10px 40px rgba(0,0,0,0.6);
   border-radius: var(--radius-sm);
+}
+
+/* Merge into project (editor Reorder tab) */
+.reorder-check {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+.reorder-item.is-checked {
+  border-color: rgba(56, 189, 248, 0.6);
+  background: rgba(56, 189, 248, 0.07);
+}
+
+.merge-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: var(--radius-md);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.merge-bar[hidden] {
+  display: none;
+}
+
+.merge-bar-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+.merge-bar-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex: 1;
+  min-width: 180px;
+}
+
+.merge-bar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Project cards & sub-gallery */
+.project-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: rgba(11, 13, 19, 0.78);
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.project-badge.is-inline {
+  position: static;
+}
+
+/* Stacked "pile of cards" look for project cards */
+.art-card.is-project,
+.art-card.is-project:hover {
+  box-shadow:
+    7px -7px 0 -1px var(--bg-surface),
+    7px -7px 0 0 rgba(56, 189, 248, 0.35),
+    14px -14px 0 -2px var(--bg-surface),
+    14px -14px 0 -1px rgba(56, 189, 248, 0.18);
+}
+
+.chip.chip-project {
+  border-color: rgba(56, 189, 248, 0.45);
+  color: var(--accent-cyan);
+}
+
+body.is-project-view .controls-panel {
+  display: none;
+}
+
+.project-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin: 1.5rem 0 1.25rem;
+  flex-wrap: wrap;
+}
+
+.project-back {
+  flex-shrink: 0;
+}
+
+.project-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.project-title {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.project-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.project-info-text {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.project-desc {
+  color: var(--text-secondary);
+  max-width: 820px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.project-desc:empty {
+  display: none;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* YouTube video artworks */
+[hidden] {
+  display: none !important;
+}
+
+.lightbox-video-wrap {
+  width: 92%;
+  max-height: 92%;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #000;
+}
+
+.lightbox-video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.video-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3.25rem;
+  height: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.2rem;
+  border-radius: 50%;
+  background: rgba(11, 13, 19, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  backdrop-filter: blur(6px);
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* Lightbox Stage Controls */

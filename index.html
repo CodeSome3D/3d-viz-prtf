@@ -687,6 +687,19 @@
        ====================================================================== -->
   <main class="container gallery-container">
     <h2 class="visually-hidden">Selected 3D renders</h2>
+    <!-- Project sub-gallery header, shown while a project card is open -->
+    <div id="projectHeader" class="project-header" hidden>
+      <button type="button" id="projectBack" class="btn btn-outline project-back" title="Back to all works (Esc)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        All works
+      </button>
+      <div class="project-header-text">
+        <h2 id="projectTitle" class="project-title">Project</h2>
+        <div id="projectInfo" class="project-info"></div>
+        <p id="projectDesc" class="project-desc"></p>
+      </div>
+    </div>
+
     <div id="galleryGrid" class="gallery-grid layout-grid">
       <!-- Static cards for search engines and no-JS visitors. app.js replaces them on load.
            Regenerate with: python tools/seo_build.py -->
@@ -746,6 +759,11 @@
 
         <div id="lightboxImgContainer" class="lightbox-img-container" title="Scroll wheel to zoom, drag to pan">
           <img id="lightboxImg" class="lightbox-img" src="" alt="Artwork High Resolution View">
+        </div>
+
+        <!-- YouTube player, shown instead of the image for video artworks -->
+        <div id="lightboxVideoWrap" class="lightbox-video-wrap" hidden>
+          <iframe id="lightboxVideo" class="lightbox-video" title="YouTube video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
         </div>
 
         <button type="button" id="lightboxNext" class="lightbox-nav-btn lightbox-next" aria-label="Next Artwork">
@@ -873,6 +891,12 @@
             </div>
           </div>
 
+          <div id="editFieldPartWrap" style="display: none;">
+            <label for="editFieldPart" class="form-label">Editing</label>
+            <select id="editFieldPart" class="form-control"></select>
+            <p class="form-hint">Pick one image or video of the project to give it its own title, description, tools, render engine, category or year. Fields left empty or equal to the project's use the project's info.</p>
+          </div>
+
           <div class="form-grid-2">
             <div>
               <label for="editFieldTitle" class="form-label">Artwork Name / Title</label>
@@ -952,6 +976,17 @@
               <input type="text" id="editFieldDesc" class="form-control" placeholder="Lighting style, materials, notes...">
             </div>
           </div>
+
+          <div id="editFieldItemsWrap">
+            <label for="editFieldItems" class="form-label">Project Materials (2 or more lines turn this artwork into a Project)</label>
+            <textarea id="editFieldItems" class="form-control" rows="4" spellcheck="false" placeholder="images/first-image.jpg&#10;images/second-image.jpg | Detail view&#10;https://youtu.be/VIDEO_ID | Turntable"></textarea>
+            <span class="form-hint">One per line: an image file from images/ or a YouTube link. Add &quot; | title&quot; after it for an optional own title. The first line is the cover. Changes apply when you leave the field.</span>
+          </div>
+
+          <div id="editFieldYoutubeWrap">
+            <label for="editFieldYoutube" class="form-label">YouTube Link (videos only)</label>
+            <input type="url" id="editFieldYoutube" class="form-control" placeholder="https://youtu.be/... (leave empty for a still image)" autocomplete="off">
+          </div>
         </div>
 
         <!-- PANEL 2: DEDICATED ADD NEW ARTWORK FORM -->
@@ -965,11 +1000,34 @@
 
           <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1.1rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
             <strong style="color: #fff;">Flexible Image Addition:</strong> Save your image file into the project's <code style="color: var(--accent-cyan);">images/</code> folder (e.g. <code>Mayekawa_Close-up_02.jpg</code>). <em>No number prefixes required!</em> Enter its filename below, set its details, and choose where you want it to appear in the gallery.
+            For a <strong style="color: #fff;">YouTube video</strong>, pick the video type and paste its link. A poster image is optional. A <strong style="color: #fff;">Project</strong> groups 2 or more images and videos into one card that opens its own sub-gallery.
           </div>
 
           <div class="form-grid-2">
             <div>
-              <label for="newFieldFile" class="form-label">Image File Name (in images/)</label>
+              <label for="newFieldType" class="form-label">Artwork Type</label>
+              <select id="newFieldType" class="form-control">
+                <option value="image" selected>Image</option>
+                <option value="video">YouTube video</option>
+                <option value="project">Project (2+ images / videos)</option>
+              </select>
+            </div>
+
+            <div id="newFieldYoutubeWrap" style="display: none;">
+              <label for="newFieldYoutube" class="form-label">YouTube Link</label>
+              <input type="url" id="newFieldYoutube" class="form-control" placeholder="https://youtu.be/... or https://www.youtube.com/watch?v=..." autocomplete="off">
+            </div>
+          </div>
+
+          <div id="newFieldItemsWrap" style="display: none;">
+            <label for="newFieldItems" class="form-label">Project Materials</label>
+            <textarea id="newFieldItems" class="form-control" rows="5" spellcheck="false" placeholder="images/first-image.jpg&#10;images/second-image.jpg | Detail view&#10;https://youtu.be/VIDEO_ID | Turntable"></textarea>
+            <span class="form-hint">One per line: an image file from images/ or a YouTube link. Add &quot; | title&quot; after it for an optional own title. The first line is the cover.</span>
+          </div>
+
+          <div class="form-grid-2">
+            <div id="newFieldFileWrap">
+              <label for="newFieldFile" id="newFieldFileLabel" class="form-label">Image File Name (in images/)</label>
               <input type="text" id="newFieldFile" class="form-control" placeholder="e.g. MyNewRender.jpg or 031_Render.png" autocomplete="off">
             </div>
 
@@ -1092,7 +1150,7 @@
         <div id="panelReorder" class="editor-panel" style="display: none;">
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1.1rem;">
             <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-              <strong style="color: #fff;">Drag &amp; Drop or use arrow buttons</strong> to freely organize your portfolio. Type any position number or click Top/Bottom to jump directly. Edits save immediately!
+              <strong style="color: #fff;">Drag &amp; Drop or use arrow buttons</strong> to freely organize your portfolio. Type any position number or click Top/Bottom to jump directly. Tick the boxes to merge artworks into one Project. Edits save immediately!
             </div>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <button type="button" id="btnReorderAddNew" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;">
@@ -1107,6 +1165,19 @@
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
             <input type="text" id="reorderSearchInput" class="form-control" placeholder="Quickly filter artworks to find and move..." style="max-width: 320px; font-size: 0.85rem; padding: 0.5rem 0.85rem;">
             <span id="reorderCountBadge" style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-muted);">30 artworks</span>
+          </div>
+
+          <div id="mergeBar" class="merge-bar" hidden>
+            <span id="mergeBarCount" class="merge-bar-count">0 selected</span>
+            <span class="merge-bar-hint">Tick 2 or more artworks; the top-most one becomes the cover.</span>
+            <div class="merge-bar-actions">
+              <button type="button" id="btnMergeProject" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;" disabled>
+                ▣ Merge into Project
+              </button>
+              <button type="button" id="btnMergeClear" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                Clear
+              </button>
+            </div>
           </div>
 
           <div id="reorderList" class="reorder-list">
@@ -1179,6 +1250,10 @@
           </button>
           <button type="button" id="btnAddNewWork" class="btn btn-secondary">
             + Add New Image
+          </button>
+          <button type="button" id="btnDeleteItem" class="btn btn-outline" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3);" title="Remove this artwork from the gallery">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Delete
           </button>
           <button type="button" id="btnResetDefaults" class="btn btn-outline" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3);" title="Revert all local changes back to the original repository data">
             Reset to Repo

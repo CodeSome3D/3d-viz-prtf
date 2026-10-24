@@ -11,6 +11,7 @@ A modern, high-aesthetic portfolio web application tailored for 3D artists, ligh
   - **Render Engines**: *Corona*, *Cycles*, *Redshift*.
   - **Category**: *Archviz*, *Product*, *Hard Surface*, *Concept Art*, *Automotive*.
   - **Year & Description**.
+- **YouTube Videos as Artworks**: paste a YouTube link in the editor and the work shows up with a play button and an embedded player in the lightbox.
 - **Clean Thumbnails**: Metadata badges appear cleanly underneath each thumbnail (no floating toast overlays obstructing your renders).
 - **GitHub Pages Ready**: Zero build dependencies, pure HTML5, modern Vanilla CSS, and modular JavaScript. Uses relative paths so it functions immediately on `https://<username>.github.io/<repo>/`.
 - **Owner Mode & Privacy**:
@@ -126,6 +127,69 @@ The order images appear in the gallery is determined **solely by their position 
 
 ---
 
+## ▶️ Adding YouTube Videos
+
+Any artwork can be a YouTube video instead of a still image.
+
+**In the browser editor (Owner Mode):** open **+ Add Artwork**, set **Artwork Type** to *YouTube video* and paste the link (`https://youtu.be/...`, `https://www.youtube.com/watch?v=...` and Shorts links all work). A poster image from `images/` is optional; without one, YouTube's own thumbnail is used. An existing artwork can be turned into a video (or back) with the **YouTube Link** field in **Edit Artwork Details**. **Delete** removes an artwork from the gallery.
+
+**By hand in `data/works.js`:** add a `youtube` field. `file` becomes optional and is used as the poster:
+
+```javascript
+{
+  "id": "031",
+  "name": "My Animation",
+  "youtube": "https://youtu.be/VIDEO_ID",
+  "file": "images/my-animation-poster.jpg",   // optional
+  "category": "...",
+  "year": "2026",
+  "description": "..."
+}
+```
+
+Video cards show a play button and the lightbox plays the video in an embedded player (youtube-nocookie.com). Tip: test locally through a small web server (`python -m http.server`), because YouTube embeds can refuse to play when `index.html` is opened directly from disk.
+
+---
+
+## 🗂️ Projects (multi-image cards)
+
+A Project is one gallery card that holds 2 or more images and/or YouTube videos. The card shows the first item as its preview, carries a **Project · N** badge and a stacked-card look, and the **Projects** chip in the category filter shows only projects. Clicking the card opens the project's own sub-gallery (with the project name, info and description on top); the lightbox then steps through the project's materials. **All works**, the browser Back button or Esc returns to the main gallery. Each project has its own link: `#project=<slug>`.
+
+**In the browser editor (Owner Mode):** in **+ Add Artwork** set **Artwork Type** to *Project* and list the materials one per line (an `images/...` path or a YouTube link, optionally followed by ` | title`). In **Edit Artwork Details**, the **Project Materials** field turns any artwork into a project as soon as it has 2 or more lines, and back into a single work when only 1 line is left. To build a project from artworks that are already in the gallery, open **Reorder Gallery**, tick 2 or more of them and click **Merge into Project**: the top-most one becomes the cover and keeps its place, category and tools, the others are removed from the main grid and become items of the project, each keeping its own title, description and year. Merging a project with other works adds them to it. Note: export or push after creating a project, and export any unsaved browser edits before converting a work.
+
+**By hand in `data/works.js`:**
+
+```javascript
+{
+  "id": "032",
+  "name": "My Project",
+  "project": "my-project",                       // url slug, unique
+  "items": [
+    { "file": "images/category_my-project_01.jpg" },   // first item = cover
+    { "file": "images/category_my-project_02.jpg", "name": "Detail" },
+    { "youtube": "https://youtu.be/VIDEO_ID", "name": "Turntable" }
+  ],
+  "category": "...",
+  "description": "..."
+}
+```
+
+All other fields (category, tools, year, description) belong to the project and apply to every item. An item can override its own title, description, year, category and tools, render engine (same field names as a work); in the editor pick it in the **Editing** list of a project (or click **Edit This Artwork** on it in the lightbox). The SEO build makes thumbnails for every item and lists them all in the sitemap.
+
+---
+
+## 🔎 SEO Build
+
+Run this after you add, remove, rename or reorder artworks in `data/works.js` (needs Python and Pillow: `pip install pillow`):
+
+```bash
+python tools/seo_build.py
+```
+
+It regenerates the small WebP gallery thumbnails in `thumbs/`, `sitemap.xml` (images and videos) and the static gallery cards + structured data inside `index.html`. Videos are listed as `VideoObject`s. Google only shows video rich results when a video has an upload date, so you can optionally add `"uploadDate": "2026-10-22"` to a video entry by hand.
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -139,6 +203,10 @@ portfolio_rend/
 │   ├── app.js            # Gallery renderer, filter logic, lightbox controller
 │   └── editor.js         # Interactive metadata editor & export utility
 ├── data/
-│   └── works.js          # All 30 projects with Name, DCC, and Renderer metadata
-└── images/               # 30 artwork files
+│   └── works.js          # All projects with Name, DCC, Renderer and optional YouTube metadata
+├── images/               # Full-size artwork files
+├── thumbs/               # WebP gallery thumbnails (generated by tools/seo_build.py)
+├── tools/
+│   └── seo_build.py      # Thumbnails, sitemap and static SEO markup generator
+└── sitemap.xml           # Generated by tools/seo_build.py
 ```

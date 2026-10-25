@@ -1677,6 +1677,12 @@ body.is-project-view .controls-panel {
   color: var(--text-muted);
 }
 
+/* Sections of the scrolling editor body keep their full height (otherwise the
+   GitHub Sync box, which has overflow: hidden, gets squeezed to a 2px line) */
+.editor-body > * {
+  flex-shrink: 0;
+}
+
 /* GitHub Sync Box in Editor */
 .editor-sync-box {
   background: var(--bg-deep);

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://codesome3d.github.io/3d-viz-prtf/</loc>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_mayekawa-compressor_01.jpg</image:loc></image:image>
@@ -8,25 +9,27 @@
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_mayekawa-compressor_03.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_3d-printed-house_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_3d-printed-house_02.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_cinematic-explore_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_veritamorph-jukebox_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_ring-crown_01.png</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_living-room_01.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_bedroom_01.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_coastal-pavilion_01.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_3d-printed-house_03.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_crypto-monuments_01.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_crypto-monuments_02.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_fintech-coins-cards_01.png</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_living-room_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_bedroom_01.jpg</image:loc></image:image>
+    <video:video><video:thumbnail_loc>https://i.ytimg.com/vi/w3AJ56_0MQM/hqdefault.jpg</video:thumbnail_loc><video:title>Crypto Coins Circle Loop</video:title><video:description>Stylized fintech art with acrylic and gold crypto coins and dramatic lighting.</video:description><video:player_loc>https://www.youtube.com/embed/w3AJ56_0MQM</video:player_loc></video:video>
+    <video:video><video:thumbnail_loc>https://i.ytimg.com/vi/WB2L9Gr32Mc/hqdefault.jpg</video:thumbnail_loc><video:title>Crypto Coins Spin Loop</video:title><video:description>Stylized fintech art with looped spinning crypto coins</video:description><video:player_loc>https://www.youtube.com/embed/WB2L9Gr32Mc</video:player_loc></video:video>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_cinematic-explore_01.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_studio-props_01.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_cinematic-explore_02.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_veritamorph-jukebox_01.jpg</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_ring-crown_01.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_clicker-microdevice_01.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_king-air_01.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_abstract-metamaterial_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_studio-props_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_koh-saah-ring_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_coastal-pavilion_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_kruger-pallet_01.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_chromatic-luminescence_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/archviz_3d-printed-house_03.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_industrial-mechanism_01.jpg</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_cinematic-explore_02.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_pop-art-pattern_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_typography-study_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_pop-art-skull-tiles_01.jpg</image:loc></image:image>

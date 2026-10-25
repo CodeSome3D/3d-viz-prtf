@@ -5,7 +5,7 @@
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
  * YouTube videos: add "youtube": "https://youtu.be/VIDEO_ID" ("file" is then an optional poster image)
  * Projects: "project": "url-slug" + "items": [{ "file": ... } or { "youtube": ... }, ...] (2+ items, first = cover)
- * Last updated: 2026-10-24
+ * Last updated: 2026-10-25
  */
 
 window.PORTFOLIO_WORKS = [
@@ -105,6 +105,16 @@ window.PORTFOLIO_WORKS = [
         "name": "Fintech Tokenomics — Coins & Cards",
         "description": "Premium credit card visual of frosted matte acrylics coins with embossed gold details.",
         "category": "Product"
+      },
+      {
+        "youtube": "https://youtu.be/w3AJ56_0MQM",
+        "name": "Crypto Coins Circle Loop",
+        "description": "Stylized fintech art with acrylic and gold crypto coins and dramatic lighting."
+      },
+      {
+        "youtube": "https://youtu.be/WB2L9Gr32Mc",
+        "name": "Crypto Coins Spin Loop",
+        "description": "Stylized fintech art with looped spinning crypto coins"
       }
     ]
   },

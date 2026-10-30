@@ -613,23 +613,25 @@
   }
 
   function updateLightboxContent(item) {
-    const videoId = getYouTubeId(item.youtube);
+    // A project in the main gallery shows its cover (first image or video); the info below is the project's
+    const media = isProject(item) ? getProjectEntries(item)[0] : item;
+    const videoId = getYouTubeId(media.youtube);
     if (videoId && elements.lightboxVideo) {
       // YouTube artwork: show the embedded player instead of the zoomable image
       elements.lightboxImgContainer.hidden = true;
       if (elements.stageControls) elements.stageControls.hidden = true;
       elements.lightboxVideoWrap.hidden = false;
-      setLightboxVideoSrc(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`, item.name || 'YouTube video');
+      setLightboxVideoSrc(`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`, media.name || 'YouTube video');
       elements.lightboxImg.removeAttribute('src');
     } else {
       stopLightboxVideo();
       elements.lightboxImgContainer.hidden = false;
       if (elements.stageControls) elements.stageControls.hidden = false;
-      elements.lightboxImg.src = item.file;
+      elements.lightboxImg.src = media.file;
     }
-    elements.lightboxImg.alt = getAltText(item);
+    elements.lightboxImg.alt = getAltText(media);
     elements.lightboxCounter.textContent = `${state.currentLightboxIndex + 1} / ${state.displayList.length}`;
-    elements.lightboxTitle.textContent = item.name || 'Untitled Render';
+    elements.lightboxTitle.textContent = (item.name || 'Untitled Render') + (isProject(item) ? ` (Project · ${item.items.length})` : '');
 
     // DCC Badges (Multiple supported)
     const dccs = getDccList(item);

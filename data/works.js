@@ -5,7 +5,7 @@
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
  * YouTube videos: add "youtube": "https://youtu.be/VIDEO_ID" ("file" is then an optional poster image)
  * Projects: "project": "url-slug" + "items": [{ "file": ... } or { "youtube": ... }, ...] (2+ items, first = cover)
- * Last updated: 2026-10-25
+ * Last updated: 2026-10-30
  */
 
 window.PORTFOLIO_WORKS = [
@@ -120,6 +120,56 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "004",
+    "name": "Dansk Gummy Industry",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "year": "2024",
+    "description": "Short project presentation made for Nordic Story.",
+    "project": "dansk-gummy-industry",
+    "items": [
+      {
+        "file": "images/ship.png",
+        "name": "Ship arriving intro"
+      },
+      {
+        "youtube": "https://youtu.be/IRKCQEEPsT8"
+      }
+    ]
+  },
+  {
+    "id": "005",
+    "name": "Holographic Sight Explosion Scheme",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "year": "2025",
+    "description": "CAD model animation, shading, rendering, motion graphics",
+    "project": "holographic-sight-explosion-scheme",
+    "items": [
+      {
+        "file": "images/Holosite_ES_01_exploded_scheme_logo.png",
+        "name": "Explosion Scheme with callouts"
+      },
+      {
+        "youtube": "https://youtu.be/K6V8VLXAK-k"
+      },
+      {
+        "file": "images/Holosite_ES_01_03_2_logo.png",
+        "name": "Holographic Site view 01"
+      },
+      {
+        "file": "images/Holosite_ES_01_04_2_logo.png",
+        "name": "Holographic Site view 02"
+      }
+    ]
+  },
+  {
+    "id": "006",
     "name": "Cinematic Views Exploration",
     "dcc": [
       "Cinema 4D"
@@ -147,7 +197,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "005",
+    "id": "007",
     "name": "Veritamorph Jukebox",
     "file": "images/concept_veritamorph-jukebox_01.jpg",
     "dcc": [
@@ -159,7 +209,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Still frame from the fan art animation made for the Veritamorph band https://youtu.be/ESg6NeaswM0"
   },
   {
-    "id": "006",
+    "id": "008",
     "name": "Ring Crown — Studio Showcase",
     "file": "images/product_ring-crown_01.png",
     "dcc": [
@@ -171,7 +221,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
   },
   {
-    "id": "007",
+    "id": "009",
     "name": "Clicker Microdevice Internals",
     "file": "images/product_clicker-microdevice_01.png",
     "dcc": [
@@ -183,7 +233,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-tech industrial product design visualization."
   },
   {
-    "id": "008",
+    "id": "010",
     "name": "King Air",
     "file": "images/product_king-air_01.png",
     "dcc": [
@@ -196,19 +246,94 @@ window.PORTFOLIO_WORKS = [
     "description": "Electric converted King Air aircraft with the new skin."
   },
   {
-    "id": "009",
-    "name": "Abstract Metamaterial",
-    "file": "images/concept_abstract-metamaterial_01.jpg",
+    "id": "011",
+    "name": "R&D Visuals",
     "dcc": [
-      "3ds Max"
+      "3ds Max",
+      "Cinema 4D"
     ],
     "renderer": "Corona",
     "category": "Concept Art",
     "year": "2020",
-    "description": "Experimental R&D visualization."
+    "description": "Experimental R&D visualization.",
+    "project": "r-d-visuals",
+    "items": [
+      {
+        "file": "images/concept_abstract-metamaterial_01.jpg",
+        "name": "Abstract Metamaterial",
+        "dcc": [
+          "3ds Max"
+        ]
+      },
+      {
+        "file": "images/concept_chromatic-luminescence_01.jpg",
+        "name": "Logo pattern R&D",
+        "description": "Vibrant artistic R&D pattern rendering.",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      },
+      {
+        "file": "images/concept_pop-art-pattern_01.jpg",
+        "name": "Pop Art Pattern",
+        "description": "Patterns exploration.",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      },
+      {
+        "file": "images/concept_pop-art-skull-tiles_01.jpg",
+        "name": "Pop Art Skull Tiles",
+        "description": "Patterns and materials exploration.",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      },
+      {
+        "file": "images/concept_monolithic-geometry_01.jpg",
+        "name": "Monolithic Geometry",
+        "description": "Materials and postproduction exploration.",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      },
+      {
+        "file": "images/product_typography-study_02.jpg",
+        "name": "Typography And Materials Study 02",
+        "description": "Typography pattern cinematic render exploration.",
+        "category": "Product",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      },
+      {
+        "file": "images/concept_abstract-spatial-synthesis_01.jpg",
+        "name": "Abstract Spatial Synthesis",
+        "description": "Materials and patterns exploration.",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      },
+      {
+        "file": "images/product_typography-study_01.jpg",
+        "name": "Typography & Material Study 01",
+        "description": "Typographic 3D broadcast-style visualization.",
+        "category": "Product",
+        "dcc": [
+          "Cinema 4D"
+        ],
+        "renderer": "Redshift"
+      }
+    ]
   },
   {
-    "id": "010",
+    "id": "012",
     "name": "Koh-Saah Ring",
     "file": "images/product_koh-saah-ring_01.jpg",
     "dcc": [
@@ -222,7 +347,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Gothic jewelry product viz in studio environment with dramatic lighting."
   },
   {
-    "id": "011",
+    "id": "013",
     "name": "Warehouse Industrial Logistics",
     "file": "images/product_kruger-pallet_01.png",
     "dcc": [
@@ -235,21 +360,8 @@ window.PORTFOLIO_WORKS = [
     "description": "Commercial logistics packaging visualization featuring accurate shaders."
   },
   {
-    "id": "012",
-    "name": "Chromatic Luminescence — Art 04",
-    "file": "images/concept_chromatic-luminescence_01.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Concept Art",
-    "year": "2020",
-    "description": "Vibrant artistic R&D pattern rendering."
-  },
-  {
-    "id": "013",
+    "id": "014",
     "name": "Industrial Mechanism",
-    "file": "images/hardsurface_industrial-mechanism_01.jpg",
     "dcc": [
       "Cinema 4D",
       "Autodesk Fusion"
@@ -257,78 +369,19 @@ window.PORTFOLIO_WORKS = [
     "renderer": "Redshift",
     "category": "Hard Surface",
     "year": "2020",
-    "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling."
-  },
-  {
-    "id": "014",
-    "name": "Pop Art Pattern",
-    "file": "images/concept_pop-art-pattern_01.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Concept Art",
-    "year": "2020",
-    "description": "Patterns exploration."
-  },
-  {
-    "id": "015",
-    "name": "Typography & Material Study 01",
-    "file": "images/product_typography-study_01.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Product",
-    "year": "2020",
-    "description": "Typographic 3D broadcast-style visualization."
-  },
-  {
-    "id": "016",
-    "name": "Pop Art Skull Tiles",
-    "file": "images/concept_pop-art-skull-tiles_01.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Concept Art",
-    "year": "2020",
-    "description": "Patterns and materials exploration."
-  },
-  {
-    "id": "017",
-    "name": "Monolithic Geometry",
-    "file": "images/concept_monolithic-geometry_01.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Concept Art",
-    "year": "2020",
-    "description": "Materials and postproduction exploration."
-  },
-  {
-    "id": "018",
-    "name": "Typography And Materials Study 02",
-    "file": "images/product_typography-study_02.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Product",
-    "year": "2020",
-    "description": "Typography pattern cinematic render exploration."
-  },
-  {
-    "id": "019",
-    "name": "Abstract Spatial Synthesis",
-    "file": "images/concept_abstract-spatial-synthesis_01.jpg",
-    "dcc": [
-      "Cinema 4D"
-    ],
-    "renderer": "Redshift",
-    "category": "Concept Art",
-    "year": "2020",
-    "description": "Materials and patterns exploration."
+    "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling.",
+    "project": "industrial-mechanism",
+    "items": [
+      {
+        "file": "images/hardsurface_industrial-mechanism_01.png",
+        "name": "Industrial Mechanism Closeup"
+      },
+      {
+        "file": "images/hardsurface_industrial-mechanism_02.png",
+        "name": "Hardsurface Industrial Mechanism Explosion Scheme",
+        "description": "Explosion scheme of a CAD model",
+        "category": "Product"
+      }
+    ]
   }
 ];

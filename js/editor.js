@@ -312,10 +312,16 @@
       if (moved && window.PORTFOLIO_APP) {
         window.PORTFOLIO_APP.showToast(`${moved} artwork${moved > 1 ? 's' : ''} moved into the project "${item.name}".`);
       }
-    } else if (items.length === 1 && isProject(item)) {
-      delete item.project;
-      delete item.items;
-      if (items[0].file) item.file = items[0].file;
+    } else if (items.length === 1) {
+      // Also covers a single artwork whose image file / video link was changed
+      if (isProject(item)) {
+        delete item.project;
+        delete item.items;
+      }
+      if (items[0].file) {
+        item.file = items[0].file;
+        delete item.youtube;
+      }
       if (items[0].youtube) item.youtube = items[0].youtube;
     } else {
       return;

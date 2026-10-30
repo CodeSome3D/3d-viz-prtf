@@ -199,14 +199,23 @@ window.PORTFOLIO_WORKS = [
   {
     "id": "007",
     "name": "Veritamorph Jukebox",
-    "file": "images/concept_veritamorph-jukebox_01.jpg",
     "dcc": [
       "Cinema 4D"
     ],
     "renderer": "Redshift",
     "category": "Concept Art",
     "year": "2020",
-    "description": "Still frame from the fan art animation made for the Veritamorph band https://youtu.be/ESg6NeaswM0"
+    "description": "Still frame from the fan art animation made for the Veritamorph band https://youtu.be/ESg6NeaswM0",
+    "project": "veritamorph-jukebox",
+    "items": [
+      {
+        "file": "images/concept_veritamorph-jukebox_01.jpg"
+      },
+      {
+        "youtube": "https://youtu.be/ESg6NeaswM0",
+        "name": "Veritamorph Jukebox Animation"
+      }
+    ]
   },
   {
     "id": "008",
@@ -234,6 +243,31 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "010",
+    "name": "Industrial Mechanism",
+    "dcc": [
+      "Cinema 4D",
+      "Autodesk Fusion"
+    ],
+    "renderer": "Redshift",
+    "category": "Hard Surface",
+    "year": "2020",
+    "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling.",
+    "project": "industrial-mechanism",
+    "items": [
+      {
+        "file": "images/hardsurface_industrial-mechanism_01.png",
+        "name": "Industrial Mechanism Closeup"
+      },
+      {
+        "file": "images/hardsurface_industrial-mechanism_02.png",
+        "name": "Hardsurface Industrial Mechanism Explosion Scheme",
+        "description": "Explosion scheme of a CAD model",
+        "category": "Product"
+      }
+    ]
+  },
+  {
+    "id": "011",
     "name": "King Air",
     "file": "images/product_king-air_01.png",
     "dcc": [
@@ -246,7 +280,19 @@ window.PORTFOLIO_WORKS = [
     "description": "Electric converted King Air aircraft with the new skin."
   },
   {
-    "id": "011",
+    "id": "012",
+    "name": "Apple Recover Center",
+    "youtube": "https://youtu.be/Q37Ps1oCBTA",
+    "dcc": [
+      "3ds Max"
+    ],
+    "renderer": "Corona",
+    "category": "Product",
+    "year": "2015",
+    "description": "Apple Recover Center commercial for local store"
+  },
+  {
+    "id": "013",
     "name": "R&D Visuals",
     "dcc": [
       "3ds Max",
@@ -333,9 +379,8 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "012",
+    "id": "014",
     "name": "Koh-Saah Ring",
-    "file": "images/product_koh-saah-ring_01.jpg",
     "dcc": [
       "3ds Max",
       "Blender",
@@ -344,10 +389,23 @@ window.PORTFOLIO_WORKS = [
     "renderer": "Cycles",
     "category": "Product",
     "year": "2015",
-    "description": "Gothic jewelry product viz in studio environment with dramatic lighting."
+    "description": "Gothic jewelry product viz in studio environment with dramatic lighting.",
+    "project": "koh-saah-ring",
+    "items": [
+      {
+        "file": "images/product_koh-saah-ring_01.jpg"
+      },
+      {
+        "youtube": "https://youtu.be/TPQxkYQCTC8"
+      },
+      {
+        "file": "images/product_koh-saah-ring_02.jpg",
+        "name": "Koh-Saah Ring closeup"
+      }
+    ]
   },
   {
-    "id": "013",
+    "id": "015",
     "name": "Warehouse Industrial Logistics",
     "file": "images/product_kruger-pallet_01.png",
     "dcc": [
@@ -358,30 +416,5 @@ window.PORTFOLIO_WORKS = [
     "category": "Product",
     "year": "2026",
     "description": "Commercial logistics packaging visualization featuring accurate shaders."
-  },
-  {
-    "id": "014",
-    "name": "Industrial Mechanism",
-    "dcc": [
-      "Cinema 4D",
-      "Autodesk Fusion"
-    ],
-    "renderer": "Redshift",
-    "category": "Hard Surface",
-    "year": "2020",
-    "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling.",
-    "project": "industrial-mechanism",
-    "items": [
-      {
-        "file": "images/hardsurface_industrial-mechanism_01.png",
-        "name": "Industrial Mechanism Closeup"
-      },
-      {
-        "file": "images/hardsurface_industrial-mechanism_02.png",
-        "name": "Hardsurface Industrial Mechanism Explosion Scheme",
-        "description": "Explosion scheme of a CAD model",
-        "category": "Product"
-      }
-    ]
   }
 ];

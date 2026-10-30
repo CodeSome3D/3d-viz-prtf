@@ -28,9 +28,13 @@
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_studio-props_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_cinematic-explore_02.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_veritamorph-jukebox_01.jpg</image:loc></image:image>
+    <video:video><video:thumbnail_loc>https://i.ytimg.com/vi/ESg6NeaswM0/hqdefault.jpg</video:thumbnail_loc><video:title>Veritamorph Jukebox Animation</video:title><video:description>Still frame from the fan art animation made for the Veritamorph band https://youtu.be/ESg6NeaswM0</video:description><video:player_loc>https://www.youtube.com/embed/ESg6NeaswM0</video:player_loc></video:video>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_ring-crown_01.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_clicker-microdevice_01.png</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_industrial-mechanism_01.png</image:loc></image:image>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_industrial-mechanism_02.png</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_king-air_01.png</image:loc></image:image>
+    <video:video><video:thumbnail_loc>https://i.ytimg.com/vi/Q37Ps1oCBTA/hqdefault.jpg</video:thumbnail_loc><video:title>Apple Recover Center</video:title><video:description>Apple Recover Center commercial for local store</video:description><video:player_loc>https://www.youtube.com/embed/Q37Ps1oCBTA</video:player_loc></video:video>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_abstract-metamaterial_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_chromatic-luminescence_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_pop-art-pattern_01.jpg</image:loc></image:image>
@@ -40,7 +44,8 @@
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/concept_abstract-spatial-synthesis_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_typography-study_01.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_koh-saah-ring_01.jpg</image:loc></image:image>
+    <video:video><video:thumbnail_loc>https://i.ytimg.com/vi/TPQxkYQCTC8/hqdefault.jpg</video:thumbnail_loc><video:title>Koh-Saah Ring</video:title><video:description>Gothic jewelry product viz in studio environment with dramatic lighting.</video:description><video:player_loc>https://www.youtube.com/embed/TPQxkYQCTC8</video:player_loc></video:video>
+    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_koh-saah-ring_02.jpg</image:loc></image:image>
     <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/product_kruger-pallet_01.png</image:loc></image:image>
-    <image:image><image:loc>https://codesome3d.github.io/3d-viz-prtf/images/hardsurface_industrial-mechanism_01.png</image:loc></image:image>
   </url>
 </urlset>

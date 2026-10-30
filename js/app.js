@@ -178,8 +178,8 @@
   };
 
   // --- CRYPTOGRAPHIC OWNER AUTHENTICATION ---
-  // One-way SHA-256 hash of password "GBs13L168MKp" (never stored as plain text)
-  const OWNER_PWD_HASH = 'dbd1648af1f6d81bca373e98aa28e5547b88063949bd16fcd8202174f742916e';
+  // One-way SHA-256 hash of the owner password (never stored as plain text)
+  const OWNER_PWD_HASH = 'f734183f474b7b6b6efc67fe359dfa2c806b07062b14735f980647b1cb897f94';
 
   function sha256Pure(ascii) {
     function rightRotate(value, amount) {

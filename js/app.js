@@ -296,6 +296,7 @@
     buildFilterChips();
     applyFilters();
     bindEvents();
+    initPhoneFilters();
     bindLightboxEvents();
     bindAuthEvents();
     precacheRemainingWorks();
@@ -565,6 +566,8 @@
     if (elements.searchClear) {
       elements.searchClear.style.display = state.searchQuery ? 'block' : 'none';
     }
+
+    updatePhoneFilters();
   }
 
   function resetAllFilters() {
@@ -592,6 +595,122 @@
     applyFilters();
   }
 
+  // --- PHONE FILTERS (bottom sheet) ---
+  // On small screens the search box and the chip rows move into a bottom sheet opened by the "Filters" button.
+  // The same elements (and their listeners) are reused, so the filter state stays in one place.
+  const phoneQuery = window.matchMedia('(max-width: 640px)');
+  const sheet = {};
+
+  function isAllChip(chip) {
+    return Object.values(chip.dataset).includes('all');
+  }
+
+  function initPhoneFilters() {
+    sheet.root = document.getElementById('filterSheet');
+    sheet.button = document.getElementById('btnFilters');
+    if (!sheet.root || !sheet.button) return;
+    sheet.panel = sheet.root.querySelector('.filter-sheet-panel');
+    sheet.body = document.getElementById('filterSheetBody');
+    sheet.label = document.getElementById('btnFiltersLabel');
+    sheet.apply = document.getElementById('filterSheetApply');
+    sheet.active = document.getElementById('activeFilters');
+    sheet.moved = [document.querySelector('.controls-panel .search-wrapper'), document.querySelector('.filter-row-unified')]
+      .filter(Boolean)
+      .map(el => {
+        const marker = document.createComment('phone filters');
+        el.before(marker);
+        return { el, marker };
+      });
+    sheet.items = [];
+
+    sheet.button.addEventListener('click', openFilterSheet);
+    sheet.root.addEventListener('click', (e) => {
+      if (e.target.closest('[data-sheet-close]')) closeFilterSheet();
+    });
+    document.getElementById('filterSheetReset').addEventListener('click', resetAllFilters);
+    sheet.root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        closeFilterSheet();
+      } else if (e.key === 'Tab') {
+        const focusable = [...sheet.panel.querySelectorAll('button, input, select, [tabindex]:not([tabindex="-1"])')]
+          .filter(el => el.offsetParent !== null && !el.disabled);
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+    sheet.active.addEventListener('click', (e) => {
+      const chip = e.target.closest('[data-remove]');
+      if (chip && sheet.items[chip.dataset.remove]) sheet.items[chip.dataset.remove].remove();
+    });
+
+    phoneQuery.addEventListener('change', placePhoneFilters);
+    placePhoneFilters();
+    updatePhoneFilters();
+  }
+
+  function placePhoneFilters() {
+    if (phoneQuery.matches) {
+      sheet.moved.forEach(({ el }) => sheet.body.appendChild(el));
+    } else {
+      closeFilterSheet(false);
+      sheet.moved.forEach(({ el, marker }) => marker.after(el));
+    }
+  }
+
+  function openFilterSheet() {
+    sheet.root.classList.add('is-open');
+    sheet.root.setAttribute('aria-hidden', 'false');
+    sheet.button.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('is-sheet-open');
+    requestAnimationFrame(() => sheet.root.querySelector('.filter-sheet-close').focus());
+  }
+
+  function closeFilterSheet(returnFocus = true) {
+    if (!sheet.root || !sheet.root.classList.contains('is-open')) return;
+    sheet.root.classList.remove('is-open');
+    sheet.root.setAttribute('aria-hidden', 'true');
+    sheet.button.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('is-sheet-open');
+    if (returnFocus) sheet.button.focus();
+  }
+
+  // Filters button count, "Show N works" and the removable chips under the toolbar
+  function updatePhoneFilters() {
+    if (!sheet.root) return;
+    sheet.items = [];
+    document.querySelectorAll('.filter-row-unified .filter-subgroup').forEach(group => {
+      const chip = group.querySelector('.chip.active');
+      if (!chip || isAllChip(chip)) return;
+      const allChip = [...group.querySelectorAll('.chip')].find(isAllChip);
+      sheet.items.push({ label: chip.textContent.trim(), remove: () => allChip && allChip.click() });
+    });
+    const query = state.searchQuery.trim();
+    if (query) {
+      sheet.items.push({
+        label: `"${query}"`,
+        remove: () => {
+          state.searchQuery = '';
+          elements.searchInput.value = '';
+          applyFilters();
+        }
+      });
+    }
+
+    const count = sheet.items.length;
+    sheet.label.textContent = count ? `Filters · ${count}` : 'Filters';
+    sheet.button.classList.toggle('has-active', count > 0);
+    const shown = state.filteredWorks.length;
+    sheet.apply.textContent = `Show ${shown} ${shown === 1 ? 'work' : 'works'}`;
+    sheet.active.hidden = count === 0;
+    sheet.active.innerHTML = sheet.items.map((it, i) =>
+      `<button type="button" class="active-filter-chip" data-remove="${i}" aria-label="Remove filter ${escapeHtml(it.label)}">${escapeHtml(it.label)}<span aria-hidden="true">&#x2715;</span></button>`
+    ).join('');
+  }
+
   // --- LIGHTBOX CONTROLLER ---
   function openLightbox(index) {
     if (index < 0 || index >= state.displayList.length) return;
@@ -616,7 +735,10 @@
     // A project in the main gallery shows its cover (first image or video); the info below is the project's
     const media = isProject(item) ? getProjectEntries(item)[0] : item;
     const videoId = getYouTubeId(media.youtube);
+    const wrapper = elements.lightboxImg.closest('.lightbox-wrapper');
+    if (wrapper) wrapper.scrollTop = 0;
     if (videoId && elements.lightboxVideo) {
+      elements.lightboxImg.closest('.lightbox-stage').style.setProperty('--lb-ratio', 16 / 9);
       // YouTube artwork: show the embedded player instead of the zoomable image
       elements.lightboxImgContainer.hidden = true;
       if (elements.stageControls) elements.stageControls.hidden = true;
@@ -841,6 +963,15 @@
     elements.lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
     elements.lightboxNext.addEventListener('click', () => navigateLightbox(1));
     elements.lightboxClose.addEventListener('click', closeLightbox);
+    document.querySelectorAll('[data-lightbox-close]').forEach(btn => btn.addEventListener('click', closeLightbox));
+
+    // Phones: the stage takes the image's proportions (see --lb-ratio in style.css)
+    elements.lightboxImg.addEventListener('load', () => {
+      const img = elements.lightboxImg;
+      if (img.naturalWidth && img.naturalHeight) {
+        img.closest('.lightbox-stage').style.setProperty('--lb-ratio', img.naturalWidth / img.naturalHeight);
+      }
+    });
 
     // Stop video playback however the dialog gets closed (Esc, light dismiss, close button)
     elements.lightboxDialog.addEventListener('close', stopLightboxVideo);

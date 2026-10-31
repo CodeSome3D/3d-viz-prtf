@@ -839,6 +839,11 @@
             <option value="year-asc">Oldest Year</option>
           </select>
 
+          <button type="button" id="btnFilters" class="filters-btn" aria-haspopup="dialog" aria-controls="filterSheet" aria-expanded="false">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5h18M6 12h12M10 19h4"/></svg>
+            <span id="btnFiltersLabel">Filters</span>
+          </button>
+
           <div class="layout-toggle-group" role="group" aria-label="Grid layout toggle">
             <button type="button" id="btnLayoutMasonry" class="layout-btn" title="Masonry Flow" aria-label="Masonry layout">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="11" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="17" width="7" height="4" rx="1.5"/></svg>
@@ -887,6 +892,8 @@
           </div>
         </div>
       </div>
+      <!-- Phones: active filters as removable chips -->
+      <div id="activeFilters" class="active-filters" hidden></div>
     </div>
   </section>
 
@@ -946,6 +953,8 @@
     <div class="lightbox-wrapper">
       <!-- Main Image Stage -->
       <div class="lightbox-stage">
+        <!-- Phones: close button on the image (the sidebar one can be scrolled out of view) -->
+        <button type="button" class="lightbox-stage-close" data-lightbox-close aria-label="Close Lightbox">&#x2715;</button>
         <button type="button" id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" aria-label="Previous Artwork">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         </button>
@@ -1510,6 +1519,22 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Floating Back to Top Arrow Button -->
+  <!-- Phones: filters bottom sheet (the search box and chip rows are moved in here on small screens) -->
+  <div id="filterSheet" class="filter-sheet" aria-hidden="true">
+    <div class="filter-sheet-backdrop" data-sheet-close></div>
+    <div class="filter-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="filterSheetTitle">
+      <div class="filter-sheet-head">
+        <h2 id="filterSheetTitle" class="filter-sheet-title">Filters</h2>
+        <button type="button" class="filter-sheet-close" data-sheet-close aria-label="Close filters">&#x2715;</button>
+      </div>
+      <div id="filterSheetBody" class="filter-sheet-body"></div>
+      <div class="filter-sheet-foot">
+        <button type="button" id="filterSheetReset" class="btn btn-outline">Reset</button>
+        <button type="button" id="filterSheetApply" class="btn btn-primary" data-sheet-close>Show works</button>
+      </div>
+    </div>
+  </div>
+
   <button type="button" id="btnBackToTop" class="back-to-top-btn" aria-label="Scroll back to top" title="Back to top">
     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>

@@ -2515,3 +2515,47 @@ a.art-media-wrap {
     bottom: 0.75rem;
   }
 }
+
+/* CV buttons in the header: on phones only the "CV EN" / "CV PL" text is shown (no icon) to save room */
+@media (max-width: 640px) {
+  .nav-actions .btn.nav-cv-link {
+    width: auto;
+    padding: 0 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .nav-actions .btn.nav-cv-link > span {
+    display: inline;
+  }
+  .nav-actions .btn.nav-cv-link svg {
+    display: none;
+  }
+}
+
+/* Tablets: with the CV buttons the header is too wide, so the email button shows "Email" and the CV buttons drop their icon */
+@media (min-width: 641px) and (max-width: 900px) {
+  .email-btn-text-full {
+    display: none;
+  }
+  .email-btn-text-short {
+    display: inline;
+  }
+  .nav-cv-link svg {
+    display: none;
+  }
+}
+
+/* Narrow phones: name and buttons do not fit on one row, so the buttons move to a second row */
+@media (max-width: 480px) {
+  .nav-content {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+    row-gap: 0.5rem;
+  }
+  .nav-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

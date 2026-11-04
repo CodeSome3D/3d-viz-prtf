@@ -190,11 +190,17 @@
     return !!(window.PORTFOLIO_APP && window.PORTFOLIO_APP.isProject(item));
   }
 
+  // Same path clean-up as app.js (Windows backslashes, doubled "images/" prefix)
+  function cleanPath(path) {
+    const app = window.PORTFOLIO_APP;
+    return app && app.normalizePath ? app.normalizePath(path) : path;
+  }
+
   // "images/a.jpg | Optional title" lines <-> [{ file, name }] / [{ youtube, name }]
   function parseMaterials(text) {
     return String(text || '').split('\n').map(line => line.trim()).filter(Boolean).map(line => {
       const [rawSource, ...rest] = line.split('|');
-      const source = rawSource.trim();
+      const source = cleanPath(rawSource.trim());
       const name = rest.join('|').trim();
       const link = toYouTubeLink(source);
       let entry;
@@ -1027,7 +1033,7 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       return;
     }
 
-    let filePath = filename;
+    let filePath = cleanPath(filename);
     if (filePath && !filePath.startsWith('images/') && !filePath.startsWith('http')) {
       filePath = `images/${filePath}`;
     }
@@ -1085,7 +1091,7 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       return;
     }
 
-    let filePath = rawFile;
+    let filePath = cleanPath(rawFile);
     if (filePath && !filePath.startsWith('images/') && !filePath.startsWith('http')) {
       filePath = `images/${filePath}`;
     }

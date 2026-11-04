@@ -23,6 +23,10 @@
       const saved = localStorage.getItem('portfolio_saved_works');
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const defaultFiles = mapFilesByName(defaultWorks);
+          parsed.forEach(item => resolveSavedPaths(item, defaultFiles));
+        }
         if (Array.isArray(parsed) && parsed.length > 0) {
           const defaultByKey = new Map(defaultWorks.filter(w => getWorkKey(w)).map(w => [getWorkKey(w), w]));
 
@@ -35,6 +39,7 @@
             if (key && defaultByKey.has(key) && !savedKeys.has(key)) {
               const def = defaultByKey.get(key);
               merged.push({ ...def, ...item, id: String(merged.length + 1).padStart(3, '0') });
+              if (isProject(item) && isProject(def)) addMissingProjectItems(merged[merged.length - 1], def);
               savedKeys.add(key);
             } else if (key && isProject(item) && !savedKeys.has(key)) {
               // Project made in the browser editor (not exported to works.js yet): keep it
@@ -1080,6 +1085,7 @@
     getWorkKey: getWorkKey,
     fillItemTexts: fillItemTexts,
     getCardImage: getCardImage,
+    normalizePath: normalizePath,
     resetToDefaults: function () {
       localStorage.removeItem('portfolio_saved_works');
       window.location.reload();
@@ -1152,6 +1158,45 @@
     if (item.file) return item.file;
     const id = getYouTubeId(item.youtube);
     return id ? `youtube:${id}` : '';
+  }
+
+  // Editor input and old saved copies can hold Windows-style or doubled paths ("images/images\\a\\b.jpg")
+  function normalizePath(path) {
+    if (!path || /^https?:/i.test(path)) return path;
+    let p = String(path).trim().replace(/\\/g, '/').replace(/\/{2,}/g, '/').replace(/^\.\//, '');
+    while (p.startsWith('images/images/')) p = p.slice('images/'.length);
+    return p;
+  }
+
+  function fileName(path) {
+    return String(path || '').split('/').pop().toLowerCase();
+  }
+
+  // works.js image paths by file name (file names are unique: thumbnails are keyed by them too)
+  function mapFilesByName(works) {
+    const map = new Map();
+    works.forEach(w => (isProject(w) ? w.items : [w]).forEach(it => {
+      if (it && it.file) map.set(fileName(it.file), it.file);
+    }));
+    return map;
+  }
+
+  // A saved copy keeps its order and texts, but its images always take their path from works.js when it has them
+  function resolveSavedPaths(item, defaultFiles) {
+    if (!item || typeof item !== 'object') return;
+    (Array.isArray(item.items) ? item.items : [item]).forEach(it => {
+      if (!it || !it.file) return;
+      const file = normalizePath(it.file);
+      it.file = defaultFiles.get(fileName(file)) || file;
+    });
+  }
+
+  // Images/videos added to a project in works.js after the browser saved its copy
+  function addMissingProjectItems(project, def) {
+    const have = new Set(project.items.map(getWorkKey));
+    def.items.forEach(it => {
+      if (!have.has(getWorkKey(it))) project.items.push({ ...it });
+    });
   }
 
   // --- PROJECTS ---

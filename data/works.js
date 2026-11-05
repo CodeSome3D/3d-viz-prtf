@@ -170,6 +170,18 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "006",
+    "name": "SKAKO Alpha Mixer",
+    "youtube": "https://youtu.be/IjeCW8p91CI",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "year": "2024",
+    "description": "Industrial concrete mixer presentation for Nordic Story and SKAKO"
+  },
+  {
+    "id": "007",
     "name": "Space Teapot",
     "youtube": "https://youtu.be/YuVY5nLMOYQ",
     "dcc": [
@@ -181,7 +193,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Short fun animation made with tyFlow and Phoenix FD"
   },
   {
-    "id": "007",
+    "id": "008",
     "name": "Cinematic Views Exploration",
     "dcc": [
       "Cinema 4D"
@@ -209,7 +221,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "008",
+    "id": "009",
     "name": "Veritamorph Jukebox",
     "dcc": [
       "Cinema 4D"
@@ -230,7 +242,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "009",
+    "id": "010",
     "name": "Ring Crown — Studio Showcase",
     "file": "images/product_ring-crown_01.png",
     "dcc": [
@@ -242,7 +254,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
   },
   {
-    "id": "010",
+    "id": "011",
     "name": "Clicker Microdevice Internals",
     "file": "images/product_clicker-microdevice_01.png",
     "dcc": [
@@ -254,7 +266,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-tech industrial product design visualization."
   },
   {
-    "id": "011",
+    "id": "012",
     "name": "Industrial Mechanism",
     "dcc": [
       "Cinema 4D",
@@ -279,7 +291,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "012",
+    "id": "013",
     "name": "King Air",
     "file": "images/product_king-air_01.png",
     "dcc": [
@@ -292,7 +304,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Electric converted King Air aircraft with the new skin."
   },
   {
-    "id": "013",
+    "id": "014",
     "name": "Apple Recover Center",
     "youtube": "https://youtu.be/Q37Ps1oCBTA",
     "dcc": [
@@ -304,7 +316,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Apple Recover Center commercial for local store"
   },
   {
-    "id": "014",
+    "id": "015",
     "name": "R&D Visuals",
     "dcc": [
       "3ds Max",
@@ -391,7 +403,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "015",
+    "id": "016",
     "name": "Koh-Saah Ring",
     "dcc": [
       "3ds Max",
@@ -417,7 +429,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "016",
+    "id": "017",
     "name": "Warehouse Industrial Logistics",
     "file": "images/product_kruger-pallet_01.png",
     "dcc": [

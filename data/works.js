@@ -170,6 +170,18 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "006",
+    "name": "Space Teapot",
+    "youtube": "https://youtu.be/YuVY5nLMOYQ",
+    "dcc": [
+      "3ds Max"
+    ],
+    "renderer": "Corona",
+    "category": "Concept Art",
+    "year": "2025",
+    "description": "Short fun animation made with tyFlow and Phoenix FD"
+  },
+  {
+    "id": "007",
     "name": "Cinematic Views Exploration",
     "dcc": [
       "Cinema 4D"
@@ -197,7 +209,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "007",
+    "id": "008",
     "name": "Veritamorph Jukebox",
     "dcc": [
       "Cinema 4D"
@@ -218,7 +230,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "008",
+    "id": "009",
     "name": "Ring Crown — Studio Showcase",
     "file": "images/product_ring-crown_01.png",
     "dcc": [
@@ -230,7 +242,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
   },
   {
-    "id": "009",
+    "id": "010",
     "name": "Clicker Microdevice Internals",
     "file": "images/product_clicker-microdevice_01.png",
     "dcc": [
@@ -242,7 +254,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-tech industrial product design visualization."
   },
   {
-    "id": "010",
+    "id": "011",
     "name": "Industrial Mechanism",
     "dcc": [
       "Cinema 4D",
@@ -267,7 +279,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "011",
+    "id": "012",
     "name": "King Air",
     "file": "images/product_king-air_01.png",
     "dcc": [
@@ -280,7 +292,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Electric converted King Air aircraft with the new skin."
   },
   {
-    "id": "012",
+    "id": "013",
     "name": "Apple Recover Center",
     "youtube": "https://youtu.be/Q37Ps1oCBTA",
     "dcc": [
@@ -292,7 +304,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Apple Recover Center commercial for local store"
   },
   {
-    "id": "013",
+    "id": "014",
     "name": "R&D Visuals",
     "dcc": [
       "3ds Max",
@@ -379,7 +391,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "014",
+    "id": "015",
     "name": "Koh-Saah Ring",
     "dcc": [
       "3ds Max",
@@ -405,7 +417,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "015",
+    "id": "016",
     "name": "Warehouse Industrial Logistics",
     "file": "images/product_kruger-pallet_01.png",
     "dcc": [

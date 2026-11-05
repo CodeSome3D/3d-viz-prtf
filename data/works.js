@@ -5,7 +5,7 @@
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
  * YouTube videos: add "youtube": "https://youtu.be/VIDEO_ID" ("file" is then an optional poster image)
  * Projects: "project": "url-slug" + "items": [{ "file": ... } or { "youtube": ... }, ...] (2+ items, first = cover)
- * Last updated: 2026-10-30
+ * Last updated: 2026-11-05
  */
 
 window.PORTFOLIO_WORKS = [
@@ -47,7 +47,7 @@ window.PORTFOLIO_WORKS = [
     "renderer": "Corona",
     "category": "Archviz",
     "year": "2020",
-    "description": "Exterior architectural visualization of the modern 3D printed house in daylight conditions.",
+    "description": "Architectural visualization of the modern 3D printed house.",
     "project": "modern-3d-printed-house",
     "items": [
       {
@@ -60,7 +60,7 @@ window.PORTFOLIO_WORKS = [
       },
       {
         "file": "images/archviz_living-room_01.jpg",
-        "name": "Minimal Living Space",
+        "name": "Kitchen",
         "description": "Scandinavian interior styling with neutral plaster, linen fabrics, and soft overcast daylight."
       },
       {
@@ -88,7 +88,7 @@ window.PORTFOLIO_WORKS = [
     "renderer": "Cycles",
     "category": "Concept Art",
     "year": "2025",
-    "description": "Stylized fintech art with monumental crypto columns and dramatic lighting.",
+    "description": "Stylized fintech art.",
     "project": "crypto-coins",
     "items": [
       {
@@ -102,7 +102,7 @@ window.PORTFOLIO_WORKS = [
       },
       {
         "file": "images/product_fintech-coins-cards_01.png",
-        "name": "Fintech Tokenomics — Coins & Cards",
+        "name": "Fintech Tokenomics — Coins & Wallets",
         "description": "Premium credit card visual of frosted matte acrylics coins with embossed gold details.",
         "category": "Product"
       },
@@ -205,7 +205,7 @@ window.PORTFOLIO_WORKS = [
     "renderer": "Redshift",
     "category": "Concept Art",
     "year": "2020",
-    "description": "Still frame from the fan art animation made for the Veritamorph band https://youtu.be/ESg6NeaswM0",
+    "description": "Fan art animation made for the Veritamorph band",
     "project": "veritamorph-jukebox",
     "items": [
       {

@@ -506,23 +506,27 @@
       const cover = getCover(item);
       const video = isVideo(cover);
       const fallback = cover.file && !video ? cover.file : getYouTubeThumb(cover);
+      // Studio theme: inside an open project the first image is shown large on desktop (see css/studio.css),
+      // so on wide screens it loads the full image instead of the 800px thumbnail.
+      const feature = Boolean(state.openProject) && index === 0;
 
       // Badges rendered strictly under the thumbnail in art-details
       const dccBadgesHtml = dccs.map(d => `<span class="badge-dcc" data-dcc="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join('');
       const rndBadgeHtml = `<span class="badge-rnd" data-rnd="${escapeHtml(rnd)}">${escapeHtml(rnd)}</span>`;
 
       return `
-        <article class="art-card${project ? ' is-project' : ''}" data-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(project ? `Project: ${name}` : name)}">
+        <article class="art-card${project ? ' is-project' : ''}${feature ? ' is-feature' : ''}" data-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(project ? `Project: ${name}` : name)}">
           <div class="art-media-wrap">
+            ${feature && cover.file && !video ? `<picture><source media="(min-width: 1025px)" srcset="${escapeHtml(cover.file)}">` : ''}
             <img 
               class="art-img" 
               src="${escapeHtml(getCardImage(item))}" 
               alt="${escapeHtml(getAltText(item))}" 
               ${index < 2 ? 'fetchpriority="high"' : (index >= 4 ? 'loading="lazy"' : '')}
               decoding="async"
-              onload="this.parentElement.classList.add('has-loaded')"
+              onload="this.closest('.art-media-wrap').classList.add('has-loaded')"
               onerror="if (this.dataset.full !== '1') { this.dataset.full = '1'; this.src = '${escapeHtml(fallback)}'; }"
-            >
+            >${feature && cover.file && !video ? '</picture>' : ''}
             ${video ? VIDEO_PLAY_ICON : ''}
             ${project ? projectBadgeHtml(item) : ''}
             <div class="card-hover-overlay">

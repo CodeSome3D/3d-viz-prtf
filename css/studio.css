@@ -262,8 +262,7 @@ body::before, body::after { display: none; }
 /* ---------- Phones ---------- */
 @media (max-width: 640px) {
   .nav-actions { gap: 0.95rem; flex-wrap: wrap; }
-  .nav-actions .btn,
-  .nav-actions .btn.nav-cv-link { width: auto; height: auto; padding: 0.25rem 0; font-size: 0.82rem; font-weight: 400; }
+  .nav-actions .btn { width: auto; height: auto; padding: 0.25rem 0; font-size: 0.82rem; font-weight: 400; }
   .nav-actions .btn > span,
   .nav-actions .btn .nav-btn-label,
   .nav-actions .btn .email-btn-text-short { display: inline !important; }

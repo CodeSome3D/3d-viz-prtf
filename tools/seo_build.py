@@ -21,6 +21,9 @@ each { "file": ... } or { "youtube": ... }, optional "name") is one gallery
 card; its first item is the cover. Every item gets a thumbnail and goes into
 the sitemap and structured data.
 
+Personal works ("industries" contains "Personal") go into the separate Personal
+section (SEO:STATIC-PERSONAL markers); all other works into the main gallery.
+
 Nothing else in index.html is touched. Safe to run as often as you like.
 """
 import html
@@ -54,6 +57,10 @@ def load_works():
 def dcc_list(item):
     dcc = item.get("dcc") or []
     return dcc if isinstance(dcc, list) else [dcc]
+
+
+def is_personal(item):
+    return "Personal" in (item.get("industries") or [])
 
 
 def youtube_id(item):
@@ -181,10 +188,11 @@ def build_sitemap(works):
     print(f"  sitemap.xml ({images} images" + (f", {videos} videos)" if videos else ")"))
 
 
-def static_cards(works):
+def static_cards(works, first=True):
     e = html.escape
     cards = []
     for i, w in enumerate(works):
+        i = i if first else i + 4  # the Personal section is below the fold: lazy-load all its images
         badges = "".join(f'<span class="badge-dcc" data-dcc="{e(d)}">{e(d)}</span>' for d in dcc_list(w))
         rnd = w.get("renderer") or ""
         if rnd:
@@ -234,7 +242,7 @@ def gallery_jsonld(works):
     data = {
         "@context": "https://schema.org",
         "@type": "ImageGallery",
-        "name": f"{AUTHOR} - 3D Visualization Portfolio",
+        "name": f"{AUTHOR} - Technical 3D Animation & Product Visualization Portfolio",
         "url": SITE_URL,
         "author": {"@id": SITE_URL + "#person"},
         "image": [
@@ -275,11 +283,12 @@ def build_index(works):
     with open(path, encoding="utf-8", newline="") as f:
         text = f.read()
     nl = "\r\n" if "\r\n" in text else "\n"
-    text = replace_block(text, "STATIC-GALLERY", static_cards(works), nl)
+    text = replace_block(text, "STATIC-GALLERY", static_cards([w for w in works if not is_personal(w)]), nl)
+    text = replace_block(text, "STATIC-PERSONAL", static_cards([w for w in works if is_personal(w)], first=False), nl)
     text = replace_block(text, "JSONLD-GALLERY", gallery_jsonld(works), nl)
     with open(path, "w", encoding="utf-8", newline="") as f:
         f.write(text)
-    print("  index.html static gallery + JSON-LD")
+    print("  index.html static gallery + Personal section + JSON-LD")
 
 
 if __name__ == "__main__":

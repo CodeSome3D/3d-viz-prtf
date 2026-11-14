@@ -316,3 +316,134 @@ body::before, body::after { display: none; }
   .nav-content { flex-wrap: wrap; height: auto; padding-top: 0.55rem; padding-bottom: 0.55rem; row-gap: 0.35rem; }
   .nav-actions { width: 100%; justify-content: flex-start; }
 }
+
+/* ==========================================================================
+   REDESIGN (2026-11): hero actions, client strip, industry filters,
+   Personal section, Services, About, Contact
+   ========================================================================== */
+/* Header: the AI Production link always shows its label (its icon is hidden in this theme) */
+.nav-actions .nav-sister-link .nav-btn-label { display: inline !important; }
+
+/* Header section links: underlined only while their section is in view (set by app.js) */
+.nav-actions .nav-anchor { border-bottom: 1px solid transparent; }
+.nav-actions .nav-anchor.is-active { color: var(--text-primary); border-bottom-color: var(--accent); }
+
+/* Anchors land below the sticky header */
+#work, #personal, #services, #about, #contact { scroll-margin-top: 84px; }
+
+/* Hero */
+.hero-proof {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.35rem; }
+.hero-btn { padding: 0.7rem 1.25rem; font-size: 0.9rem; font-weight: 500; text-decoration: none; }
+.hero-btn.btn-outline { background: rgba(15, 14, 13, 0.45); border: 1px solid rgba(236, 232, 225, 0.35); color: var(--text-primary); }
+.hero-btn.btn-outline:hover { border-color: var(--accent); color: var(--text-primary); }
+
+/* Filters: industry row first, software / renderer row collapsed behind a toggle */
+.filter-row-primary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  padding: 6px 0;
+}
+.more-filters-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: 0;
+  padding: 0.2rem 0;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.more-filters-btn:hover, .more-filters-btn.has-active { color: var(--text-primary); }
+.more-filters-btn svg { transition: transform 0.2s ease; }
+.more-filters-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+@media (min-width: 641px) {
+  .controls-panel .filter-row-unified:not(.is-open) { display: none; }
+}
+@media (max-width: 640px) {
+  .more-filters-btn { display: none; }
+  .filter-row-primary { padding: 0; }
+}
+
+/* Grids hidden by app.js (the theme's display: grid would otherwise win over [hidden]) */
+.gallery-grid[hidden], .personal-section[hidden] { display: none !important; }
+.gallery-container.is-main-empty { min-height: 0; margin-bottom: 0; }
+
+/* Shared section heading */
+.section-head { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.75rem; }
+.section-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-stretch: 112%;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+.section-lede { color: var(--text-secondary); font-size: 0.95rem; }
+
+/* Personal / concept section: below the main grid, visibly secondary */
+.personal-section { border-top: 1px solid var(--border-subtle); padding-top: 2.5rem; margin-bottom: 5rem; }
+.personal-section .section-title { font-size: clamp(1.3rem, 2.2vw, 1.75rem); }
+body.is-project-view .personal-section { display: none; }
+
+/* Services, About, Contact */
+.info-section { border-top: 1px solid var(--border-subtle); padding: 4.5rem 0; }
+.services-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+.service-card { border-top: 1px solid var(--accent-line); padding-top: 1.1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+.service-num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.service-title { font-family: var(--font-display); font-weight: 500; font-size: 1.15rem; line-height: 1.25; color: var(--text-primary); }
+.service-text { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; }
+
+.about-inner { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 3rem; align-items: start; }
+.about-photo { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); filter: grayscale(0.25); }
+.about-text { display: flex; flex-direction: column; gap: 1rem; max-width: 68ch; }
+.about-text .section-title { margin-bottom: 0.25rem; }
+.about-text p:not(.section-kicker) { color: var(--text-secondary); font-size: 1rem; line-height: 1.7; }
+
+.contact-section { padding-bottom: 5rem; }
+.contact-inner { display: flex; flex-direction: column; gap: 1rem; }
+.contact-title { font-size: clamp(2rem, 5vw, 3.6rem); max-width: 18ch; }
+.contact-text { color: var(--text-secondary); font-size: 1.02rem; line-height: 1.7; max-width: 60ch; }
+.contact-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
+.contact-btn { padding: 0.8rem 1.35rem; font-size: 0.95rem; font-weight: 500; text-decoration: none; overflow-wrap: anywhere; }
+.contact-btn.btn-outline { border: 1px solid var(--border-subtle); color: var(--text-primary); background: none; }
+.contact-btn.btn-outline:hover { border-color: var(--accent); }
+
+.footer-title { font-weight: 500; color: var(--text-primary); }
+
+@media (max-width: 1024px) {
+  .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.25rem; }
+}
+@media (max-width: 640px) {
+  #work, #personal, #services, #about, #contact { scroll-margin-top: 0; }
+  /* Eyebrow: each part stays on one line; the parts wrap as a whole */
+  .hero-kicker { flex-wrap: wrap; row-gap: 0.2rem; }
+  .hero-kicker span { white-space: nowrap; }
+  .hero-actions { gap: 0.6rem; }
+  .hero-btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
+  .info-section { padding: 3rem 0; }
+  .services-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .about-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+  .about-photo { max-width: 160px; }
+  .personal-section { padding-top: 2rem; margin-bottom: 3rem; }
+}

@@ -97,6 +97,24 @@
   const btnDeleteItem = document.getElementById('btnDeleteItem');
 
   const editFieldItemsWrap = document.getElementById('editFieldItemsWrap');
+  const editFieldIndustriesWrap = document.getElementById('editFieldIndustriesWrap');
+  const editIndustryGroup = document.getElementById('editIndustryGroup');
+  const newIndustryGroup = document.getElementById('newIndustryGroup');
+
+  // Industry / task filters: a work-level field (project items always use the project's industries)
+  function setIndustryChecks(group, values) {
+    if (!group) return;
+    const list = Array.isArray(values) ? values : [];
+    group.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.checked = list.includes(cb.value);
+      cb.closest('.dcc-checkbox-label').classList.toggle('is-checked', cb.checked);
+    });
+  }
+
+  function getIndustryChecks(group) {
+    if (!group) return [];
+    return Array.from(group.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+  }
   let currentEditingItem = null;
   let editingItemIndex = -1; // >= 0 while one item of a project is being edited
   const ITEM_FIELDS = ['name', 'description', 'year', 'category', 'dcc', 'renderer'];
@@ -380,6 +398,8 @@
     }
 
     editFieldDesc.value = view.description || '';
+    setIndustryChecks(editIndustryGroup, item.industries);
+    if (editFieldIndustriesWrap) editFieldIndustriesWrap.style.display = editingItemIndex >= 0 ? 'none' : '';
     if (editFieldYoutube) editFieldYoutube.value = view.youtube ? toYouTubeLink(view.youtube) || view.youtube : '';
     if (editFieldYoutubeWrap) editFieldYoutubeWrap.style.display = isProject(item) ? 'none' : 'block';
     if (editFieldItems) {
@@ -418,6 +438,13 @@
     currentEditingItem.category = editFieldCategory ? editFieldCategory.value : 'Archviz';
     currentEditingItem.year = editFieldYear ? editFieldYear.value : '2024';
     currentEditingItem.description = editFieldDesc.value.trim();
+
+    // Industries belong to the whole work / project (the field is hidden while one project item is edited)
+    if (!itemMode && editIndustryGroup) {
+      const industries = getIndustryChecks(editIndustryGroup);
+      if (industries.length) currentEditingItem.industries = industries;
+      else delete currentEditingItem.industries;
+    }
 
     // YouTube link: a valid link makes the work a video; clearing it turns it back into an image
     // (only possible when the work has an image file, otherwise the link is kept)
@@ -520,6 +547,8 @@
  * ----------------------------------------------------
  * Allowed DCC Tools: "3ds Max", "Blender", "Cinema 4D", "Autodesk Fusion", "ZBrush"
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
+ * Industries (one or more): "Industrial machinery", "Consumer products", "Exploded views & internals", "Architecture", "Personal"
+ *   ("Personal" works are shown in the separate Personal section below the main grid)
  * YouTube videos: add "youtube": "https://youtu.be/VIDEO_ID" ("file" is then an optional poster image)
  * Projects: "project": "url-slug" + "items": [{ "file": ... } or { "youtube": ... }, ...] (2+ items, first = cover)
  * Last updated: ${new Date().toISOString().split('T')[0]}
@@ -1142,6 +1171,8 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
       year: year,
       description: desc
     });
+    const newIndustries = getIndustryChecks(newIndustryGroup);
+    if (newIndustries.length) newItem.industries = newIndustries;
 
     currentWorks.splice(targetIndex, 0, newItem);
     if (project) adoptExistingWorks(newItem);
@@ -1299,6 +1330,21 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
         if (cb) {
           cb.closest('.dcc-checkbox-label').classList.toggle('is-checked', cb.checked);
         }
+      });
+    }
+
+    // Industry checkboxes: Add New form (styling only) and Edit form (styling + auto-save)
+    if (newIndustryGroup) {
+      newIndustryGroup.addEventListener('change', (e) => {
+        const cb = e.target.closest('input[type="checkbox"]');
+        if (cb) cb.closest('.dcc-checkbox-label').classList.toggle('is-checked', cb.checked);
+      });
+    }
+    if (editIndustryGroup) {
+      editIndustryGroup.addEventListener('change', (e) => {
+        const cb = e.target.closest('input[type="checkbox"]');
+        if (cb) cb.closest('.dcc-checkbox-label').classList.toggle('is-checked', cb.checked);
+        saveCurrentItem(false);
       });
     }
 

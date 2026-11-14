@@ -3,9 +3,11 @@
  * ----------------------------------------------------
  * Allowed DCC Tools: "3ds Max", "Blender", "Cinema 4D", "Autodesk Fusion", "ZBrush"
  * Allowed Render Engines: "Corona", "Cycles", "Redshift"
+ * Industries (one or more): "Industrial machinery", "Consumer products", "Exploded views & internals", "Architecture", "Personal"
+ *   ("Personal" works are shown in the separate Personal section below the main grid)
  * YouTube videos: add "youtube": "https://youtu.be/VIDEO_ID" ("file" is then an optional poster image)
  * Projects: "project": "url-slug" + "items": [{ "file": ... } or { "youtube": ... }, ...] (2+ items, first = cover)
- * Last updated: 2026-11-05
+ * Last updated: 2026-11-14
  */
 
 window.PORTFOLIO_WORKS = [
@@ -17,6 +19,9 @@ window.PORTFOLIO_WORKS = [
     ],
     "renderer": "Cycles",
     "category": "Product",
+    "industries": [
+      "Industrial machinery"
+    ],
     "year": "2025",
     "description": "Mayekawa Compressor product visualization in studio environment.",
     "project": "mayekawa-compressor",
@@ -40,12 +45,164 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "002",
+    "name": "SKAKO Alpha Mixer",
+    "youtube": "https://youtu.be/IjeCW8p91CI",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Industrial machinery"
+    ],
+    "year": "2024",
+    "description": "Industrial concrete mixer presentation for Nordic Story and SKAKO"
+  },
+  {
+    "id": "003",
+    "name": "Warehouse Industrial Logistics",
+    "file": "images/product_kruger-pallet_01.png",
+    "dcc": [
+      "3ds Max",
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Industrial machinery"
+    ],
+    "year": "2026",
+    "description": "Commercial logistics packaging visualization featuring accurate shaders."
+  },
+  {
+    "id": "004",
+    "name": "Holographic Sight Explosion Scheme",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Consumer products",
+      "Exploded views & internals"
+    ],
+    "year": "2025",
+    "description": "CAD model animation, shading, rendering, motion graphics",
+    "project": "holographic-sight-explosion-scheme",
+    "items": [
+      {
+        "file": "images/Holosite_ES_01_exploded_scheme_logo.png",
+        "name": "Explosion Scheme with callouts"
+      },
+      {
+        "youtube": "https://youtu.be/K6V8VLXAK-k"
+      },
+      {
+        "file": "images/Holosite_ES_01_03_2_logo.png",
+        "name": "Holographic Site view 01"
+      },
+      {
+        "file": "images/Holosite_ES_01_04_2_logo.png",
+        "name": "Holographic Site view 02"
+      }
+    ]
+  },
+  {
+    "id": "005",
+    "name": "Clicker Microdevice Internals",
+    "file": "images/product_clicker-microdevice_01.png",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Consumer products",
+      "Exploded views & internals"
+    ],
+    "year": "2025",
+    "description": "High-tech industrial product design visualization."
+  },
+  {
+    "id": "006",
+    "name": "Industrial Mechanism",
+    "dcc": [
+      "Cinema 4D",
+      "Autodesk Fusion"
+    ],
+    "renderer": "Redshift",
+    "category": "Hard Surface",
+    "industries": [
+      "Industrial machinery",
+      "Exploded views & internals"
+    ],
+    "year": "2020",
+    "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling.",
+    "project": "industrial-mechanism",
+    "items": [
+      {
+        "file": "images/hardsurface_industrial-mechanism_01.png",
+        "name": "Industrial Mechanism Closeup"
+      },
+      {
+        "file": "images/hardsurface_industrial-mechanism_02.png",
+        "name": "Hardsurface Industrial Mechanism Explosion Scheme",
+        "description": "Explosion scheme of a CAD model",
+        "category": "Product"
+      }
+    ]
+  },
+  {
+    "id": "007",
+    "name": "King Air",
+    "file": "images/product_king-air_01.png",
+    "dcc": [
+      "3ds Max",
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Industrial machinery"
+    ],
+    "year": "2025",
+    "description": "Electric converted King Air aircraft with the new skin."
+  },
+  {
+    "id": "008",
+    "name": "Dansk Gummy Industry",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Industrial machinery"
+    ],
+    "year": "2024",
+    "description": "Short project presentation made for Nordic Story.",
+    "project": "dansk-gummy-industry",
+    "items": [
+      {
+        "file": "images/ship.png",
+        "name": "Ship arriving intro"
+      },
+      {
+        "youtube": "https://youtu.be/IRKCQEEPsT8"
+      }
+    ]
+  },
+  {
+    "id": "009",
     "name": "Modern 3D Printed House",
     "dcc": [
       "3ds Max"
     ],
     "renderer": "Corona",
     "category": "Archviz",
+    "industries": [
+      "Architecture"
+    ],
     "year": "2020",
     "description": "Architectural visualization of the modern 3D printed house.",
     "project": "modern-3d-printed-house",
@@ -80,13 +237,75 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "003",
+    "id": "010",
+    "name": "Ring Crown — Studio Showcase",
+    "file": "images/product_ring-crown_01.png",
+    "dcc": [
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Consumer products"
+    ],
+    "year": "2025",
+    "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
+  },
+  {
+    "id": "011",
+    "name": "Apple Recover Center",
+    "youtube": "https://youtu.be/Q37Ps1oCBTA",
+    "dcc": [
+      "3ds Max"
+    ],
+    "renderer": "Corona",
+    "category": "Product",
+    "industries": [
+      "Consumer products"
+    ],
+    "year": "2015",
+    "description": "Apple Recover Center commercial for local store"
+  },
+  {
+    "id": "012",
+    "name": "Koh-Saah Ring",
+    "dcc": [
+      "3ds Max",
+      "Blender",
+      "ZBrush"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Consumer products"
+    ],
+    "year": "2015",
+    "description": "Gothic jewelry product viz in studio environment with dramatic lighting.",
+    "project": "koh-saah-ring",
+    "items": [
+      {
+        "file": "images/product_koh-saah-ring_01.jpg"
+      },
+      {
+        "youtube": "https://youtu.be/TPQxkYQCTC8"
+      },
+      {
+        "file": "images/product_koh-saah-ring_02.jpg",
+        "name": "Koh-Saah Ring closeup"
+      }
+    ]
+  },
+  {
+    "id": "013",
     "name": "Crypto Coins",
     "dcc": [
       "Blender"
     ],
     "renderer": "Cycles",
     "category": "Concept Art",
+    "industries": [
+      "Personal"
+    ],
     "year": "2025",
     "description": "Stylized fintech art.",
     "project": "crypto-coins",
@@ -119,69 +338,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "004",
-    "name": "Dansk Gummy Industry",
-    "dcc": [
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2024",
-    "description": "Short project presentation made for Nordic Story.",
-    "project": "dansk-gummy-industry",
-    "items": [
-      {
-        "file": "images/ship.png",
-        "name": "Ship arriving intro"
-      },
-      {
-        "youtube": "https://youtu.be/IRKCQEEPsT8"
-      }
-    ]
-  },
-  {
-    "id": "005",
-    "name": "Holographic Sight Explosion Scheme",
-    "dcc": [
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2025",
-    "description": "CAD model animation, shading, rendering, motion graphics",
-    "project": "holographic-sight-explosion-scheme",
-    "items": [
-      {
-        "file": "images/Holosite_ES_01_exploded_scheme_logo.png",
-        "name": "Explosion Scheme with callouts"
-      },
-      {
-        "youtube": "https://youtu.be/K6V8VLXAK-k"
-      },
-      {
-        "file": "images/Holosite_ES_01_03_2_logo.png",
-        "name": "Holographic Site view 01"
-      },
-      {
-        "file": "images/Holosite_ES_01_04_2_logo.png",
-        "name": "Holographic Site view 02"
-      }
-    ]
-  },
-  {
-    "id": "006",
-    "name": "SKAKO Alpha Mixer",
-    "youtube": "https://youtu.be/IjeCW8p91CI",
-    "dcc": [
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2024",
-    "description": "Industrial concrete mixer presentation for Nordic Story and SKAKO"
-  },
-  {
-    "id": "007",
+    "id": "014",
     "name": "Space Teapot",
     "youtube": "https://youtu.be/YuVY5nLMOYQ",
     "dcc": [
@@ -189,17 +346,23 @@ window.PORTFOLIO_WORKS = [
     ],
     "renderer": "Corona",
     "category": "Concept Art",
+    "industries": [
+      "Personal"
+    ],
     "year": "2025",
     "description": "Short fun animation made with tyFlow and Phoenix FD"
   },
   {
-    "id": "008",
+    "id": "015",
     "name": "Cinematic Views Exploration",
     "dcc": [
       "Cinema 4D"
     ],
     "renderer": "Redshift",
     "category": "Concept Art",
+    "industries": [
+      "Personal"
+    ],
     "year": "2020",
     "description": "Cinematic R&D exploration.",
     "project": "cinematic-views-exploration",
@@ -221,13 +384,16 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "009",
+    "id": "016",
     "name": "Veritamorph Jukebox",
     "dcc": [
       "Cinema 4D"
     ],
     "renderer": "Redshift",
     "category": "Concept Art",
+    "industries": [
+      "Personal"
+    ],
     "year": "2020",
     "description": "Fan art animation made for the Veritamorph band",
     "project": "veritamorph-jukebox",
@@ -242,81 +408,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "010",
-    "name": "Ring Crown — Studio Showcase",
-    "file": "images/product_ring-crown_01.png",
-    "dcc": [
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2025",
-    "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
-  },
-  {
-    "id": "011",
-    "name": "Clicker Microdevice Internals",
-    "file": "images/product_clicker-microdevice_01.png",
-    "dcc": [
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2025",
-    "description": "High-tech industrial product design visualization."
-  },
-  {
-    "id": "012",
-    "name": "Industrial Mechanism",
-    "dcc": [
-      "Cinema 4D",
-      "Autodesk Fusion"
-    ],
-    "renderer": "Redshift",
-    "category": "Hard Surface",
-    "year": "2020",
-    "description": "Complex mechanical assembly showcasing anodized metals, machined grooves, and precision CAD modeling.",
-    "project": "industrial-mechanism",
-    "items": [
-      {
-        "file": "images/hardsurface_industrial-mechanism_01.png",
-        "name": "Industrial Mechanism Closeup"
-      },
-      {
-        "file": "images/hardsurface_industrial-mechanism_02.png",
-        "name": "Hardsurface Industrial Mechanism Explosion Scheme",
-        "description": "Explosion scheme of a CAD model",
-        "category": "Product"
-      }
-    ]
-  },
-  {
-    "id": "013",
-    "name": "King Air",
-    "file": "images/product_king-air_01.png",
-    "dcc": [
-      "3ds Max",
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2025",
-    "description": "Electric converted King Air aircraft with the new skin."
-  },
-  {
-    "id": "014",
-    "name": "Apple Recover Center",
-    "youtube": "https://youtu.be/Q37Ps1oCBTA",
-    "dcc": [
-      "3ds Max"
-    ],
-    "renderer": "Corona",
-    "category": "Product",
-    "year": "2015",
-    "description": "Apple Recover Center commercial for local store"
-  },
-  {
-    "id": "015",
+    "id": "017",
     "name": "R&D Visuals",
     "dcc": [
       "3ds Max",
@@ -324,6 +416,9 @@ window.PORTFOLIO_WORKS = [
     ],
     "renderer": "Corona",
     "category": "Concept Art",
+    "industries": [
+      "Personal"
+    ],
     "year": "2020",
     "description": "Experimental R&D visualization.",
     "project": "r-d-visuals",
@@ -401,44 +496,5 @@ window.PORTFOLIO_WORKS = [
         "renderer": "Redshift"
       }
     ]
-  },
-  {
-    "id": "016",
-    "name": "Koh-Saah Ring",
-    "dcc": [
-      "3ds Max",
-      "Blender",
-      "ZBrush"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2015",
-    "description": "Gothic jewelry product viz in studio environment with dramatic lighting.",
-    "project": "koh-saah-ring",
-    "items": [
-      {
-        "file": "images/product_koh-saah-ring_01.jpg"
-      },
-      {
-        "youtube": "https://youtu.be/TPQxkYQCTC8"
-      },
-      {
-        "file": "images/product_koh-saah-ring_02.jpg",
-        "name": "Koh-Saah Ring closeup"
-      }
-    ]
-  },
-  {
-    "id": "017",
-    "name": "Warehouse Industrial Logistics",
-    "file": "images/product_kruger-pallet_01.png",
-    "dcc": [
-      "3ds Max",
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "year": "2026",
-    "description": "Commercial logistics packaging visualization featuring accurate shaders."
   }
 ];

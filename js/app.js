@@ -12,6 +12,10 @@
   const ALLOWED_CATEGORIES = ['Archviz', 'Concept Art', 'Hard Surface', 'Product'];
   const ALLOWED_DCCS = ['3ds Max', 'Blender', 'Cinema 4D', 'Autodesk Fusion', 'ZBrush'];
   const ALLOWED_RENDERERS = ['Corona', 'Cycles', 'Redshift'];
+  // Primary filter by industry / task. A work can have several ("industries" array in works.js).
+  // "Personal" works are shown in their own section below the main grid.
+  const INDUSTRIES = ['Industrial machinery', 'Consumer products', 'Exploded views & internals', 'Architecture', 'Personal'];
+  const PERSONAL = 'Personal';
 
   // Helper to load initial works from localStorage or fallback to default data file
   function loadInitialWorks() {
@@ -84,6 +88,7 @@
     filteredWorks: [],
     displayList: [],      // cards currently shown: filtered works, or the open project's materials
     openProject: null,    // project whose sub-gallery is open
+    selectedIndustry: 'all',
     selectedCategory: 'all',
     selectedDcc: 'all',
     selectedRenderer: 'all',
@@ -109,6 +114,16 @@
     return [];
   }
 
+  // Helper: industries of a work (project items inherit the project's)
+  function getIndustries(item) {
+    if (!item || !Array.isArray(item.industries)) return [];
+    return item.industries.filter(Boolean);
+  }
+
+  function isPersonal(item) {
+    return getIndustries(item).includes(PERSONAL);
+  }
+
   // Helper: Get list of available categories
   function getAvailableCategories() {
     const cats = new Set(ALLOWED_CATEGORIES);
@@ -125,6 +140,12 @@
   // DOM Elements
   const elements = {
     galleryGrid: document.getElementById('galleryGrid'),
+    personalSection: document.getElementById('personal'),
+    personalGrid: document.getElementById('personalGrid'),
+    indFilterList: document.getElementById('indFilterList'),
+    btnMoreFilters: document.getElementById('btnMoreFilters'),
+    btnMoreFiltersLabel: document.getElementById('btnMoreFiltersLabel'),
+    secondaryFilters: document.getElementById('secondaryFilters'),
     emptyState: document.getElementById('emptyState'),
     resultsCount: document.getElementById('resultsCount'),
     resetFiltersBtn: document.getElementById('resetFiltersBtn'),
@@ -398,6 +419,14 @@
 
   // --- FILTER CHIPS BUILDER ---
   function buildFilterChips() {
+    // Industries / tasks (primary row)
+    if (elements.indFilterList) {
+      elements.indFilterList.innerHTML = `
+        <button type="button" class="chip${state.selectedIndustry === 'all' ? ' active' : ''}" data-ind="all">All</button>
+        ${INDUSTRIES.map(ind => `<button type="button" class="chip${state.selectedIndustry === ind ? ' active' : ''}" data-ind="${escapeHtml(ind)}">${escapeHtml(ind)}</button>`).join('')}
+      `;
+    }
+
     // Categories: Archviz, Concept Art, Hard Surface, Product, etc.
     const categories = getAvailableCategories();
     if (elements.catFilterList) {
@@ -429,6 +458,11 @@
     const matches = (item, owner) => {
       const itemDccs = getDccList(item);
 
+      // Industry filter (a work can belong to several industries)
+      if (state.selectedIndustry !== 'all' && !getIndustries(item).includes(state.selectedIndustry)) {
+        return false;
+      }
+
       // Category filter
       if (state.selectedCategory === PROJECTS_FILTER) {
         if (!isProject(owner)) return false;
@@ -459,7 +493,8 @@
         const rndMatch = (item.renderer || '').toLowerCase().includes(query);
         const catMatch = (item.category || '').toLowerCase().includes(query);
         const descMatch = (item.description || '').toLowerCase().includes(query);
-        if (!titleMatch && !dccMatch && !rndMatch && !catMatch && !descMatch) {
+        const indMatch = getIndustries(item).some(i => i.toLowerCase().includes(query));
+        if (!titleMatch && !dccMatch && !rndMatch && !catMatch && !descMatch && !indMatch) {
           return false;
         }
       }
@@ -486,17 +521,32 @@
   }
 
   // --- RENDER GALLERY ---
+  // Main grid: client / product work. Personal grid (own section below): works with the "Personal" industry.
+  // Both grids share one displayList (main first), so lightbox arrows walk through all shown works.
   function renderGallery() {
-    state.displayList = state.openProject ? getProjectEntries(state.openProject) : state.filteredWorks;
-    if (state.displayList.length === 0) {
-      elements.galleryGrid.innerHTML = '';
-      elements.emptyState.style.display = 'flex';
-      return;
+    let main, personal;
+    if (state.openProject) {
+      main = getProjectEntries(state.openProject);
+      personal = [];
+    } else {
+      main = state.filteredWorks.filter(w => !isPersonal(w));
+      personal = state.filteredWorks.filter(isPersonal);
     }
+    state.displayList = [...main, ...personal];
 
-    elements.emptyState.style.display = 'none';
+    elements.galleryGrid.innerHTML = main.map((item, index) => cardHtml(item, index)).join('');
+    if (elements.personalGrid) {
+      elements.personalGrid.innerHTML = personal.map((item, i) => cardHtml(item, main.length + i)).join('');
+    }
+    if (elements.personalSection) elements.personalSection.hidden = personal.length === 0;
+    elements.galleryGrid.hidden = main.length === 0 && personal.length > 0;
+    // Only Personal works match: the empty main area should not leave a gap above the Personal section
+    elements.galleryGrid.closest('.gallery-container').classList.toggle('is-main-empty', elements.galleryGrid.hidden);
+    elements.emptyState.style.display = state.displayList.length === 0 ? 'flex' : 'none';
+  }
 
-    const cardsHtml = state.displayList.map((item, index) => {
+  function cardHtml(item, index) {
+    {
       const dccs = getDccList(item);
       const rnd = item.renderer || 'Corona';
       const name = item.name || 'Untitled Render';
@@ -551,9 +601,7 @@
           </div>
         </article>
       `;
-    }).join('');
-
-    elements.galleryGrid.innerHTML = cardsHtml;
+    }
   }
 
   function updateStatusLine() {
@@ -563,11 +611,19 @@
         : `${state.filteredWorks.length} / ${state.works.length} works`;
     }
 
-    const hasFilters = state.selectedCategory !== 'all' ||
+    const hasFilters = state.selectedIndustry !== 'all' ||
+      state.selectedCategory !== 'all' ||
       state.selectedDcc !== 'all' ||
       state.selectedRenderer !== 'all' ||
       state.searchQuery.trim() !== '' ||
       state.sortBy !== 'default';
+
+    // "Software & renderer" toggle shows how many of its filters are on
+    const secondaryCount = [state.selectedCategory, state.selectedDcc, state.selectedRenderer].filter(v => v !== 'all').length;
+    if (elements.btnMoreFiltersLabel) {
+      elements.btnMoreFiltersLabel.textContent = secondaryCount ? `Software & renderer · ${secondaryCount}` : 'Software & renderer';
+    }
+    if (elements.btnMoreFilters) elements.btnMoreFilters.classList.toggle('has-active', secondaryCount > 0);
 
     if (elements.resetFiltersBtn) {
       elements.resetFiltersBtn.style.display = hasFilters ? 'inline-block' : 'none';
@@ -580,6 +636,7 @@
   }
 
   function resetAllFilters() {
+    state.selectedIndustry = 'all';
     state.selectedCategory = 'all';
     state.selectedDcc = 'all';
     state.selectedRenderer = 'all';
@@ -589,6 +646,11 @@
     elements.sortSelect.value = 'default';
 
     // Update chips active states
+    if (elements.indFilterList) {
+      elements.indFilterList.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.ind === 'all');
+      });
+    }
     if (elements.catFilterList) {
       elements.catFilterList.querySelectorAll('.chip').forEach(c => {
         c.classList.toggle('active', c.dataset.cat === 'all');
@@ -623,7 +685,7 @@
     sheet.label = document.getElementById('btnFiltersLabel');
     sheet.apply = document.getElementById('filterSheetApply');
     sheet.active = document.getElementById('activeFilters');
-    sheet.moved = [document.querySelector('.controls-panel .search-wrapper'), document.querySelector('.filter-row-unified')]
+    sheet.moved = [document.querySelector('.controls-panel .search-wrapper'), document.querySelector('.filter-row-primary'), document.querySelector('.filter-row-unified')]
       .filter(Boolean)
       .map(el => {
         const marker = document.createComment('phone filters');
@@ -691,7 +753,7 @@
   function updatePhoneFilters() {
     if (!sheet.root) return;
     sheet.items = [];
-    document.querySelectorAll('.filter-row-unified .filter-subgroup').forEach(group => {
+    document.querySelectorAll('.filter-row-primary .filter-subgroup, .filter-row-unified .filter-subgroup').forEach(group => {
       const chip = group.querySelector('.chip.active');
       if (!chip || isAllChip(chip)) return;
       const allChip = [...group.querySelectorAll('.chip')].find(isAllChip);
@@ -869,6 +931,28 @@
     // Reset filters
     elements.resetFiltersBtn.addEventListener('click', resetAllFilters);
 
+    // Industry chip list clicks
+    if (elements.indFilterList) {
+      elements.indFilterList.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+
+        elements.indFilterList.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.selectedIndustry = chip.dataset.ind;
+        applyFilters();
+      });
+    }
+
+    // "Software & renderer": shows / hides the secondary filter row (always shown in the phone sheet)
+    if (elements.btnMoreFilters && elements.secondaryFilters) {
+      elements.btnMoreFilters.addEventListener('click', () => {
+        const open = !elements.secondaryFilters.classList.contains('is-open');
+        elements.secondaryFilters.classList.toggle('is-open', open);
+        elements.btnMoreFilters.setAttribute('aria-expanded', String(open));
+      });
+    }
+
     // Category chip list clicks
     if (elements.catFilterList) {
       elements.catFilterList.addEventListener('click', (e) => {
@@ -905,36 +989,43 @@
     });
 
     // Layout toggles
+    const grids = [elements.galleryGrid, elements.personalGrid].filter(Boolean);
+    const setLayout = (layout) => {
+      grids.forEach(grid => { grid.classList.toggle('layout-masonry', layout === 'masonry'); grid.classList.toggle('layout-grid', layout !== 'masonry'); });
+    };
+
     elements.btnLayoutMasonry.addEventListener('click', () => {
       elements.btnLayoutMasonry.classList.add('active');
       elements.btnLayoutGrid.classList.remove('active');
-      elements.galleryGrid.className = 'gallery-grid layout-masonry';
+      setLayout('masonry');
     });
 
     elements.btnLayoutGrid.addEventListener('click', () => {
       elements.btnLayoutGrid.classList.add('active');
       elements.btnLayoutMasonry.classList.remove('active');
-      elements.galleryGrid.className = 'gallery-grid layout-grid';
+      setLayout('grid');
     });
 
-    // Card clicks (Open Lightbox)
-    elements.galleryGrid.addEventListener('click', (e) => {
-      const card = e.target.closest('.art-card');
-      if (!card) return;
-      const index = parseInt(card.dataset.index, 10);
-      openCard(index);
-    });
-
-    // Card keyboard trigger (Enter/Space)
-    elements.galleryGrid.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+    grids.forEach(grid => {
+      // Card clicks (Open Lightbox)
+      grid.addEventListener('click', (e) => {
         const card = e.target.closest('.art-card');
-        if (card) {
-          e.preventDefault();
-          const index = parseInt(card.dataset.index, 10);
-          openCard(index);
+        if (!card) return;
+        const index = parseInt(card.dataset.index, 10);
+        openCard(index);
+      });
+
+      // Card keyboard trigger (Enter/Space)
+      grid.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const card = e.target.closest('.art-card');
+          if (card) {
+            e.preventDefault();
+            const index = parseInt(card.dataset.index, 10);
+            openCard(index);
+          }
         }
-      }
+      });
     });
 
     // Project sub-gallery: back button, browser back/forward, Esc
@@ -947,6 +1038,30 @@
         closeProject();
       }
     });
+
+    // Header links: underline only the section in view (Work, About, Contact); none over the hero or Services
+    const navLinks = [...document.querySelectorAll('.nav-actions a.nav-anchor')];
+    const spySections = ['work', 'services', 'about', 'contact'].map(id => document.getElementById(id)).filter(Boolean);
+    if (navLinks.length && spySections.length) {
+      let spyFrame = 0;
+      const updateNavSpy = () => {
+        spyFrame = 0;
+        const line = window.innerHeight * 0.35;
+        let current = '';
+        spySections.forEach(sec => { if (sec.getBoundingClientRect().top <= line) current = sec.id; });
+        const atBottom = Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2;
+        if (atBottom && window.scrollY > 0) current = 'contact';
+        navLinks.forEach(a => {
+          const active = a.getAttribute('href') === `#${current}`;
+          a.classList.toggle('is-active', active);
+          if (active) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
+        });
+      };
+      const requestSpy = () => { if (!spyFrame) spyFrame = requestAnimationFrame(updateNavSpy); };
+      window.addEventListener('scroll', requestSpy, { passive: true });
+      window.addEventListener('resize', requestSpy);
+      updateNavSpy();
+    }
 
     // Floating Back to Top Button
     if (elements.btnBackToTop) {
@@ -1071,6 +1186,7 @@
         console.warn('Could not save to localStorage', e);
       }
       updateHeaderStats();
+      state.selectedIndustry = 'all';
       buildFilterChips();
       state.selectedCategory = 'all';
       if (state.openProject) {
@@ -1085,6 +1201,7 @@
     },
     getYouTubeId: getYouTubeId,
     isProject: isProject,
+    INDUSTRIES: INDUSTRIES,
     slugify: slugify,
     getWorkKey: getWorkKey,
     fillItemTexts: fillItemTexts,

@@ -2289,10 +2289,7 @@ a.art-media-wrap {
     font-size: 0.7rem;
   }
 
-  /* Bottom sheet */
-  body.is-sheet-open {
-    overflow: hidden;
-  }
+  /* Bottom sheet (a modal <dialog>: no scroll lock on body, see css/studio.css) */
   .filter-sheet {
     display: block;
     position: fixed;

@@ -15,7 +15,7 @@
   --border-focus: rgba(255, 106, 43, 0.6);
   --text-primary: #ece8e1;
   --text-secondary: #a8a299;
-  --text-muted: #77716a;
+  --text-muted: #8b857e; /* >= 4.6:1 on every theme background (was #77716a, 4.0:1) */
   --text-accent: #ff6a2b;
   --accent: #ff6a2b;
   --accent-cyan: #ff6a2b;
@@ -82,7 +82,7 @@ body::before, body::after { display: none; }
   background:
     linear-gradient(0deg, rgba(15, 14, 13, 1) 0%, rgba(15, 14, 13, 0.55) 38%, rgba(15, 14, 13, 0.05) 75%),
     linear-gradient(90deg, rgba(15, 14, 13, 0.7) 0%, rgba(15, 14, 13, 0) 55%),
-    url('../assets/hero_cinematic-explore.jpg') center 40% / cover no-repeat;
+    url('../assets/hero_cinematic-explore.webp') center 40% / cover no-repeat; /* preloaded in index.html */
 }
 .hero-section > .container { width: 100%; }
 .hero-content { max-width: none; gap: 1.1rem; }
@@ -446,4 +446,104 @@ body.is-project-view .personal-section { display: none; }
   .about-inner { grid-template-columns: 1fr; gap: 1.5rem; }
   .about-photo { max-width: 160px; }
   .personal-section { padding-top: 2rem; margin-bottom: 3rem; }
+}
+
+/* ==========================================================================
+   WEB GUIDANCE AUDIT FIXES (2026-11-14)
+   ========================================================================== */
+/* Dark-only site: native UI (scrollbars, select menus, inputs) follows it */
+:root { color-scheme: dark; }
+
+/* Phones load a smaller hero (same picture; preloaded with the same media query in index.html) */
+@media (max-width: 640px) {
+  .hero-section {
+    background:
+    linear-gradient(0deg, rgba(15, 14, 13, 1) 0%, rgba(15, 14, 13, 0.55) 38%, rgba(15, 14, 13, 0.05) 75%),
+    linear-gradient(90deg, rgba(15, 14, 13, 0.7) 0%, rgba(15, 14, 13, 0) 55%),
+      url('../assets/hero_cinematic-explore-1280.webp') center 40% / cover no-repeat;
+  }
+}
+
+/* Skip link: hidden until focused, then pinned top-left */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: #140b05;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 2px;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible, .skip-link:focus { transform: none; outline: 2px solid var(--text-primary); outline-offset: 2px; }
+
+/* Visible keyboard focus for controls whose native ring was removed */
+.search-input:focus-visible,
+.sort-select:focus-visible,
+.form-control:focus-visible,
+.filters-btn:focus-visible,
+.more-filters-btn:focus-visible,
+.layout-btn:focus-visible,
+.chip:focus-visible,
+.active-filter-chip:focus-visible,
+.filter-sheet-close:focus-visible,
+.nav-actions .btn:focus-visible,
+.hero-btn:focus-visible,
+.contact-btn:focus-visible,
+.back-to-top-btn:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+.project-title:focus { outline: none; }
+.project-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* Cards: the title is a real <button>; its ::after covers the whole card, so the whole card stays clickable */
+.art-card { position: relative; }
+.card-link {
+  all: unset;
+  cursor: pointer;
+  color: inherit;
+}
+.card-link::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.card-link:focus-visible { outline: none; }
+.art-card:has(.card-link:focus-visible) .art-media-wrap { outline: 2px solid var(--accent); outline-offset: 3px; }
+.art-card:has(.card-link:focus-visible) .art-title { color: var(--accent); }
+
+/* Dialogs: stop scroll chaining into the page instead of locking <body> (prevent-page-scroll-under-modal-dialog) */
+dialog:modal, dialog::backdrop { overscroll-behavior: contain; }
+dialog::backdrop { overflow: hidden; }
+
+/* Phone filter sheet is a modal <dialog>: reset UA dialog box, keep the sheet's own backdrop and slide-in */
+dialog.filter-sheet {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  background: transparent;
+  color: inherit;
+  overflow: hidden;
+}
+dialog.filter-sheet::backdrop { background: transparent; }
+
+/* Large OS text: the toolbar row wraps instead of pushing the page sideways */
+@media (max-width: 640px) {
+  .controls-row-main .view-tools { flex-wrap: wrap; row-gap: 0.4rem; }
+  .results-status { white-space: normal; }
+}
+
+/* Reduced motion: no smooth scrolling, no non-essential transitions (elements keep their final state) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
 }

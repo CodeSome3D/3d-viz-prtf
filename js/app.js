@@ -565,7 +565,7 @@
       const rndBadgeHtml = `<span class="badge-rnd" data-rnd="${escapeHtml(rnd)}">${escapeHtml(rnd)}</span>`;
 
       return `
-        <article class="art-card${project ? ' is-project' : ''}${feature ? ' is-feature' : ''}" data-index="${index}" tabindex="0" role="button" aria-label="${escapeHtml(project ? `Project: ${name}` : name)}">
+        <article class="art-card${project ? ' is-project' : ''}${feature ? ' is-feature' : ''}" data-index="${index}">
           <div class="art-media-wrap">
             ${feature && cover.file && !video ? `<picture><source media="(min-width: 1025px)" srcset="${escapeHtml(cover.file)}">` : ''}
             <img 
@@ -588,7 +588,7 @@
           </div>
           <div class="art-details">
             <div class="art-header">
-              <h3 class="art-title">${escapeHtml(name)}</h3>
+              <h3 class="art-title">${cardLinkHtml(item, name, project, video, index)}</h3>
               ${year ? `<span class="art-year">${escapeHtml(year)}</span>` : ''}
             </div>
             <div class="art-meta-row">
@@ -699,19 +699,10 @@
       if (e.target.closest('[data-sheet-close]')) closeFilterSheet();
     });
     document.getElementById('filterSheetReset').addEventListener('click', resetAllFilters);
-    sheet.root.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        closeFilterSheet();
-      } else if (e.key === 'Tab') {
-        const focusable = [...sheet.panel.querySelectorAll('button, input, select, [tabindex]:not([tabindex="-1"])')]
-          .filter(el => el.offsetParent !== null && !el.disabled);
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
+    // Esc / back gesture: let the sheet slide out first, then close the dialog
+    sheet.root.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeFilterSheet();
     });
     sheet.active.addEventListener('click', (e) => {
       const chip = e.target.closest('[data-remove]');
@@ -732,21 +723,27 @@
     }
   }
 
+  // The sheet is a modal <dialog>: the browser makes the page inert and keeps focus inside it
   function openFilterSheet() {
-    sheet.root.classList.add('is-open');
-    sheet.root.setAttribute('aria-hidden', 'false');
+    clearTimeout(sheet.closeTimer);
+    if (!sheet.root.open) sheet.root.showModal();
     sheet.button.setAttribute('aria-expanded', 'true');
-    document.body.classList.add('is-sheet-open');
-    requestAnimationFrame(() => sheet.root.querySelector('.filter-sheet-close').focus());
+    requestAnimationFrame(() => {
+      sheet.root.classList.add('is-open');
+      sheet.root.querySelector('.filter-sheet-close').focus();
+    });
   }
 
   function closeFilterSheet(returnFocus = true) {
-    if (!sheet.root || !sheet.root.classList.contains('is-open')) return;
+    if (!sheet.root || !sheet.root.open) return;
     sheet.root.classList.remove('is-open');
-    sheet.root.setAttribute('aria-hidden', 'true');
     sheet.button.setAttribute('aria-expanded', 'false');
-    document.body.classList.remove('is-sheet-open');
-    if (returnFocus) sheet.button.focus();
+    // Wait for the slide-out (0.28s in style.css) unless motion is reduced
+    clearTimeout(sheet.closeTimer);
+    sheet.closeTimer = setTimeout(() => {
+      sheet.root.close();
+      if (returnFocus) sheet.button.focus();
+    }, prefersReducedMotion() ? 0 : 280);
   }
 
   // Filters button count, "Show N works" and the removable chips under the toolbar
@@ -792,14 +789,12 @@
     const item = state.displayList[index];
     updateLightboxContent(item);
 
-    elements.lightboxDialog.showModal();
-    document.body.style.overflow = 'hidden';
+    if (!elements.lightboxDialog.open) elements.lightboxDialog.showModal();
   }
 
   function closeLightbox() {
     stopLightboxVideo();
     elements.lightboxDialog.close();
-    document.body.style.overflow = '';
   }
 
   function updateLightboxContent(item) {
@@ -1008,34 +1003,26 @@
 
     grids.forEach(grid => {
       // Card clicks (Open Lightbox)
+      // (Enter / Space on the card's <button> or <a> also arrive here as clicks)
       grid.addEventListener('click', (e) => {
         const card = e.target.closest('.art-card');
         if (!card) return;
+        // Ctrl / Cmd / Shift click on a project link: let the browser open it in a new tab
+        if (e.target.closest('a.card-link') && (e.ctrlKey || e.metaKey || e.shiftKey)) return;
+        e.preventDefault();
         const index = parseInt(card.dataset.index, 10);
         openCard(index);
-      });
-
-      // Card keyboard trigger (Enter/Space)
-      grid.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          const card = e.target.closest('.art-card');
-          if (card) {
-            e.preventDefault();
-            const index = parseInt(card.dataset.index, 10);
-            openCard(index);
-          }
-        }
       });
     });
 
     // Project sub-gallery: back button, browser back/forward, Esc
     if (elements.projectBack) {
-      elements.projectBack.addEventListener('click', () => closeProject());
+      elements.projectBack.addEventListener('click', () => closeProject(true, true));
     }
     window.addEventListener('hashchange', syncProjectFromHash);
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && state.openProject && !document.querySelector('dialog[open]')) {
-        closeProject();
+        closeProject(true, true);
       }
     });
 
@@ -1077,7 +1064,7 @@
       handleScroll();
 
       elements.btnBackToTop.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: scrollBehavior() });
       });
     }
   }
@@ -1419,11 +1406,16 @@
       history.pushState(null, '', `#project=${encodeURIComponent(project.project)}`);
     }
     const top = elements.projectHeader ? elements.projectHeader.getBoundingClientRect().top + window.scrollY - 90 : 0;
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    window.scrollTo({ top: Math.max(0, top), behavior: scrollBehavior() });
+    // Keyboard / screen reader users continue inside the project, not at the top of the page
+    if (elements.projectTitle) elements.projectTitle.focus({ preventScroll: true });
   }
 
-  function closeProject(updateHash = true) {
+  // restoreFocus: put focus back on the project's card (Back button, Esc, browser Back);
+  // not when a header link (#about, #contact ...) closed the project, so the page can jump there
+  function closeProject(updateHash = true, restoreFocus = false) {
     if (!state.openProject) return;
+    const closed = state.openProject;
     state.openProject = null;
     document.body.classList.remove('is-project-view');
     if (elements.projectHeader) elements.projectHeader.hidden = true;
@@ -1431,6 +1423,30 @@
     if (updateHash && location.hash.startsWith('#project=')) {
       history.pushState(null, '', location.pathname + location.search);
     }
+    if (restoreFocus) {
+      const index = state.displayList.indexOf(closed);
+      const link = index >= 0 ? document.querySelector(`.art-card[data-index="${index}"] .card-link`) : null;
+      if (link) link.focus();
+    }
+  }
+
+  function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function scrollBehavior() {
+    return prefersReducedMotion() ? 'auto' : 'smooth';
+  }
+
+  // The card's interactive element: a link for projects (shareable #project=slug), a button otherwise.
+  // Its ::after covers the whole card (css/studio.css), so the image is clickable too.
+  function cardLinkHtml(item, name, project, video, index) {
+    const extra = project ? `, project with ${item.items.length} items` : (video ? ', video' : '');
+    const label = `${escapeHtml(name)}<span class="visually-hidden">${escapeHtml(extra)}</span>`;
+    if (project && !state.openProject) {
+      return `<a class="card-link" href="#project=${encodeURIComponent(item.project)}" data-index="${index}">${label}</a>`;
+    }
+    return `<button type="button" class="card-link" data-index="${index}">${label}</button>`;
   }
 
   function syncProjectFromHash() {
@@ -1440,7 +1456,7 @@
     if (project && project !== state.openProject) {
       openProject(project, false);
     } else if (!project && state.openProject) {
-      closeProject(false);
+      closeProject(false, !location.hash);
     }
   }
 

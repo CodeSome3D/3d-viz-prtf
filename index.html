@@ -772,16 +772,25 @@
   </script>
   <!-- SEO:JSONLD-GALLERY:END -->
 
+  <!-- Dark-only site: native UI and the mobile browser bar match it -->
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0f0e0d">
+
+  <!-- LCP: the hero background (CSS) is not seen by the preload scanner, so preload it; same media queries as css/studio.css -->
+  <link rel="preload" as="image" type="image/webp" href="assets/hero_cinematic-explore-1280.webp" media="(max-width: 640px)" fetchpriority="high">
+  <link rel="preload" as="image" type="image/webp" href="assets/hero_cinematic-explore.webp" media="(min-width: 641px)" fetchpriority="high">
+
   <!-- Fonts: Archivo (display), IBM Plex Sans (text) & IBM Plex Mono (specs) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/studio.css?v=20261114e">
+  <link rel="stylesheet" href="css/style.css?v=20261114a">
+  <link rel="stylesheet" href="css/studio.css?v=20261114f">
 </head>
 <body>
+  <a class="skip-link" href="#workStart">Skip to work</a>
 
   <!-- ======================================================================
        NAVIGATION HEADER
@@ -958,7 +967,7 @@
        GALLERY DISPLAY
        ====================================================================== -->
   <main class="container gallery-container">
-    <h2 class="visually-hidden">Selected work</h2>
+    <h2 id="workStart" class="visually-hidden" tabindex="-1">Selected work</h2>
     <!-- Project sub-gallery header, shown while a project card is open -->
     <div id="projectHeader" class="project-header" hidden>
       <button type="button" id="projectBack" class="btn btn-outline project-back" title="Back to all works (Esc)">
@@ -966,7 +975,7 @@
         All works
       </button>
       <div class="project-header-text">
-        <h2 id="projectTitle" class="project-title">Project</h2>
+        <h2 id="projectTitle" class="project-title" tabindex="-1">Project</h2>
         <div id="projectInfo" class="project-info"></div>
         <p id="projectDesc" class="project-desc"></p>
       </div>
@@ -1226,7 +1235,7 @@
           </div>
 
           <div class="editor-preview-strip">
-            <img id="editorPreviewImg" class="editor-preview-img" src="" alt="Thumbnail preview">
+            <img id="editorPreviewImg" class="editor-preview-img" alt="Thumbnail preview" loading="lazy">
             <div class="editor-preview-info">
               <span id="editorPreviewTitle" class="editor-preview-title">Mayekawa Compressor</span>
               <span id="editorPreviewFile" class="editor-preview-file">images/product_mayekawa-compressor_01.jpg</span>
@@ -1392,7 +1401,7 @@
 
           <!-- Dynamic Live Preview of the new image -->
           <div class="editor-preview-strip" id="newPreviewStrip" style="display: none;">
-            <img id="newPreviewImg" class="editor-preview-img" src="" alt="Thumbnail preview">
+            <img id="newPreviewImg" class="editor-preview-img" alt="Thumbnail preview" loading="lazy">
             <div class="editor-preview-info">
               <span id="newPreviewTitleText" class="editor-preview-title">Preview</span>
               <span id="newPreviewPathText" class="editor-preview-file">images/...</span>
@@ -1590,7 +1599,10 @@
             </div>
             <div style="margin-top: 0.75rem;">
               <label for="ghTokenInput" class="form-label">GitHub Personal Access Token (repo scope)</label>
-              <input type="password" id="ghTokenInput" class="form-control" placeholder="ghp_... (saved securely in your browser only)">
+              <input type="password" id="ghTokenInput" class="form-control" placeholder="ghp_... (kept for this browser tab only)" autocomplete="off">
+              <label class="form-hint" style="display: flex; align-items: center; gap: 0.45rem; margin-top: 0.5rem; cursor: pointer;">
+                <input type="checkbox" id="ghRememberToken"> Remember the token on this device (stored in this browser's localStorage; leave off on shared computers)
+              </label>
             </div>
             <div class="sync-button-row" style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
               <button type="button" id="btnPushGitHub" class="btn btn-primary">
@@ -1682,9 +1694,9 @@
 
   <!-- Floating Back to Top Arrow Button -->
   <!-- Phones: filters bottom sheet (the search box and chip rows are moved in here on small screens) -->
-  <div id="filterSheet" class="filter-sheet" aria-hidden="true">
+  <dialog id="filterSheet" class="filter-sheet" aria-labelledby="filterSheetTitle">
     <div class="filter-sheet-backdrop" data-sheet-close></div>
-    <div class="filter-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="filterSheetTitle">
+    <div class="filter-sheet-panel">
       <div class="filter-sheet-head">
         <h2 id="filterSheetTitle" class="filter-sheet-title">Filters</h2>
         <button type="button" class="filter-sheet-close" data-sheet-close aria-label="Close filters">&#x2715;</button>
@@ -1695,7 +1707,7 @@
         <button type="button" id="filterSheetApply" class="btn btn-primary" data-sheet-close>Show works</button>
       </div>
     </div>
-  </div>
+  </dialog>
 
   <button type="button" id="btnBackToTop" class="back-to-top-btn" aria-label="Scroll back to top" title="Back to top">
     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1716,8 +1728,8 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="data/works.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/editor.js"></script>
+  <script src="data/works.js?v=20261114a"></script>
+  <script src="js/app.js?v=20261114a"></script>
+  <script src="js/editor.js?v=20261114a"></script>
 </body>
 </html>

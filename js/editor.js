@@ -176,7 +176,7 @@
     selectWorkItem.innerHTML = works.map(w => {
       const source = isProject(w) ? `Project, ${w.items.length} items`
         : (w.youtube ? `YouTube ${getYouTubeId(w.youtube)}` : (w.file || '').split('/').pop());
-      const label = `${w.id || '—'}: ${w.name || 'Untitled'} (${source})`;
+      const label = `${w.id || '-'}: ${w.name || 'Untitled'} (${source})`;
       const isSelected = selectedId === w.id ? 'selected' : '';
       return `<option value="${w.id}" ${isSelected}>${escapeHtml(label)}</option>`;
     }).join('');
@@ -715,9 +715,9 @@ window.PORTFOLIO_WORKS = ${JSON.stringify(window.PORTFOLIO_WORKS, null, 2)};
     const works = window.PORTFOLIO_WORKS || [];
     newFieldSpecificPos.innerHTML = works.map((w, idx) => {
       const pos = idx + 1;
-      const label = `Position #${pos} — Before "${w.name || 'Artwork'}"`;
+      const label = `Position #${pos}: before "${w.name || 'Artwork'}"`;
       return `<option value="${pos}">${escapeHtml(label)}</option>`;
-    }).join('') + `<option value="${works.length + 1}" selected>Position #${works.length + 1} — At the very end</option>`;
+    }).join('') + `<option value="${works.length + 1}" selected>Position #${works.length + 1}: at the very end</option>`;
   }
 
   function moveArtwork(fromIndex, toIndex, showToast = true) {

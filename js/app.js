@@ -879,8 +879,8 @@
     elements.lightboxRenderer.textContent = rnd;
     elements.lightboxRenderer.setAttribute('data-rnd', rnd);
 
-    elements.lightboxCategory.textContent = item.category ? I18N.label('category', item.category) : '—';
-    elements.lightboxYear.textContent = item.year || '—';
+    elements.lightboxCategory.textContent = item.category ? I18N.label('category', item.category) : '-';
+    elements.lightboxYear.textContent = item.year || '-';
     elements.lightboxDesc.textContent = item.description || t('lightbox.noDesc');
   }
 

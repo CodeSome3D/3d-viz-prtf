@@ -238,7 +238,7 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "010",
-    "name": "Ring Crown — Studio Showcase",
+    "name": "Ring Crown - Studio Showcase",
     "file": "images/product_ring-crown_01.png",
     "dcc": [
       "Blender"
@@ -312,16 +312,16 @@ window.PORTFOLIO_WORKS = [
     "items": [
       {
         "file": "images/concept_crypto-monuments_01.png",
-        "name": "Crypto Monuments — Columns"
+        "name": "Crypto Monuments - Columns"
       },
       {
         "file": "images/concept_crypto-monuments_02.png",
-        "name": "Crypto Monuments — Circle",
+        "name": "Crypto Monuments - Circle",
         "description": "Monolithic circular composition with dramatic cinematic lighting and floating crypto coins."
       },
       {
         "file": "images/product_fintech-coins-cards_01.png",
-        "name": "Fintech Tokenomics — Coins & Wallets",
+        "name": "Fintech Tokenomics - Coins & Wallets",
         "description": "Premium credit card visual of frosted matte acrylics coins with embossed gold details.",
         "category": "Product"
       },

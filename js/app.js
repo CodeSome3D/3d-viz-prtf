@@ -1502,6 +1502,8 @@
   }
 
   function openProject(project, updateHash = true) {
+    // Remember where the gallery was, so closing the project returns exactly there
+    if (!state.openProject) state.galleryScrollY = window.scrollY;
     state.openProject = project;
     document.body.classList.add('is-project-view');
     showProjectHeader(project);
@@ -1509,8 +1511,14 @@
     if (updateHash && location.hash !== `#project=${project.project}`) {
       history.pushState(null, '', `#project=${encodeURIComponent(project.project)}`);
     }
-    const top = elements.projectHeader ? elements.projectHeader.getBoundingClientRect().top + window.scrollY - 90 : 0;
-    window.scrollTo({ top: Math.max(0, top), behavior: scrollBehavior() });
+    // No animated scrolling: jump once, only if the project title is not already in view under the sticky bars
+    if (elements.projectHeader) {
+      const offset = stickyOffset();
+      const rect = elements.projectHeader.getBoundingClientRect();
+      if (rect.top < offset || rect.top > window.innerHeight * 0.6) {
+        jumpTo(rect.top + window.scrollY - offset);
+      }
+    }
     // Keyboard / screen reader users continue inside the project, not at the top of the page
     if (elements.projectTitle) elements.projectTitle.focus({ preventScroll: true });
   }
@@ -1527,11 +1535,29 @@
     if (updateHash && location.hash.startsWith('#project=')) {
       history.pushState(null, '', location.pathname + location.search);
     }
+    // Back to exactly where the gallery was (no animation), unless a header link is taking the page elsewhere
+    if (restoreFocus || !location.hash) {
+      if (typeof state.galleryScrollY === 'number') jumpTo(state.galleryScrollY);
+    }
     if (restoreFocus) {
       const index = state.displayList.indexOf(closed);
       const link = index >= 0 ? document.querySelector(`.art-card[data-index="${index}"] .card-link`) : null;
-      if (link) link.focus();
+      if (link) link.focus({ preventScroll: true });
     }
+  }
+
+  // Instant scroll that ignores the page-wide "scroll-behavior: smooth" (kept for header links only)
+  function jumpTo(top) {
+    window.scrollTo({ top: Math.max(0, Math.round(top)), behavior: 'instant' });
+  }
+
+  // Height of what stays stuck at the top (header on wider screens, the toolbar) plus a small gap
+  function stickyOffset() {
+    let offset = 12;
+    document.querySelectorAll('.site-header, .controls-panel').forEach(el => {
+      if (getComputedStyle(el).position === 'sticky') offset += el.getBoundingClientRect().height;
+    });
+    return offset;
   }
 
   // Clipboard: async API (https / localhost), with the older copy command as a fallback

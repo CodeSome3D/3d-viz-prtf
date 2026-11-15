@@ -772,6 +772,22 @@
   </script>
   <!-- SEO:JSONLD-GALLERY:END -->
 
+  <!-- EN | PL: when the page will switch to Polish, hide it until js/i18n.js has translated it (avoids a visible text jump) -->
+  <script>
+    (function () {
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        var saved = null; try { saved = localStorage.getItem('portfolio_lang'); } catch (e) {}
+        var lang = q === 'pl' || q === 'en' ? q : (saved === 'pl' || saved === 'en' ? saved : (/^pl\b/i.test((navigator.languages && navigator.languages[0]) || navigator.language || '') ? 'pl' : 'en'));
+        if (lang === 'pl') {
+          document.documentElement.lang = 'pl';
+          document.documentElement.classList.add('i18n-pending');
+          setTimeout(function () { document.documentElement.classList.remove('i18n-pending'); }, 1500);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Dark-only site: native UI and the mobile browser bar match it -->
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#0f0e0d">
@@ -787,10 +803,10 @@
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css?v=20261114a">
-  <link rel="stylesheet" href="css/studio.css?v=20261114f">
+  <link rel="stylesheet" href="css/studio.css?v=20261115a">
 </head>
 <body>
-  <a class="skip-link" href="#workStart">Skip to work</a>
+  <a class="skip-link" href="#workStart" data-i18n="skip">Skip to work</a>
 
   <!-- ======================================================================
        NAVIGATION HEADER
@@ -803,11 +819,11 @@
         </div>
         <div class="brand-titles">
           <span class="brand-name">Egor Baklykov</span>
-          <span class="brand-subtitle">Technical 3D Animation &amp; Product Visualization</span>
+          <span class="brand-subtitle" data-i18n="brand.subtitle">Technical 3D Animation &amp; Product Visualization</span>
         </div>
       </a>
 
-      <nav class="nav-actions" aria-label="Portfolio Contact & Actions">
+      <nav class="nav-actions" aria-label="Main navigation" data-i18n-attr="aria-label:nav.label">
         <button type="button" id="btnEditGallery" class="btn btn-primary admin-only" title="Reorder artworks and add new images (Owner Mode)">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>
           <span>Edit Gallery</span>
@@ -818,19 +834,25 @@
           <span>Edit Metadata</span>
         </button>
 
-        <a href="#work" class="btn btn-outline nav-anchor"><span>Work</span></a>
-        <a href="#about" class="btn btn-outline nav-anchor"><span>About</span></a>
-        <a href="#contact" class="btn btn-outline nav-anchor"><span>Contact</span></a>
+        <a href="#work" class="btn btn-outline nav-anchor"><span data-i18n="nav.work">Work</span></a>
+        <a href="#about" class="btn btn-outline nav-anchor"><span data-i18n="nav.about">About</span></a>
+        <a href="#contact" class="btn btn-outline nav-anchor"><span data-i18n="nav.contact">Contact</span></a>
 
         <a href="https://www.linkedin.com/in/egorbaklykov/" target="_blank" rel="noopener noreferrer" class="btn btn-outline" title="Connect on LinkedIn" aria-label="LinkedIn Profile">
           <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.78c-.89 0-1.61.72-1.61 1.61s.72 1.61 1.61 1.61 1.61-.72 1.61-1.61-.72-1.61-1.61-1.61Z"/></svg>
           <span>LinkedIn</span>
         </a>
 
-        <a href="https://codesome3d.github.io/portfolio_ai/" class="btn btn-outline nav-sister-link" title="Open my AI production portfolio" aria-label="AI Production portfolio">
+        <a href="https://codesome3d.github.io/portfolio_ai/" class="btn btn-outline nav-sister-link" title="Open my AI production portfolio" data-i18n-attr="title:nav.aiTitle">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16z"/></svg>
-          <span class="nav-btn-label">AI Production</span>
+          <span class="nav-btn-label" data-i18n="nav.ai">AI Production</span>
         </a>
+
+        <div class="lang-switch" role="group" aria-label="Language" data-i18n-attr="aria-label:lang.group">
+          <button type="button" class="lang-btn" data-lang="en" lang="en" aria-pressed="true" title="English">EN</button>
+          <span class="lang-sep" aria-hidden="true">|</span>
+          <button type="button" class="lang-btn" data-lang="pl" lang="pl" aria-pressed="false" title="Polski">PL</button>
+        </div>
       </nav>
     </div>
   </header>
@@ -840,20 +862,20 @@
        ====================================================================== -->
   <section class="hero-section">
     <div class="container hero-content">
-      <p class="hero-kicker"><span>Egor Baklykov</span><span>Technical 3D Artist</span><span>Poznań, PL</span></p>
+      <p class="hero-kicker"><span>Egor Baklykov</span><span data-i18n="hero.kicker.role">Technical 3D Artist</span><span data-i18n="hero.kicker.place">Poznań, PL</span></p>
       <h1 class="hero-title">
-        <span class="gradient-text">Show how your product works.</span>
+        <span class="gradient-text" data-i18n="hero.title">Show how your product works.</span>
       </h1>
 
-      <p class="hero-description">
+      <p class="hero-description" data-i18n="hero.text">
         Technical 3D animation and product visualization for industrial, robotics and tech companies. From your CAD files to a film your customers understand in seconds.
       </p>
 
-      <p class="hero-proof">15+ years · 250+ projects · ABB, AMD, Rockwool</p>
+      <p class="hero-proof" data-i18n="hero.proof">15+ years · 250+ projects · ABB, AMD, Rockwool</p>
 
       <div class="hero-actions">
-        <a href="#work" class="btn btn-primary hero-btn">View work</a>
-        <a href="#contact" class="btn btn-outline hero-btn">Send your CAD file</a>
+        <a href="#work" class="btn btn-primary hero-btn" data-i18n="hero.viewWork">View work</a>
+        <a href="#contact" class="btn btn-outline hero-btn" data-i18n="hero.sendCad">Send your CAD file</a>
       </div>
     </div>
   </section>
@@ -877,18 +899,19 @@
             placeholder="Search projects, tools..." 
             autocomplete="off"
             aria-label="Search portfolio"
+            data-i18n-attr="placeholder:search.placeholder;aria-label:search.label"
           >
-          <button type="button" id="searchClear" class="search-clear" title="Clear search">✕</button>
+          <button type="button" id="searchClear" class="search-clear" title="Clear search" aria-label="Clear search" data-i18n-attr="title:search.clear;aria-label:search.clear">✕</button>
         </div>
 
         <div class="view-tools">
-          <select id="sortSelect" class="sort-select" aria-label="Sort Artworks">
-            <option value="default">Default Order</option>
-            <option value="name-asc">Name (A → Z)</option>
-            <option value="name-desc">Name (Z → A)</option>
-            <option value="category">Category</option>
-            <option value="year-desc">Newest Year</option>
-            <option value="year-asc">Oldest Year</option>
+          <select id="sortSelect" class="sort-select" aria-label="Sort works" data-i18n-attr="aria-label:sort.label">
+            <option value="default" data-i18n="sort.default">Default Order</option>
+            <option value="name-asc" data-i18n="sort.nameAsc">Name (A → Z)</option>
+            <option value="name-desc" data-i18n="sort.nameDesc">Name (Z → A)</option>
+            <option value="category" data-i18n="sort.category">Category</option>
+            <option value="year-desc" data-i18n="sort.newest">Newest Year</option>
+            <option value="year-asc" data-i18n="sort.oldest">Oldest Year</option>
           </select>
 
           <button type="button" id="btnFilters" class="filters-btn" aria-haspopup="dialog" aria-controls="filterSheet" aria-expanded="false">
@@ -907,7 +930,7 @@
 
           <div class="results-status">
             <span id="resultsCount">29 works</span>
-            <button type="button" id="resetFiltersBtn" class="reset-filters-btn">Reset</button>
+            <button type="button" id="resetFiltersBtn" class="reset-filters-btn" data-i18n="filters.reset">Reset</button>
           </div>
 
           <button type="button" id="btnControlsEditGallery" class="btn btn-primary admin-only" title="Reorder artworks and add new images" style="padding: 0.4rem 0.85rem; font-size: 0.8rem; gap: 0.4rem;">
@@ -920,7 +943,7 @@
       <!-- Row 2: primary filter by industry / task (a work can have several) -->
       <div class="filter-row-primary">
         <div class="filter-subgroup">
-          <span class="filter-label">Industry:</span>
+          <span class="filter-label" data-i18n="filters.industry">Industry:</span>
           <div class="chip-list" id="indFilterList">
             <!-- Populated via JS -->
           </div>
@@ -934,7 +957,7 @@
       <!-- Row 3 (collapsed): Category, DCC and Renderer filter chips -->
       <div class="filter-row-unified" id="secondaryFilters">
         <div class="filter-subgroup">
-          <span class="filter-label">Category:</span>
+          <span class="filter-label" data-i18n="filters.category">Category:</span>
           <div class="chip-list" id="catFilterList">
             <!-- Populated via JS -->
           </div>
@@ -943,7 +966,7 @@
         <div class="filter-divider" aria-hidden="true"></div>
 
         <div class="filter-subgroup">
-          <span class="filter-label">DCC:</span>
+          <span class="filter-label" data-i18n="filters.dcc">DCC:</span>
           <div class="chip-list" id="dccFilterList">
             <!-- Populated via JS -->
           </div>
@@ -952,7 +975,7 @@
         <div class="filter-divider" aria-hidden="true"></div>
 
         <div class="filter-subgroup">
-          <span class="filter-label">Renderer:</span>
+          <span class="filter-label" data-i18n="filters.renderer">Renderer:</span>
           <div class="chip-list" id="rndFilterList">
             <!-- Populated via JS -->
           </div>
@@ -967,12 +990,12 @@
        GALLERY DISPLAY
        ====================================================================== -->
   <main class="container gallery-container">
-    <h2 id="workStart" class="visually-hidden" tabindex="-1">Selected work</h2>
+    <h2 id="workStart" class="visually-hidden" tabindex="-1" data-i18n="works.heading">Selected work</h2>
     <!-- Project sub-gallery header, shown while a project card is open -->
     <div id="projectHeader" class="project-header" hidden>
-      <button type="button" id="projectBack" class="btn btn-outline project-back" title="Back to all works (Esc)">
+      <button type="button" id="projectBack" class="btn btn-outline project-back" title="Back to all works (Esc)" data-i18n-attr="title:project.backTitle">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-        All works
+        <span data-i18n="project.back">All works</span>
       </button>
       <div class="project-header-text">
         <h2 id="projectTitle" class="project-title" tabindex="-1">Project</h2>
@@ -1003,9 +1026,9 @@
     <!-- Empty State -->
     <div id="emptyState" class="empty-state" role="status">
       <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
-      <h3>No matching works found</h3>
-      <p>Try other search words, pick another industry, or reset the filters.</p>
-      <button type="button" class="btn btn-secondary" onclick="document.getElementById('resetFiltersBtn').click()">Reset Filters</button>
+      <h3 data-i18n="empty.title">No matching works found</h3>
+      <p data-i18n="empty.text">Try other search words, pick another industry, or reset the filters.</p>
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('resetFiltersBtn').click()" data-i18n="empty.reset">Reset filters</button>
     </div>
   </main>
 
@@ -1014,8 +1037,8 @@
        ====================================================================== -->
   <section id="personal" class="container personal-section" aria-labelledby="personalTitle">
     <div class="section-head">
-      <h2 id="personalTitle" class="section-title">Personal &amp; concept</h2>
-      <p class="section-lede">Concept art, R&amp;D and experiments.</p>
+      <h2 id="personalTitle" class="section-title" data-i18n="personal.title">Personal &amp; concept</h2>
+      <p class="section-lede" data-i18n="personal.lede">Concept art, R&amp;D and experiments.</p>
     </div>
     <div id="personalGrid" class="gallery-grid layout-grid">
       <!-- SEO:STATIC-PERSONAL:START -->
@@ -1036,29 +1059,29 @@
   <section id="services" class="info-section services-section" aria-labelledby="servicesTitle">
     <div class="container">
       <div class="section-head">
-        <p class="section-kicker">Services</p>
-        <h2 id="servicesTitle" class="section-title">What I make</h2>
+        <p class="section-kicker" data-i18n="services.kicker">Services</p>
+        <h2 id="servicesTitle" class="section-title" data-i18n="services.title">What I make</h2>
       </div>
       <div class="services-grid">
         <article class="service-card">
           <span class="service-num">01</span>
-          <h3 class="service-title">Product &amp; technical animation</h3>
-          <p class="service-text">Assembly, disassembly, mechanisms in motion, camera flythroughs. From CAD to final edit.</p>
+          <h3 class="service-title" data-i18n="services.1.title">Product &amp; technical animation</h3>
+          <p class="service-text" data-i18n="services.1.text">Assembly, disassembly, mechanisms in motion, camera flythroughs. From CAD to final edit.</p>
         </article>
         <article class="service-card">
           <span class="service-num">02</span>
-          <h3 class="service-title">Exploded views &amp; internals</h3>
-          <p class="service-text">Show what is inside a machine or device, part by part, with engineering accuracy.</p>
+          <h3 class="service-title" data-i18n="services.2.title">Exploded views &amp; internals</h3>
+          <p class="service-text" data-i18n="services.2.text">Show what is inside a machine or device, part by part, with engineering accuracy.</p>
         </article>
         <article class="service-card">
           <span class="service-num">03</span>
-          <h3 class="service-title">Product stills for web, print and trade shows</h3>
-          <p class="service-text">Studio and in-context renders that match your brand.</p>
+          <h3 class="service-title" data-i18n="services.3.title">Product stills for web, print and trade shows</h3>
+          <p class="service-text" data-i18n="services.3.text">Studio and in-context renders that match your brand.</p>
         </article>
         <article class="service-card">
           <span class="service-num">04</span>
-          <h3 class="service-title">Training &amp; workshops</h3>
-          <p class="service-text">Blender and 3D visualization workshops for marketing and engineering teams, in English, Polish or Russian.</p>
+          <h3 class="service-title" data-i18n="services.4.title">Training &amp; workshops</h3>
+          <p class="service-text" data-i18n="services.4.text">Blender and 3D visualization workshops for marketing and engineering teams, in English, Polish or Russian.</p>
         </article>
       </div>
     </div>
@@ -1071,11 +1094,11 @@
     <div class="container about-inner">
       <img class="about-photo" src="assets/EB_avatar_about.webp" alt="Egor Baklykov" width="480" height="480" loading="lazy" decoding="async">
       <div class="about-text">
-        <p class="section-kicker">About</p>
+        <p class="section-kicker" data-i18n="about.kicker">About</p>
         <h2 id="aboutTitle" class="section-title">Egor Baklykov</h2>
-        <p>I'm Egor, a 3D artist with an engineering degree in radio equipment design. I read CAD files and technical drawings the way engineers do, so I can show complex machinery accurately, not just attractively.</p>
-        <p>For 15+ years I have created product and technical animations for clients such as ABB (200+ animations of industrial robots and electrification systems), AMD and Rockwool. I handle the full pipeline myself, from storyboard and CAD cleanup to animation, VFX and final edit, and I write Python tools that automate the repetitive parts.</p>
-        <p>Based in Poznań, Poland. Working in English, Polish and Russian. Open to full-time roles and freelance projects.</p>
+        <p data-i18n="about.p1">I'm Egor, a 3D artist with an engineering degree in radio equipment design. I read CAD files and technical drawings the way engineers do, so I can show complex machinery accurately, not just attractively.</p>
+        <p data-i18n="about.p2">For 15+ years I have created product and technical animations for clients such as ABB (200+ animations of industrial robots and electrification systems), AMD and Rockwool. I handle the full pipeline myself, from storyboard and CAD cleanup to animation, VFX and final edit, and I write Python tools that automate the repetitive parts.</p>
+        <p data-i18n="about.p3">Based in Poznań, Poland. Working in English, Polish and Russian. Open to full-time roles and freelance projects.</p>
       </div>
     </div>
   </section>
@@ -1085,9 +1108,9 @@
        ====================================================================== -->
   <section id="contact" class="info-section contact-section" aria-labelledby="contactTitle">
     <div class="container contact-inner">
-      <p class="section-kicker">Contact</p>
-      <h2 id="contactTitle" class="section-title contact-title">Have a product to show?</h2>
-      <p class="contact-text">Send me your CAD files, drawings or even photos, and a few words about where the visuals will be used. I'll reply within 2 business days with questions and a rough estimate.</p>
+      <p class="section-kicker" data-i18n="contact.kicker">Contact</p>
+      <h2 id="contactTitle" class="section-title contact-title" data-i18n="contact.title">Have a product to show?</h2>
+      <p class="contact-text" data-i18n="contact.text">Send me your CAD files, drawings or even photos, and a few words about where the visuals will be used. I'll reply within 2 business days with questions and a rough estimate.</p>
       <div class="contact-actions">
         <a href="mailto:jegor.baklykov@gmail.com" class="btn btn-primary contact-btn" title="Send email to jegor.baklykov@gmail.com">jegor.baklykov@gmail.com</a>
         <a href="https://www.linkedin.com/in/egorbaklykov/" target="_blank" rel="noopener noreferrer" class="btn btn-outline contact-btn">LinkedIn</a>
@@ -1103,12 +1126,12 @@
       <!-- Main Image Stage -->
       <div class="lightbox-stage">
         <!-- Phones: close button on the image (the sidebar one can be scrolled out of view) -->
-        <button type="button" class="lightbox-stage-close" data-lightbox-close aria-label="Close Lightbox">&#x2715;</button>
-        <button type="button" id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" aria-label="Previous Artwork">
+        <button type="button" class="lightbox-stage-close" data-lightbox-close aria-label="Close" data-i18n-attr="aria-label:lightbox.close">&#x2715;</button>
+        <button type="button" id="lightboxPrev" class="lightbox-nav-btn lightbox-prev" aria-label="Previous work" data-i18n-attr="aria-label:lightbox.prev">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         </button>
 
-        <div id="lightboxImgContainer" class="lightbox-img-container" title="Scroll wheel to zoom, drag to pan">
+        <div id="lightboxImgContainer" class="lightbox-img-container" title="Scroll wheel to zoom, drag to pan" data-i18n-attr="title:lightbox.zoomHint">
           <img id="lightboxImg" class="lightbox-img" src="" alt="Artwork High Resolution View">
         </div>
 
@@ -1117,20 +1140,20 @@
           <iframe id="lightboxVideo" class="lightbox-video" title="YouTube video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
         </div>
 
-        <button type="button" id="lightboxNext" class="lightbox-nav-btn lightbox-next" aria-label="Next Artwork">
+        <button type="button" id="lightboxNext" class="lightbox-nav-btn lightbox-next" aria-label="Next work" data-i18n-attr="aria-label:lightbox.next">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </button>
 
         <!-- Stage Zoom Bar -->
         <div class="stage-controls">
-          <button type="button" id="zoomOutBtn" class="stage-btn" title="Zoom Out (-)">
+          <button type="button" id="zoomOutBtn" class="stage-btn" title="Zoom out (-)" aria-label="Zoom out (-)" data-i18n-attr="title:lightbox.zoomOut;aria-label:lightbox.zoomOut">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
           <span id="zoomLevelText" class="zoom-level-text">100%</span>
-          <button type="button" id="zoomInBtn" class="stage-btn" title="Zoom In (+)">
+          <button type="button" id="zoomInBtn" class="stage-btn" title="Zoom in (+)" aria-label="Zoom in (+)" data-i18n-attr="title:lightbox.zoomIn;aria-label:lightbox.zoomIn">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <button type="button" id="zoomResetBtn" class="stage-btn" title="Reset Zoom (0)">
+          <button type="button" id="zoomResetBtn" class="stage-btn" title="Reset zoom (0)" aria-label="Reset zoom (0)" data-i18n-attr="title:lightbox.zoomReset;aria-label:lightbox.zoomReset">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
           </button>
         </div>
@@ -1139,27 +1162,34 @@
       <!-- Detail Sidebar -->
       <aside class="lightbox-sidebar">
         <div class="sidebar-header">
-          <span id="lightboxCounter" class="item-counter">0 / 0</span>
-          <button type="button" id="lightboxClose" class="close-btn" aria-label="Close Lightbox">✕</button>
+          <span id="lightboxCounter" class="item-counter" aria-live="polite">0 / 0</span>
+          <button type="button" id="lightboxClose" class="close-btn" aria-label="Close" data-i18n-attr="aria-label:lightbox.close">✕</button>
         </div>
 
+        <p id="lightboxContext" class="lightbox-context" hidden></p>
         <h2 id="lightboxTitle" class="sidebar-title">Artwork Title</h2>
+
+        <!-- Project in the gallery sequence: step through all its images / videos, then back -->
+        <div class="lightbox-project-actions">
+          <button type="button" id="lightboxSeeProject" class="btn btn-primary lightbox-project-btn" hidden>See the whole project</button>
+          <button type="button" id="lightboxBackToAll" class="btn btn-outline lightbox-project-btn" hidden>Back to all works</button>
+        </div>
 
         <div class="specs-card">
           <div class="spec-row">
-            <span class="spec-key">DCC Tools</span>
+            <span class="spec-key" data-i18n="lightbox.dcc">DCC Tools</span>
             <div id="lightboxDcc" class="art-badges-inline spec-val"></div>
           </div>
           <div class="spec-row">
-            <span class="spec-key">Render Engine</span>
+            <span class="spec-key" data-i18n="lightbox.renderer">Render Engine</span>
             <span id="lightboxRenderer" class="badge-rnd spec-val">Cycles</span>
           </div>
           <div class="spec-row">
-            <span class="spec-key">Category</span>
+            <span class="spec-key" data-i18n="lightbox.category">Category</span>
             <span id="lightboxCategory" class="spec-val">Archviz</span>
           </div>
           <div class="spec-row">
-            <span class="spec-key">Year</span>
+            <span class="spec-key" data-i18n="lightbox.year">Year</span>
             <span id="lightboxYear" class="spec-val">2024</span>
           </div>
         </div>
@@ -1698,18 +1728,18 @@
     <div class="filter-sheet-backdrop" data-sheet-close></div>
     <div class="filter-sheet-panel">
       <div class="filter-sheet-head">
-        <h2 id="filterSheetTitle" class="filter-sheet-title">Filters</h2>
-        <button type="button" class="filter-sheet-close" data-sheet-close aria-label="Close filters">&#x2715;</button>
+        <h2 id="filterSheetTitle" class="filter-sheet-title" data-i18n="filters">Filters</h2>
+        <button type="button" class="filter-sheet-close" data-sheet-close aria-label="Close filters" data-i18n-attr="aria-label:filters.close">&#x2715;</button>
       </div>
       <div id="filterSheetBody" class="filter-sheet-body"></div>
       <div class="filter-sheet-foot">
-        <button type="button" id="filterSheetReset" class="btn btn-outline">Reset</button>
+        <button type="button" id="filterSheetReset" class="btn btn-outline" data-i18n="filters.reset">Reset</button>
         <button type="button" id="filterSheetApply" class="btn btn-primary" data-sheet-close>Show works</button>
       </div>
     </div>
   </dialog>
 
-  <button type="button" id="btnBackToTop" class="back-to-top-btn" aria-label="Scroll back to top" title="Back to top">
+  <button type="button" id="btnBackToTop" class="back-to-top-btn" aria-label="Back to top" title="Back to top" data-i18n-attr="aria-label:backToTop;title:backToTop">
     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
     </svg>
@@ -1721,15 +1751,16 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-left">
-        <span class="footer-title">Egor Baklykov · Technical 3D Animation &amp; Product Visualization · Poznań, Poland</span>
+        <span class="footer-title" data-i18n="footer.title">Egor Baklykov · Technical 3D Animation &amp; Product Visualization · Poznań, Poland</span>
         <span class="footer-note">&copy; 2026 Egor Baklykov</span>
       </div>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="data/works.js?v=20261114a"></script>
-  <script src="js/app.js?v=20261114a"></script>
-  <script src="js/editor.js?v=20261114a"></script>
+  <script src="data/works.js?v=20261115a"></script>
+  <script src="js/i18n.js?v=20261115a"></script>
+  <script src="js/app.js?v=20261115a"></script>
+  <script src="js/editor.js?v=20261115a"></script>
 </body>
 </html>

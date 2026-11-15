@@ -17,6 +17,10 @@
   const INDUSTRIES = ['Industrial machinery', 'Consumer products', 'Exploded views & internals', 'Architecture', 'Personal'];
   const PERSONAL = 'Personal';
 
+  // Interface texts come from js/i18n.js (EN | PL); without it, keys fall back to English-ish defaults
+  const I18N = window.I18N || { t: (k) => k, label: (p, v) => v, lang: 'en' };
+  const t = (key, vars) => I18N.t(key, vars);
+
   // Helper to load initial works from localStorage or fallback to default data file
   function loadInitialWorks() {
     const defaultWorks = Array.isArray(window.PORTFOLIO_WORKS) ? [...window.PORTFOLIO_WORKS] : [];
@@ -96,6 +100,8 @@
     sortBy: 'default',
     layout: 'grid',
     currentLightboxIndex: -1,
+    lightboxList: [],      // what the lightbox steps through (gallery list or one project's items)
+    lightboxProject: null, // { project, galleryList, galleryIndex } while stepping through a project in the lightbox
     zoomLevel: 1,
     panOffset: { x: 0, y: 0 },
     isDragging: false,
@@ -182,6 +188,9 @@
     lightboxYear: document.getElementById('lightboxYear'),
     lightboxDesc: document.getElementById('lightboxDesc'),
     lightboxEditBtn: document.getElementById('lightboxEditBtn'),
+    lightboxSeeProject: document.getElementById('lightboxSeeProject'),
+    lightboxBackToAll: document.getElementById('lightboxBackToAll'),
+    lightboxContext: document.getElementById('lightboxContext'),
     zoomInBtn: document.getElementById('zoomInBtn'),
     zoomOutBtn: document.getElementById('zoomOutBtn'),
     zoomResetBtn: document.getElementById('zoomResetBtn'),
@@ -422,8 +431,8 @@
     // Industries / tasks (primary row)
     if (elements.indFilterList) {
       elements.indFilterList.innerHTML = `
-        <button type="button" class="chip${state.selectedIndustry === 'all' ? ' active' : ''}" data-ind="all">All</button>
-        ${INDUSTRIES.map(ind => `<button type="button" class="chip${state.selectedIndustry === ind ? ' active' : ''}" data-ind="${escapeHtml(ind)}">${escapeHtml(ind)}</button>`).join('')}
+        <button type="button" class="chip${state.selectedIndustry === 'all' ? ' active' : ''}" data-ind="all">${escapeHtml(t('filters.all'))}</button>
+        ${INDUSTRIES.map(ind => `<button type="button" class="chip${state.selectedIndustry === ind ? ' active' : ''}" data-ind="${escapeHtml(ind)}">${escapeHtml(I18N.label('industry', ind))}</button>`).join('')}
       `;
     }
 
@@ -431,22 +440,22 @@
     const categories = getAvailableCategories();
     if (elements.catFilterList) {
       elements.catFilterList.innerHTML = `
-        <button type="button" class="chip active" data-cat="all">All</button>
-        ${categories.map(cat => `<button type="button" class="chip" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`).join('')}
-        ${state.works.some(isProject) ? `<button type="button" class="chip chip-project" data-cat="${PROJECTS_FILTER}">Projects</button>` : ''}
+        <button type="button" class="chip${state.selectedCategory === 'all' ? ' active' : ''}" data-cat="all">${escapeHtml(t('filters.all'))}</button>
+        ${categories.map(cat => `<button type="button" class="chip${state.selectedCategory === cat ? ' active' : ''}" data-cat="${escapeHtml(cat)}">${escapeHtml(I18N.label('category', cat))}</button>`).join('')}
+        ${state.works.some(isProject) ? `<button type="button" class="chip chip-project${state.selectedCategory === PROJECTS_FILTER ? ' active' : ''}" data-cat="${PROJECTS_FILTER}">${escapeHtml(t('filters.projects'))}</button>` : ''}
       `;
     }
 
     // Fixed allowed DCCs: 3ds Max, Blender, Cinema 4D, Autodesk Fusion, ZBrush
     elements.dccFilterList.innerHTML = `
-      <button type="button" class="chip active" data-dcc="all">All</button>
-      ${ALLOWED_DCCS.map(dcc => `<button type="button" class="chip" data-dcc="${escapeHtml(dcc)}">${escapeHtml(dcc)}</button>`).join('')}
+      <button type="button" class="chip${state.selectedDcc === 'all' ? ' active' : ''}" data-dcc="all">${escapeHtml(t('filters.all'))}</button>
+      ${ALLOWED_DCCS.map(dcc => `<button type="button" class="chip${state.selectedDcc === dcc ? ' active' : ''}" data-dcc="${escapeHtml(dcc)}">${escapeHtml(dcc)}</button>`).join('')}
     `;
 
     // Fixed allowed Renderers: Corona, Cycles, Redshift
     elements.rndFilterList.innerHTML = `
-      <button type="button" class="chip active" data-rnd="all">All</button>
-      ${ALLOWED_RENDERERS.map(rnd => `<button type="button" class="chip" data-rnd="${escapeHtml(rnd)}">${escapeHtml(rnd)}</button>`).join('')}
+      <button type="button" class="chip${state.selectedRenderer === 'all' ? ' active' : ''}" data-rnd="all">${escapeHtml(t('filters.all'))}</button>
+      ${ALLOWED_RENDERERS.map(rnd => `<button type="button" class="chip${state.selectedRenderer === rnd ? ' active' : ''}" data-rnd="${escapeHtml(rnd)}">${escapeHtml(rnd)}</button>`).join('')}
     `;
   }
 
@@ -551,7 +560,7 @@
       const rnd = item.renderer || 'Corona';
       const name = item.name || 'Untitled Render';
       const year = item.year || '';
-      const category = item.category || 'Render';
+      const category = item.category ? I18N.label('category', item.category) : 'Render';
       const project = isProject(item);
       const cover = getCover(item);
       const video = isVideo(cover);
@@ -607,8 +616,8 @@
   function updateStatusLine() {
     if (elements.resultsCount) {
       elements.resultsCount.textContent = state.filteredWorks.length === state.works.length
-        ? `${state.works.length} works`
-        : `${state.filteredWorks.length} / ${state.works.length} works`;
+        ? t('works.count', { n: state.works.length })
+        : t('works.countOf', { n: state.filteredWorks.length, total: state.works.length });
     }
 
     const hasFilters = state.selectedIndustry !== 'all' ||
@@ -621,7 +630,7 @@
     // "Software & renderer" toggle shows how many of its filters are on
     const secondaryCount = [state.selectedCategory, state.selectedDcc, state.selectedRenderer].filter(v => v !== 'all').length;
     if (elements.btnMoreFiltersLabel) {
-      elements.btnMoreFiltersLabel.textContent = secondaryCount ? `Software & renderer · ${secondaryCount}` : 'Software & renderer';
+      elements.btnMoreFiltersLabel.textContent = secondaryCount ? t('filters.moreCount', { n: secondaryCount }) : t('filters.more');
     }
     if (elements.btnMoreFilters) elements.btnMoreFilters.classList.toggle('has-active', secondaryCount > 0);
 
@@ -769,25 +778,28 @@
     }
 
     const count = sheet.items.length;
-    sheet.label.textContent = count ? `Filters · ${count}` : 'Filters';
+    sheet.label.textContent = count ? t('filters.count', { n: count }) : t('filters');
     sheet.button.classList.toggle('has-active', count > 0);
     const shown = state.filteredWorks.length;
-    sheet.apply.textContent = `Show ${shown} ${shown === 1 ? 'work' : 'works'}`;
+    sheet.apply.textContent = t('filters.show', { n: shown });
     sheet.active.hidden = count === 0;
     sheet.active.innerHTML = sheet.items.map((it, i) =>
-      `<button type="button" class="active-filter-chip" data-remove="${i}" aria-label="Remove filter ${escapeHtml(it.label)}">${escapeHtml(it.label)}<span aria-hidden="true">&#x2715;</span></button>`
+      `<button type="button" class="active-filter-chip" data-remove="${i}" aria-label="${escapeHtml(t('filters.remove', { label: it.label }))}">${escapeHtml(it.label)}<span aria-hidden="true">&#x2715;</span></button>`
     ).join('');
   }
 
   // --- LIGHTBOX CONTROLLER ---
-  function openLightbox(index) {
-    if (index < 0 || index >= state.displayList.length) return;
+  // The lightbox walks through its own list: the shown gallery, or (project mode) one project's images and videos.
+  // Project mode: "See the whole project" on a project cover; Next after the last item continues with the next work,
+  // Previous before the first item returns to the project's cover, "Back to all works" returns to the cover at once.
+  function openLightbox(index, list = state.displayList) {
+    if (index < 0 || index >= list.length) return;
 
+    state.lightboxList = list;
     state.currentLightboxIndex = index;
     resetZoom();
 
-    const item = state.displayList[index];
-    updateLightboxContent(item);
+    updateLightboxContent(list[index]);
 
     if (!elements.lightboxDialog.open) elements.lightboxDialog.showModal();
   }
@@ -795,6 +807,26 @@
   function closeLightbox() {
     stopLightboxVideo();
     elements.lightboxDialog.close();
+  }
+
+  function enterLightboxProject() {
+    const project = state.lightboxList[state.currentLightboxIndex];
+    if (!isProject(project) || state.lightboxProject) return;
+    state.lightboxProject = { project, galleryList: state.lightboxList, galleryIndex: state.currentLightboxIndex };
+    openLightbox(0, getProjectEntries(project));
+    if (elements.lightboxNext) elements.lightboxNext.focus();
+  }
+
+  // offset 0: back to the project's cover; +1: the work after the project
+  function exitLightboxProject(offset = 0, focusBack = true) {
+    const mode = state.lightboxProject;
+    if (!mode) return;
+    state.lightboxProject = null;
+    const total = mode.galleryList.length;
+    openLightbox((mode.galleryIndex + offset + total) % total, mode.galleryList);
+    if (focusBack && offset === 0 && elements.lightboxSeeProject && !elements.lightboxSeeProject.hidden) {
+      elements.lightboxSeeProject.focus();
+    }
   }
 
   function updateLightboxContent(item) {
@@ -818,8 +850,23 @@
       elements.lightboxImg.src = media.file;
     }
     elements.lightboxImg.alt = getAltText(media);
-    elements.lightboxCounter.textContent = `${state.currentLightboxIndex + 1} / ${state.displayList.length}`;
-    elements.lightboxTitle.textContent = (item.name || 'Untitled Render') + (isProject(item) ? ` (Project · ${item.items.length})` : '');
+    elements.lightboxCounter.textContent = `${state.currentLightboxIndex + 1} / ${state.lightboxList.length}`;
+    elements.lightboxTitle.textContent = (item.name || 'Untitled Render') + (isProject(item) ? t('lightbox.projectSuffix', { n: item.items.length }) : '');
+
+    // Project cover in the gallery sequence: offer the whole project; inside a project: the way back
+    const inProject = Boolean(state.lightboxProject);
+    if (elements.lightboxSeeProject) {
+      elements.lightboxSeeProject.hidden = inProject || !isProject(item);
+      if (isProject(item)) elements.lightboxSeeProject.textContent = t('lightbox.seeProject', { n: item.items.length });
+    }
+    if (elements.lightboxBackToAll) {
+      elements.lightboxBackToAll.hidden = !inProject;
+      elements.lightboxBackToAll.textContent = t('lightbox.backToAll');
+    }
+    if (elements.lightboxContext) {
+      elements.lightboxContext.hidden = !inProject;
+      if (inProject) elements.lightboxContext.textContent = t('lightbox.inProject', { name: state.lightboxProject.project.name || '' });
+    }
 
     // DCC Badges (Multiple supported)
     const dccs = getDccList(item);
@@ -832,20 +879,28 @@
     elements.lightboxRenderer.textContent = rnd;
     elements.lightboxRenderer.setAttribute('data-rnd', rnd);
 
-    elements.lightboxCategory.textContent = item.category || 'Artwork';
+    elements.lightboxCategory.textContent = item.category ? I18N.label('category', item.category) : '—';
     elements.lightboxYear.textContent = item.year || '—';
-    elements.lightboxDesc.textContent = item.description || 'No description provided.';
+    elements.lightboxDesc.textContent = item.description || t('lightbox.noDesc');
   }
 
   function navigateLightbox(direction) {
-    const total = state.displayList.length;
-    if (total <= 1) return;
-
+    const list = state.lightboxList;
+    const total = list.length;
     let newIndex = state.currentLightboxIndex + direction;
+
+    if (state.lightboxProject) {
+      // Leaving the project at either end continues the gallery sequence
+      if (newIndex >= total) return exitLightboxProject(1, false);
+      if (newIndex < 0) return exitLightboxProject(0, false);
+      return openLightbox(newIndex, list);
+    }
+
+    if (total <= 1) return;
     if (newIndex < 0) newIndex = total - 1;
     if (newIndex >= total) newIndex = 0;
 
-    openLightbox(newIndex);
+    openLightbox(newIndex, list);
   }
 
   function stopLightboxVideo() {
@@ -1085,7 +1140,12 @@
     });
 
     // Stop video playback however the dialog gets closed (Esc, light dismiss, close button)
-    elements.lightboxDialog.addEventListener('close', stopLightboxVideo);
+    elements.lightboxDialog.addEventListener('close', () => {
+      stopLightboxVideo();
+      state.lightboxProject = null;
+    });
+    if (elements.lightboxSeeProject) elements.lightboxSeeProject.addEventListener('click', enterLightboxProject);
+    if (elements.lightboxBackToAll) elements.lightboxBackToAll.addEventListener('click', () => exitLightboxProject(0));
 
     // Light dismiss: click outside the wrapper to close
     elements.lightboxDialog.addEventListener('click', (e) => {
@@ -1154,13 +1214,23 @@
 
     // Lightbox Edit Shortcut
     elements.lightboxEditBtn.addEventListener('click', () => {
-      const currentItem = state.displayList[state.currentLightboxIndex];
+      const currentItem = state.lightboxList[state.currentLightboxIndex];
       closeLightbox();
       if (window.PORTFOLIO_EDITOR && window.PORTFOLIO_EDITOR.openWithItem) {
         window.PORTFOLIO_EDITOR.openWithItem(currentItem._project || currentItem, currentItem._itemIndex);
       }
     });
   }
+
+  // EN | PL switch (js/i18n.js): rebuild everything this file renders as text
+  document.addEventListener('langchange', () => {
+    buildFilterChips();
+    applyFilters();
+    if (state.openProject) showProjectHeader(state.openProject);
+    if (elements.lightboxDialog && elements.lightboxDialog.open && state.lightboxList[state.currentLightboxIndex]) {
+      updateLightboxContent(state.lightboxList[state.currentLightboxIndex]);
+    }
+  });
 
   // --- PUBLIC INTERFACE FOR EDITOR SYNC ---
   window.PORTFOLIO_APP = {
@@ -1352,7 +1422,7 @@
   }
 
   function projectBadgeHtml(item) {
-    return `<span class="project-badge">${PROJECT_ICON} Project &middot; ${item.items.length}</span>`;
+    return `<span class="project-badge">${PROJECT_ICON} ${escapeHtml(t('badge.project', { n: item.items.length }))}</span>`;
   }
 
   // Each project material becomes a card that carries the project's metadata
@@ -1381,9 +1451,9 @@
   function showProjectHeader(project) {
     if (!elements.projectHeader) return;
     elements.projectTitle.textContent = project.name || 'Untitled Project';
-    const info = [project.category, project.year, `${project.items.length} items`].filter(Boolean)
-      .map(t => `<span class="project-info-text">${escapeHtml(t)}</span>`).join('');
-    elements.projectInfo.innerHTML = `<span class="project-badge is-inline">${PROJECT_ICON} Project</span>${info}${getBadgesHtml(project)}`;
+    const info = [project.category ? I18N.label('category', project.category) : '', project.year, t('project.items', { n: project.items.length })].filter(Boolean)
+      .map(text => `<span class="project-info-text">${escapeHtml(text)}</span>`).join('');
+    elements.projectInfo.innerHTML = `<span class="project-badge is-inline">${PROJECT_ICON} ${escapeHtml(t('project.badge'))}</span>${info}${getBadgesHtml(project)}`;
     elements.projectDesc.textContent = project.description || '';
     elements.projectHeader.hidden = false;
   }
@@ -1441,7 +1511,7 @@
   // The card's interactive element: a link for projects (shareable #project=slug), a button otherwise.
   // Its ::after covers the whole card (css/studio.css), so the image is clickable too.
   function cardLinkHtml(item, name, project, video, index) {
-    const extra = project ? `, project with ${item.items.length} items` : (video ? ', video' : '');
+    const extra = project ? t('card.project', { n: item.items.length }) : (video ? t('card.video') : '');
     const label = `${escapeHtml(name)}<span class="visually-hidden">${escapeHtml(extra)}</span>`;
     if (project && !state.openProject) {
       return `<a class="card-link" href="#project=${encodeURIComponent(item.project)}" data-index="${index}">${label}</a>`;

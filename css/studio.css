@@ -436,14 +436,14 @@ body.is-project-view .personal-section { display: none; }
 }
 @media (max-width: 640px) {
   #work, #personal, #services, #about, #contact { scroll-margin-top: 0; }
-  /* Eyebrow: each part stays on one line; the parts wrap as a whole */
-  .hero-kicker { flex-wrap: wrap; row-gap: 0.2rem; }
-  .hero-kicker span { white-space: nowrap; }
+  /* Eyebrow: parts flow like a sentence and wrap between words (never inside a word, never past the screen) */
+  .hero-kicker { display: block; line-height: 1.7; }
+  .hero-kicker span + span::before { margin-left: 0.55rem; margin-right: 0.55rem; }
   .hero-actions { gap: 0.6rem; }
   .hero-btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
   .info-section { padding: 3rem 0; }
   .services-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-  .about-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+  .about-inner { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .about-photo { max-width: 160px; }
   .personal-section { padding-top: 2rem; margin-bottom: 3rem; }
 }
@@ -547,3 +547,60 @@ dialog.filter-sheet::backdrop { background: transparent; }
     transition-delay: 0s !important;
   }
 }
+
+/* ==========================================================================
+   2026-11-15: language switch, lightbox project mode, lighter hero eyebrow
+   ========================================================================== */
+/* Hero eyebrow: light text with a soft shadow, readable over the bright parts of the render */
+.hero-kicker {
+  color: var(--text-primary);
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.35rem 0.65rem;
+  background: rgba(12, 11, 10, 0.88); /* dark strip: keeps >= 4.5:1 even over the brightest parts of the render */
+  border-radius: 2px;
+}
+.hero-kicker span + span::before { color: var(--text-secondary); }
+
+/* EN | PL switch in the header */
+.lang-switch { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--font-mono); font-size: 0.78rem; }
+.lang-btn {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 0.3rem 0.1rem;
+  min-block-size: 24px;
+  color: var(--text-secondary);
+  font: inherit;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.lang-btn:hover { color: var(--text-primary); }
+.lang-btn[aria-pressed="true"] { color: var(--text-primary); border-bottom-color: var(--accent); }
+.lang-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lang-sep { color: var(--text-muted); }
+
+/* Lightbox: "See the whole project" / "Back to all works" */
+.lightbox-context {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: -0.35rem;
+}
+.lightbox-project-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.lightbox-project-actions:not(:has(button:not([hidden]))) { display: none; }
+.lightbox-project-btn { padding: 0.6rem 1rem; font-size: 0.85rem; font-weight: 500; }
+.lightbox-project-btn[hidden] { display: none; }
+.lightbox-project-btn.btn-outline { border: 1px solid var(--border-subtle); color: var(--text-primary); background: none; }
+.lightbox-project-btn.btn-outline:hover { border-color: var(--accent); }
+.lightbox-project-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Long words (Polish compounds, very large OS text) wrap instead of running past the screen */
+.hero-content, .info-section, .personal-section, .project-header, .lightbox-sidebar { overflow-wrap: break-word; }
+.hero-description, .about-text p, .service-text, .contact-text { hyphens: auto; }
+
+/* Polish visitors: the page stays hidden for the moment before js/i18n.js has translated it (no EN -> PL jump).
+   Set by the inline script in <head>; removed by i18n.js, or after 1.5 s at the latest. */
+html.i18n-pending body { visibility: hidden; }

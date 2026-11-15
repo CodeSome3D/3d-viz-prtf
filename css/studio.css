@@ -597,3 +597,28 @@ dialog.filter-sheet::backdrop { background: transparent; }
 /* Polish visitors: the page stays hidden for the moment before js/i18n.js has translated it (no EN -> PL jump).
    Set by the inline script in <head>; removed by i18n.js, or after 1.5 s at the latest. */
 html.i18n-pending body { visibility: hidden; }
+
+/* "Email address copied" chip: small, bottom centre, above the page (and above the back-to-top button) */
+.copy-chip {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  z-index: 1100;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  box-shadow: var(--shadow-md);
+  overflow-wrap: break-word;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 0.75rem);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.copy-chip:empty { display: none; }
+.copy-chip.is-visible { opacity: 1; transform: translate(-50%, 0); }

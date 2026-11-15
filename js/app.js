@@ -1081,6 +1081,16 @@
       }
     });
 
+    // Email links: the mail app still opens (mailto), and the address is also copied to the clipboard,
+    // with a small chip at the bottom, for visitors without a mail program
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a[href^="mailto:"]');
+      if (!link) return;
+      const email = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]);
+      // Copy failed (blocked clipboard): the chip still shows the address, so it can be copied by hand
+      copyText(email).then(done => showCopyChip(t(done ? 'contact.copied' : 'contact.copyManual', { email })));
+    });
+
     // Header links: underline only the section in view (Work, About, Contact); none over the hero or Services
     const navLinks = [...document.querySelectorAll('.nav-actions a.nav-anchor')];
     const spySections = ['work', 'services', 'about', 'contact'].map(id => document.getElementById(id)).filter(Boolean);
@@ -1498,6 +1508,41 @@
       const link = index >= 0 ? document.querySelector(`.art-card[data-index="${index}"] .card-link`) : null;
       if (link) link.focus();
     }
+  }
+
+  // Clipboard: async API (https / localhost), with the older copy command as a fallback
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(() => true, () => legacyCopy(text));
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+
+  function legacyCopy(text) {
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const done = document.execCommand('copy');
+      area.remove();
+      return done;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  let copyChipTimer = 0;
+  function showCopyChip(message) {
+    const chip = document.getElementById('copyChip');
+    if (!chip) return;
+    chip.textContent = message;
+    chip.classList.add('is-visible');
+    clearTimeout(copyChipTimer);
+    copyChipTimer = setTimeout(() => chip.classList.remove('is-visible'), 3500);
   }
 
   function prefersReducedMotion() {

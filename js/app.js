@@ -336,6 +336,21 @@
     bindAuthEvents();
     precacheRemainingWorks();
     syncProjectFromHash();
+    openOwnerFromUrl();
+  }
+
+  // Hidden owner entry that works without a keyboard (phones): open the site with ?owner or #owner.
+  // Shows the same password dialog; the marker is removed from the address afterwards.
+  function openOwnerFromUrl() {
+    let url;
+    try { url = new URL(location.href); } catch (e) { return; }
+    const viaQuery = url.searchParams.has('owner');
+    const viaHash = url.hash === '#owner';
+    if (!viaQuery && !viaHash) return;
+    url.searchParams.delete('owner');
+    if (viaHash) url.hash = '';
+    history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+    if (!document.body.classList.contains('is-admin')) openAuthModal();
   }
 
   // --- ADMIN & AUTH MODE ---
@@ -951,13 +966,19 @@
       elements.btnToggleAdmin.addEventListener('click', toggleAdminMode);
     }
 
-    // Hotkey: Ctrl+Alt+E toggles admin mode
+    // Hotkey: Ctrl+Alt+E toggles admin mode (capture phase, so nothing on the page can swallow it).
+    // e.code = the physical E key: on Polish layouts Ctrl+Alt is AltGr and e.key becomes 'ę'.
+    // Not inside text fields, where AltGr+E is needed to type 'ę'.
     window.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'e') {
-        e.preventDefault();
-        toggleAdminMode();
-      }
-    });
+      const key = (e.key || '').toLowerCase();
+      const isE = e.code === 'KeyE' || key === 'e' || key === 'ę';
+      if (!(e.ctrlKey && e.altKey && isE)) return;
+      const target = e.target;
+      const typing = target && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName));
+      if (typing && key === 'ę') return;
+      e.preventDefault();
+      toggleAdminMode();
+    }, true);
 
     // Search input
     elements.searchInput.addEventListener('input', (e) => {
@@ -1074,7 +1095,10 @@
     if (elements.projectBack) {
       elements.projectBack.addEventListener('click', () => closeProject(true, true));
     }
-    window.addEventListener('hashchange', syncProjectFromHash);
+    window.addEventListener('hashchange', () => {
+      if (location.hash === '#owner') return openOwnerFromUrl();
+      syncProjectFromHash();
+    });
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && state.openProject && !document.querySelector('dialog[open]')) {
         closeProject(true, true);

@@ -60,22 +60,6 @@ window.PORTFOLIO_WORKS = [
   },
   {
     "id": "003",
-    "name": "Warehouse Industrial Logistics",
-    "file": "images/product_kruger-pallet_01.png",
-    "dcc": [
-      "3ds Max",
-      "Blender"
-    ],
-    "renderer": "Cycles",
-    "category": "Product",
-    "industries": [
-      "Industrial machinery"
-    ],
-    "year": "2026",
-    "description": "Commercial logistics packaging visualization featuring accurate shaders."
-  },
-  {
-    "id": "004",
     "name": "Holographic Sight Explosion Scheme",
     "dcc": [
       "Blender"
@@ -108,7 +92,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "005",
+    "id": "004",
     "name": "Clicker Microdevice Internals",
     "file": "images/product_clicker-microdevice_01.png",
     "dcc": [
@@ -124,7 +108,7 @@ window.PORTFOLIO_WORKS = [
     "description": "High-tech industrial product design visualization."
   },
   {
-    "id": "006",
+    "id": "005",
     "name": "Industrial Mechanism",
     "dcc": [
       "Cinema 4D",
@@ -153,7 +137,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "007",
+    "id": "006",
     "name": "King Air",
     "file": "images/product_king-air_01.png",
     "dcc": [
@@ -169,7 +153,7 @@ window.PORTFOLIO_WORKS = [
     "description": "Electric converted King Air aircraft with the new skin."
   },
   {
-    "id": "008",
+    "id": "007",
     "name": "Dansk Gummy Industry",
     "dcc": [
       "Blender"
@@ -193,7 +177,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "009",
+    "id": "008",
     "name": "Modern 3D Printed House",
     "dcc": [
       "3ds Max"
@@ -237,7 +221,7 @@ window.PORTFOLIO_WORKS = [
     ]
   },
   {
-    "id": "010",
+    "id": "009",
     "name": "Ring Crown - Studio Showcase",
     "file": "images/product_ring-crown_01.png",
     "dcc": [
@@ -250,6 +234,22 @@ window.PORTFOLIO_WORKS = [
     ],
     "year": "2025",
     "description": "High-end luxury jewelry product rendering featuring studio caustics and diamond dispersion modeled with precision in Autodesk Fusion."
+  },
+  {
+    "id": "010",
+    "name": "Warehouse Industrial Logistics",
+    "file": "images/product_kruger-pallet_01.png",
+    "dcc": [
+      "3ds Max",
+      "Blender"
+    ],
+    "renderer": "Cycles",
+    "category": "Product",
+    "industries": [
+      "Industrial machinery"
+    ],
+    "year": "2026",
+    "description": "Commercial logistics packaging visualization featuring accurate shaders."
   },
   {
     "id": "011",

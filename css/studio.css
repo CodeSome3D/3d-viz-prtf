@@ -551,15 +551,8 @@ dialog.filter-sheet::backdrop { background: transparent; }
 /* ==========================================================================
    2026-11-15: language switch, lightbox project mode, lighter hero eyebrow
    ========================================================================== */
-/* Hero eyebrow: light text with a soft shadow, readable over the bright parts of the render */
-.hero-kicker {
-  color: var(--text-primary);
-  width: fit-content;
-  max-width: 100%;
-  padding: 0.35rem 0.65rem;
-  background: rgba(12, 11, 10, 0.88); /* dark strip: keeps >= 4.5:1 even over the brightest parts of the render */
-  border-radius: 2px;
-}
+/* Hero eyebrow: a brighter warm off-white than before (#a8a299), no background behind it */
+.hero-kicker { color: #dcd7cf; }
 .hero-kicker span + span::before { color: var(--text-secondary); }
 
 /* EN | PL switch in the header */

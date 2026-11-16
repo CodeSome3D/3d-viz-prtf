@@ -645,15 +645,16 @@ body {
   position: relative;
   aspect-ratio: 560 / 480; /* reserved before anything loads: no layout shift */
   width: 100%;
-  background: #0f0e0d;
-  border-radius: var(--radius-sm);
+  background: transparent; /* the render has a transparent background: the page pattern shows through */
   overflow: hidden;
   cursor: ew-resize;
   touch-action: pan-y; /* vertical swipes still scroll the page; horizontal drags move the split */
   user-select: none;
   -webkit-user-select: none;
 }
-.ba-stage canvas { display: block; width: 100%; height: 100%; }
+.ba-stage canvas, .ba-stage .ba-still { display: block; width: 100%; height: 100%; }
+.ba-stage.is-static { cursor: default; }
+.ba-stage.is-static .ba-divider, .ba-stage.is-static .ba-tag-before { display: none; }
 .ba-divider {
   position: absolute;
   top: 0;

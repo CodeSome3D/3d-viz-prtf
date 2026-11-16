@@ -1,12 +1,15 @@
 /**
  * BEFORE / AFTER TURNTABLE (Contact section)
  * ----------------------------------------------------
- * One looping video holds both states stacked: "before" (clay playblast) on top, "after" (final render) below.
- * Each frame is drawn into a canvas: left of the split comes from the top half, right of it from the bottom half,
- * so the two states can never drift apart.
+ * The video packs both states AND their transparency into every frame (2 x 2 tiles, 560 x 480 each):
+ *   top-left: "before" colour (premultiplied)   top-right: "before" alpha (grey)
+ *   bottom-left: "after" colour (premultiplied) bottom-right: "after" alpha (grey)
+ * A small WebGL shader rebuilds the transparent image and applies the split, so it works in every browser
+ * (plain H.264 / AV1, no alpha-video support needed) and both states always stay in sync.
  * The split follows the mouse while hovering, can be dragged on touch screens and moved with the arrow keys.
  * The video is fetched only when the section comes near the screen, and pauses when off-screen or the tab is hidden.
  * With "reduce motion" the still poster is shown instead (the split still works).
+ * Without WebGL a single transparent still of the final render is shown.
  */
 (function () {
   'use strict';
@@ -16,9 +19,6 @@
 
   const stage = widget.querySelector('.ba-stage');
   const canvas = widget.querySelector('canvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width;   // one state: 560 x 480 (the video is 560 x 960)
-  const H = canvas.height;
   const DEFAULT_SPLIT = 0.5;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -26,14 +26,89 @@
   let source = null;           // poster image or video, whichever is ready
   let video = null;
   let visible = false;
-  let frameRequest = 0;
+
+  // ---- WebGL setup ----
+  const gl = canvas.getContext('webgl', { premultipliedAlpha: true, alpha: true, antialias: false });
+  if (!gl) {
+    // No WebGL: show a transparent still of the final render instead of the interactive widget
+    const img = new Image();
+    img.src = widget.dataset.still;
+    img.alt = '';
+    img.className = 'ba-still';
+    canvas.replaceWith(img);
+    stage.classList.add('is-static');
+    return;
+  }
+
+  const VERT = `
+    attribute vec2 p;
+    varying vec2 uv;
+    void main() { uv = vec2(p.x * 0.5 + 0.5, 0.5 - p.y * 0.5); gl_Position = vec4(p, 0.0, 1.0); }`;
+  const FRAG = `
+    precision mediump float;
+    uniform sampler2D tex;
+    uniform float split;
+    varying vec2 uv;
+    void main() {
+      float row = uv.x < split ? 0.0 : 0.5;              // before: top row, after: bottom row
+      vec2 c = vec2(uv.x * 0.5, row + uv.y * 0.5);        // colour tile
+      vec2 a = vec2(0.5 + uv.x * 0.5, row + uv.y * 0.5);  // alpha tile
+      float alpha = clamp((texture2D(tex, a).r - 0.015) / 0.97, 0.0, 1.0);  // tiny encoder noise -> fully clear
+      vec3 rgb = min(texture2D(tex, c).rgb, vec3(alpha));                    // premultiplied colour never exceeds alpha
+      gl_FragColor = vec4(rgb, alpha);
+    }`;
+  function shader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'p');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const splitLoc = gl.getUniformLocation(prog, 'split');
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.clearColor(0, 0, 0, 0);
+
+  // Backing store = CSS size x device pixel ratio (sharp on high-density screens)
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.max(1, Math.round(r.width * dpr));
+    const h = Math.max(1, Math.round(r.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+  }
 
   // ---- Drawing ----
   function draw() {
     if (!source) return;
-    const x = Math.round(W * split);
-    if (x > 0) ctx.drawImage(source, 0, 0, x, H, 0, 0, x, H);            // before (top half)
-    if (x < W) ctx.drawImage(source, x, H, W - x, H, x, 0, W - x, H);    // after (bottom half)
+    resize();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    try {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, source);
+    } catch (e) {
+      return;
+    }
+    gl.uniform1f(splitLoc, split);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
   function setSplit(value) {
@@ -41,12 +116,11 @@
     stage.style.setProperty('--split', `${(split * 100).toFixed(2)}%`);
     stage.classList.toggle('is-before-hidden', split < 0.12);
     stage.classList.toggle('is-after-hidden', split > 0.88);
-    const pct = Math.round(split * 100);
-    stage.setAttribute('aria-valuenow', String(pct));
+    stage.setAttribute('aria-valuenow', String(Math.round(split * 100)));
     draw();
   }
 
-  // ---- Poster first (instant, tiny), video when near the screen ----
+  // ---- Poster first (instant, small), video when near the screen ----
   const poster = new Image();
   poster.decoding = 'async';
   poster.onload = () => { if (!video || video.readyState < 2) { source = poster; draw(); } };
@@ -55,7 +129,8 @@
   function loop() {
     draw();
     if (video && !video.paused) {
-      frameRequest = 'requestVideoFrameCallback' in video ? video.requestVideoFrameCallback(loop) : requestAnimationFrame(loop);
+      if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback(loop);
+      else requestAnimationFrame(loop);
     }
   }
 
@@ -67,7 +142,6 @@
     video.playsInline = true;
     video.setAttribute('playsinline', '');
     video.preload = 'auto';
-    video.setAttribute('aria-hidden', 'true');
     [['webm', 'video/webm; codecs="av01.0.05M.08"'], ['mp4', 'video/mp4']].forEach(([key, type]) => {
       const url = widget.dataset[key];
       if (!url) return;
@@ -94,9 +168,7 @@
   if ('IntersectionObserver' in window) {
     // Start fetching a little before the section scrolls into view
     new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.target === widget && e.isIntersecting) loadVideo();
-      });
+      entries.forEach(e => { if (e.isIntersecting) loadVideo(); });
     }, { rootMargin: '400px 0px' }).observe(widget);
     new IntersectionObserver(entries => {
       entries.forEach(e => { visible = e.isIntersecting; updatePlayback(); });
@@ -110,6 +182,7 @@
     if (reducedMotion.matches) { if (video) video.pause(); source = poster; draw(); }
     else { loadVideo(); updatePlayback(); }
   });
+  window.addEventListener('resize', draw);
 
   // ---- Interaction: hover (mouse), drag (touch / pen), arrow keys ----
   function fromEvent(e) {

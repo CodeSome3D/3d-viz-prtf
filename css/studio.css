@@ -692,3 +692,10 @@ body {
 .ba-stage.is-before-hidden .ba-tag-before,
 .ba-stage.is-after-hidden .ba-tag-after { opacity: 0; }
 .ba-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Hero: no tall empty band above the text. The hero is sized by its content, with a top space
+   equal to the cap height of a capital "G" in the heading (0.72 x heading size; same clamp as .hero-title). */
+.hero-section { min-height: 0; padding-top: calc(clamp(2.6rem, 6.4vw, 5.6rem) * 0.72); }
+@media (max-width: 640px) {
+  .hero-section { min-height: 0; padding-top: calc(clamp(2.6rem, 6.4vw, 5.6rem) * 0.72); }
+}
